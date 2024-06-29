@@ -1,0 +1,9 @@
+vaadin-app-layout {
+  --vaadin-app-layout-drawer-overlay: true;
+}
+vaadin-drawer-toggle {
+  margin: 0;
+}
+vaadin-app-layout::part(navbar) {
+  min-height: 0;
+}

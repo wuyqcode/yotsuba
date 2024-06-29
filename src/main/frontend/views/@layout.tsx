@@ -1,11 +1,33 @@
-import { createMenuItems, useViewConfig } from '@vaadin/hilla-file-router/runtime.js';
+import {
+  AppBar,
+  Box,
+  IconButton,
+  Menu,
+  MenuItem,
+  Toolbar,
+  Typography
+} from '@mui/material';
+import {
+  createMenuItems,
+  useViewConfig
+} from '@vaadin/hilla-file-router/runtime.js';
 import { effect, signal } from '@vaadin/hilla-react-signals';
-import { AppLayout, DrawerToggle, Icon, SideNav, SideNavItem } from '@vaadin/react-components';
+import {
+  AppLayout,
+  DrawerToggle,
+  Icon,
+  SideNav,
+  SideNavItem
+} from '@vaadin/react-components';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import DensityMediumTwoToneIcon from '@mui/icons-material/DensityMediumTwoTone';
+import FormatAlignJustifyTwoToneIcon from '@mui/icons-material/FormatAlignJustifyTwoTone';
 import { Avatar } from '@vaadin/react-components/Avatar.js';
 import { Button } from '@vaadin/react-components/Button.js';
 import { useAuth } from 'Frontend/util/auth.js';
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Padding } from '@mui/icons-material';
 
 const defaultTitle = document.title;
 const documentTitleSignal = signal('');
@@ -20,58 +42,86 @@ export default function MainLayout() {
   const currentTitle = useViewConfig()?.title ?? defaultTitle;
   const navigate = useNavigate();
   const location = useLocation();
-
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
   useEffect(() => {
     documentTitleSignal.value = currentTitle;
   }, [currentTitle]);
-
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  const handleClick = (event: any) => {
+    setAnchorEl(event.currentTarget);
+  };
   const { state, logout } = useAuth();
   const profilePictureUrl =
     state.user &&
     `data:image;base64,${btoa(
-      state.user.profilePicture.reduce((str, n) => str + String.fromCharCode((n + 256) % 256), ''),
+      state.user.profilePicture.reduce(
+        (str, n) => str + String.fromCharCode((n + 256) % 256),
+        ''
+      )
     )}`;
   return (
     <AppLayout primarySection="drawer">
-      <div slot="drawer" className="flex flex-col justify-between h-full p-m">
-        <header className="flex flex-col gap-m">
-          <span className="font-semibold text-l">My App</span>
-          <SideNav onNavigate={({ path }) => navigate(path!)} location={location}>
-            {createMenuItems().map(({ to, title, icon }) => (
-              <SideNavItem path={to} key={to}>
-                {icon ? <Icon src={icon} slot="prefix"></Icon> : <></>}
-                {title}
-              </SideNavItem>
-            ))}
-          </SideNav>
-        </header>
-        <footer className="flex flex-col gap-s">
+      <Box sx={{ flexGrow: 1 }} slot="drawer">
+        <DrawerToggle>
+          <DensityMediumTwoToneIcon fontSize="medium" />
+        </DrawerToggle>
+        <SideNav onNavigate={({ path }) => navigate(path!)} location={location}>
+          {createMenuItems().map(({ to, title, icon }) => (
+            <SideNavItem path={to} key={to}>
+              {icon ? <Icon src={icon} slot="prefix"></Icon> : <></>}
+              {title}
+            </SideNavItem>
+          ))}
+        </SideNav>
+      </Box>
+
+      <Box sx={{ flexGrow: 1 }} slot="navbar">
+        <Toolbar
+          disableGutters
+          variant="dense"
+          sx={{ padding: '0 16px 0 0', minHeight: '0' }}
+        >
+          <DrawerToggle>
+            <DensityMediumTwoToneIcon fontSize="medium" />
+          </DrawerToggle>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            News
+          </Typography>
           {state.user ? (
             <>
-              <div className="flex items-center gap-s">
-                <Avatar theme="xsmall" img={profilePictureUrl} name={state.user.name} />
-                {state.user.name}
+              <div className="flex items-center" onClick={handleClick}>
+                <AccountCircle />
               </div>
-              <Button
-                onClick={async () => {
-                  await logout();
-                  document.location.reload();
+              <Menu
+                id="basic-menu"
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                MenuListProps={{
+                  'aria-labelledby': 'basic-button'
                 }}
               >
-                Sign out
-              </Button>
+                <MenuItem onClick={handleClose}>Profile</MenuItem>
+                <MenuItem onClick={handleClose}>
+                  <Button
+                    onClick={async () => {
+                      await logout();
+                      document.location.reload();
+                    }}
+                  >
+                    Sign out
+                  </Button>
+                </MenuItem>
+              </Menu>
             </>
           ) : (
             <Link to="/login">Sign in</Link>
           )}
-        </footer>
-      </div>
-
-      <DrawerToggle slot="navbar" aria-label="Menu toggle"></DrawerToggle>
-      <h1 slot="navbar" className="text-l m-0">
-        {documentTitleSignal}
-      </h1>
-
+        </Toolbar>
+      </Box>
       <Suspense>
         <Outlet />
       </Suspense>
