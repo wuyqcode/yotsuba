@@ -1,6 +1,7 @@
 import {
   AppBar,
   Box,
+  Container,
   IconButton,
   Menu,
   MenuItem,
@@ -66,13 +67,23 @@ export default function MainLayout() {
     <AppLayout primarySection="drawer">
       <Box sx={{ flexGrow: 1 }} slot="drawer">
         <DrawerToggle>
-          <DensityMediumTwoToneIcon fontSize="medium" />
+          <DensityMediumTwoToneIcon
+            fontSize="medium"
+            sx={{ userSelect: 'none', cursor: 'pointer' }}
+          />
         </DrawerToggle>
         <SideNav onNavigate={({ path }) => navigate(path!)} location={location}>
           {createMenuItems().map(({ to, title, icon }) => (
             <SideNavItem path={to} key={to}>
               {icon ? <Icon src={icon} slot="prefix"></Icon> : <></>}
-              {title}
+              <Typography
+                sx={{
+                  userSelect: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                {title}
+              </Typography>
             </SideNavItem>
           ))}
         </SideNav>
@@ -85,10 +96,18 @@ export default function MainLayout() {
           sx={{ padding: '0 16px 0 0', minHeight: '0' }}
         >
           <DrawerToggle>
-            <DensityMediumTwoToneIcon fontSize="medium" />
+            <DensityMediumTwoToneIcon
+              fontSize="medium"
+              sx={{ userSelect: 'none', cursor: 'pointer' }}
+            />
           </DrawerToggle>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            News
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{ flexGrow: 1, userSelect: 'none', cursor: 'pointer' }}
+            onClick={() => navigate('/')}
+          >
+            Yotsuba
           </Typography>
           {state.user ? (
             <>
