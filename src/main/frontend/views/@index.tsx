@@ -3,11 +3,11 @@ import { useSignal } from '@vaadin/hilla-react-signals';
 import { Button } from '@vaadin/react-components/Button.js';
 import { Notification } from '@vaadin/react-components/Notification.js';
 import { TextField } from '@vaadin/react-components/TextField.js';
-import { HelloWorldService } from 'Frontend/generated/endpoints.js';
+import { HelloWorldEndpoint } from 'Frontend/generated/endpoints.js';
 
 export const config: ViewConfig = {
   menu: { order: 0, icon: 'line-awesome/svg/globe-solid.svg' },
-  title: 'Hello World',
+  title: 'Hello World'
 };
 
 export default function HelloWorldView() {
@@ -24,8 +24,10 @@ export default function HelloWorldView() {
         />
         <Button
           onClick={async () => {
-            const serverResponse = await HelloWorldService.sayHello(name.value);
-            Notification.show(serverResponse);
+            const serverResponse = await HelloWorldEndpoint.sayHello(
+              name.value
+            );
+            Notification.show(serverResponse ?? '');
           }}
         >
           Say hello

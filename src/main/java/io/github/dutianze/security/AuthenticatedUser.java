@@ -3,10 +3,11 @@ package io.github.dutianze.security;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import io.github.dutianze.data.User;
 import io.github.dutianze.data.UserRepository;
-import java.util.Optional;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Component
 public class AuthenticatedUser {
@@ -22,7 +23,7 @@ public class AuthenticatedUser {
     @Transactional
     public Optional<User> get() {
         return authenticationContext.getAuthenticatedUser(UserDetails.class)
-                .map(userDetails -> userRepository.findByUsername(userDetails.getUsername()));
+                                    .map(userDetails -> userRepository.findByUsername(userDetails.getUsername()));
     }
 
     public void logout() {

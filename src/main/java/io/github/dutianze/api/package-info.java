@@ -1,4 +1,4 @@
 @NonNullApi
-package io.github.dutianze.services;
+package io.github.dutianze.api;
 
 import org.springframework.lang.NonNullApi;

@@ -1,13 +1,11 @@
-package io.github.dutianze.services;
+package io.github.dutianze.api.endpoint;
 
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import com.vaadin.hilla.BrowserCallable;
-import org.springframework.stereotype.Service;
+import com.vaadin.hilla.Endpoint;
 
-@BrowserCallable
+@Endpoint
 @AnonymousAllowed
-@Service
-public class HelloWorldService {
+public class HelloWorldEndpoint {
 
     public String sayHello(String name) {
         if (name.isEmpty()) {
