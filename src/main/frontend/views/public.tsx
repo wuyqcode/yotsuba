@@ -8,7 +8,18 @@ import {
   Typography,
   List,
   ListItem,
-  ListItemText
+  ListItemText,
+  Container,
+  Stack,
+  Grid,
+  MenuItem,
+  TextField,
+  FormControl,
+  RadioGroup,
+  FormControlLabel,
+  FormLabel,
+  Radio,
+  Checkbox
 } from '@mui/material';
 import { styled } from '@mui/system';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -18,24 +29,10 @@ export const config: ViewConfig = {
   title: 'Public'
 };
 
-const CustomFileDropArea = styled(Box)({
-  border: '2px dashed #ccc',
-  borderRadius: '5px',
-  padding: '20px',
-  textAlign: 'center',
-  cursor: 'pointer',
-  marginBottom: '20px'
-});
-
-const CustomFilePreview = styled(Box)({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '10px'
-});
-
 const ImageUpload = () => {
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [outputFormat, setOutputFormat] = useState('');
 
   const handleFileChange = (event: any) => {
     const selectedFile = event.target.files[0];
@@ -50,6 +47,10 @@ const ImageUpload = () => {
 
   const handleButtonClick = () => {
     fileInputRef?.current?.click();
+  };
+
+  const handleFormatChange = (event: any) => {
+    setOutputFormat(event.target.value);
   };
 
   const handleSubmit = async (event: any) => {
@@ -68,12 +69,27 @@ const ImageUpload = () => {
 
       if (response.ok) {
         const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', file.name);
-        document.body.appendChild(link);
-        link.click();
+        const disposition = response.headers.get('content-disposition');
+        let filename = file.name;
+        if (disposition && disposition.indexOf('attachment') !== -1) {
+          const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+          const matches = filenameRegex.exec(disposition);
+
+          if (matches !== null && matches[1]) {
+            filename = decodeURIComponent(matches[1]).replace(/\+/g, ' ');
+          }
+        }
+        let blobURL = window.URL.createObjectURL(blob);
+        let tempLink = document.createElement('a');
+        tempLink.style.display = 'none';
+        tempLink.href = blobURL;
+        tempLink.download = filename;
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        setTimeout(function () {
+          document.body.removeChild(tempLink);
+          window.URL.revokeObjectURL(blobURL);
+        }, 200);
       }
     } catch (error) {
       console.error('Error uploading file:', error);
@@ -82,43 +98,49 @@ const ImageUpload = () => {
   };
 
   return (
-    <Box>
-      <Box component="form" onSubmit={handleSubmit}>
-        <Typography variant="h2" gutterBottom>
-          EPUB File Upload & Preview
+    <Container>
+      <Box textAlign="center">
+        <Typography variant="h4" gutterBottom>
+          Epub Converter
         </Typography>
-        <CustomFileDropArea onClick={handleButtonClick}>
-          <input
-            type="file"
-            onChange={handleFileChange}
-            style={{ display: 'none' }}
-            ref={fileInputRef}
-            accept=".epub"
-          />
-          <label style={{ display: 'block', cursor: 'pointer' }}>
-            Click to Upload EPUB File
-          </label>
-        </CustomFileDropArea>
-        <CustomFilePreview>
-          {file && (
-            <List>
-              <ListItem
-                secondaryAction={
-                  <IconButton edge="end" onClick={handleRemoveFile}>
-                    <DeleteIcon />
-                  </IconButton>
-                }
-              >
-                <ListItemText primary={file.name} />
-              </ListItem>
-            </List>
-          )}
-        </CustomFilePreview>
-        <Button variant="contained" type="submit">
-          Submit
-        </Button>
       </Box>
-    </Box>
+
+      <Grid container spacing={3}>
+        <Grid item container xs={12} justifyContent="center">
+          <Stack>
+            <Button variant="contained" component="label">
+              Upload File
+              <input type="file" hidden onChange={handleFileChange} />
+            </Button>
+            {file && <Typography variant="body1">{file.name}</Typography>}
+          </Stack>
+        </Grid>
+        <Grid item container xs={12} justifyContent="center">
+          <FormControl component="fieldset">
+            <FormLabel component="legend">Select Output Format</FormLabel>
+            <RadioGroup value={outputFormat} onChange={handleFormatChange}>
+              <FormControlLabel
+                value="hiragana"
+                required
+                disabled
+                control={<Checkbox defaultChecked />}
+                label="追加平假名"
+              />
+              <FormControlLabel
+                value="english"
+                control={<Checkbox />}
+                label="追加英文"
+              />
+            </RadioGroup>
+          </FormControl>
+        </Grid>
+        <Grid item container xs={12} justifyContent="flex-end">
+          <Button variant="contained" color="primary" onClick={handleSubmit}>
+            Convert
+          </Button>
+        </Grid>
+      </Grid>
+    </Container>
   );
 };
 

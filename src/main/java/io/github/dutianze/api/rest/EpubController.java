@@ -17,7 +17,10 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
@@ -57,7 +60,7 @@ public class EpubController {
             Document doc = Jsoup.parse(new String(resource.getData(), resource.getInputEncoding()));
             Elements paragraphs = doc.select("p");
             for (Element paragraph : paragraphs) {
-                String content = paragraph.text();
+                String content = paragraph.ownText();
                 paragraph.empty();
                 List<Token> tokenize = TOKENIZER.tokenize(content);
                 if (tokenize.isEmpty()) {
@@ -92,12 +95,11 @@ public class EpubController {
         // output
         ByteArrayResource byteArrayResource = new ByteArrayResource(outputStream.toByteArray());
         HttpHeaders headers = new HttpHeaders();
-        String fileName = URLEncoder.encode(Objects.requireNonNull(file.getOriginalFilename()), StandardCharsets.UTF_8);
+        Objects.requireNonNull(file.getOriginalFilename());
+        String fileName = URLEncoder.encode(file.getOriginalFilename(), StandardCharsets.UTF_8);
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        return ResponseEntity.ok()
-                             .headers(headers)
-                             .body(byteArrayResource);
+        return ResponseEntity.ok().headers(headers).body(byteArrayResource);
     }
 
     public static String convertToRuby(String kanji, String kana) {
@@ -166,7 +168,6 @@ public class EpubController {
         if (cachedEnglish != null) {
             return Optional.of(cachedEnglish);
         }
-        System.out.println(katakana);
         try {
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
@@ -194,6 +195,7 @@ public class EpubController {
             String responseBody = response.body();
             String english = parseTranslationResponse(responseBody);
             cache.put(katakana, english);
+            System.out.println(katakana + "  " + english);
 
             TimeUnit.MILLISECONDS.sleep(1);
             if (english.isBlank()) {
