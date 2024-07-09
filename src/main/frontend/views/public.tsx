@@ -71,13 +71,8 @@ const ImageUpload = () => {
         const blob = await response.blob();
         const disposition = response.headers.get('content-disposition');
         let filename = file.name;
-        if (disposition && disposition.indexOf('attachment') !== -1) {
-          const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-          const matches = filenameRegex.exec(disposition);
-
-          if (matches !== null && matches[1]) {
-            filename = decodeURIComponent(matches[1]).replace(/\+/g, ' ');
-          }
+        if (disposition) {
+			filename = decodeURIComponent(disposition.split("filename=")[1]).replace(/\+/g, ' ');
         }
         let blobURL = window.URL.createObjectURL(blob);
         let tempLink = document.createElement('a');
