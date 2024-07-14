@@ -11,15 +11,10 @@ div[data-milkdown-root='true'] {
   height: 100%;
 }
 .milkdown {
-  max-width: 56rem; /* max-w-4xl */
-  margin-top: 0; /* my-0 */
-  margin-right: auto; /* mx-auto */
-  margin-bottom: 0; /* my-0 */
-  margin-left: auto; /* mx-auto */
-  padding: 1.875rem; /* p-7.5 */
-  padding-bottom: 6.25rem; /* pb-25 */
+  border: thick double #32a1ce;
+  margin: 1rem 2rem;
 }
 
 .milkdown .editor {
-  outline: none; /* outline-none */
+  outline: none;
 }

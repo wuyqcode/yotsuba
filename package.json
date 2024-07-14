@@ -8,7 +8,6 @@
     "@milkdown/core": "^7.4.0",
     "@milkdown/ctx": "^7.4.0",
     "@milkdown/plugin-clipboard": "^7.4.0",
-    "@milkdown/plugin-emoji": "^7.4.0",
     "@milkdown/plugin-history": "^7.4.0",
     "@milkdown/plugin-listener": "^7.4.0",
     "@milkdown/plugin-prism": "^7.4.0",
@@ -137,7 +136,7 @@
       "workbox-core": "7.1.0",
       "workbox-precaching": "7.1.0"
     },
-    "hash": "5d24bbd49bafa98c281a50fb105e8ab42181cada31ff050fd0d2f590cc5f16c3"
+    "hash": "7cf6567055414274fdf8d5ad82e936aafbd2f4e541057f07a81456a641c9b7b7"
   },
   "overrides": {
     "@vaadin/bundles": "$@vaadin/bundles",
@@ -187,13 +186,11 @@
     "@milkdown/preset-commonmark": "$@milkdown/preset-commonmark",
     "@milkdown/prose": "$@milkdown/prose",
     "@milkdown/react": "$@milkdown/react",
-    "@milkdown/theme-nord": "$@milkdown/theme-nord",
     "@milkdown/transformer": "$@milkdown/transformer",
     "@milkdown/plugin-history": "$@milkdown/plugin-history",
     "@milkdown/plugin-listener": "$@milkdown/plugin-listener",
     "@milkdown/preset-gfm": "$@milkdown/preset-gfm",
     "@milkdown/plugin-clipboard": "$@milkdown/plugin-clipboard",
-    "@milkdown/plugin-emoji": "$@milkdown/plugin-emoji",
     "@milkdown/plugin-prism": "$@milkdown/plugin-prism",
     "@milkdown/plugin-upload": "$@milkdown/plugin-upload",
     "lodash.debounce": "$lodash.debounce"
