@@ -1,13 +1,6 @@
-import {
-  AppBar,
-  Box,
-  Container,
-  IconButton,
-  Menu,
-  MenuItem,
-  Toolbar,
-  Typography
-} from '@mui/material';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import DensityMediumTwoToneIcon from '@mui/icons-material/DensityMediumTwoTone';
+import { Box, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
 import {
   createMenuItems,
   useViewConfig
@@ -20,15 +13,10 @@ import {
   SideNav,
   SideNavItem
 } from '@vaadin/react-components';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import DensityMediumTwoToneIcon from '@mui/icons-material/DensityMediumTwoTone';
-import FormatAlignJustifyTwoToneIcon from '@mui/icons-material/FormatAlignJustifyTwoTone';
-import { Avatar } from '@vaadin/react-components/Avatar.js';
 import { Button } from '@vaadin/react-components/Button.js';
 import { useAuth } from 'Frontend/util/auth.js';
 import { Suspense, useEffect, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Padding } from '@mui/icons-material';
 
 const defaultTitle = document.title;
 const documentTitleSignal = signal('');
@@ -65,7 +53,10 @@ export default function MainLayout() {
     )}`;
   return (
     <AppLayout primarySection="drawer">
-      <Box sx={{ flexGrow: 1 }} slot="drawer">
+      <Box
+        sx={{ flexGrow: 1, zIndex: '999', position: 'relative' }}
+        slot="drawer"
+      >
         <DrawerToggle>
           <DensityMediumTwoToneIcon
             fontSize="medium"

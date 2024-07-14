@@ -4,25 +4,16 @@ import { useState, useRef } from 'react';
 import {
   Box,
   Button,
-  IconButton,
   Typography,
-  List,
-  ListItem,
-  ListItemText,
   Container,
   Stack,
   Grid,
-  MenuItem,
-  TextField,
   FormControl,
   RadioGroup,
   FormControlLabel,
   FormLabel,
-  Radio,
   Checkbox
 } from '@mui/material';
-import { styled } from '@mui/system';
-import DeleteIcon from '@mui/icons-material/Delete';
 
 export const config: ViewConfig = {
   menu: { order: 1, icon: 'line-awesome/svg/comment-solid.svg' },
@@ -72,7 +63,9 @@ const ImageUpload = () => {
         const disposition = response.headers.get('content-disposition');
         let filename = file.name;
         if (disposition) {
-			filename = decodeURIComponent(disposition.split("filename=")[1]).replace(/\+/g, ' ');
+          filename = decodeURIComponent(
+            disposition.split('filename=')[1]
+          ).replace(/\+/g, ' ');
         }
         let blobURL = window.URL.createObjectURL(blob);
         let tempLink = document.createElement('a');

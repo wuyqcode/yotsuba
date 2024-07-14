@@ -5,6 +5,19 @@
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
+    "@milkdown/core": "^7.4.0",
+    "@milkdown/ctx": "^7.4.0",
+    "@milkdown/plugin-clipboard": "^7.4.0",
+    "@milkdown/plugin-emoji": "^7.4.0",
+    "@milkdown/plugin-history": "^7.4.0",
+    "@milkdown/plugin-listener": "^7.4.0",
+    "@milkdown/plugin-prism": "^7.4.0",
+    "@milkdown/plugin-upload": "^7.4.0",
+    "@milkdown/preset-commonmark": "^7.4.0",
+    "@milkdown/preset-gfm": "^7.4.0",
+    "@milkdown/prose": "^7.4.0",
+    "@milkdown/react": "^7.4.0",
+    "@milkdown/transformer": "^7.4.0",
     "@mui/icons-material": "^5.15.21",
     "@mui/material": "^5.15.21",
     "@polymer/polymer": "3.5.1",
@@ -30,6 +43,7 @@
     "construct-style-sheets-polyfill": "3.1.0",
     "date-fns": "2.29.3",
     "lit": "3.1.4",
+    "lodash.debounce": "^4.0.8",
     "proj4": "2.11.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
@@ -123,7 +137,7 @@
       "workbox-core": "7.1.0",
       "workbox-precaching": "7.1.0"
     },
-    "hash": "48a7c1abbf6e09ab21a9c1fa1e4a5161efe88385032ba9a0428c027c8ef71a78"
+    "hash": "5d24bbd49bafa98c281a50fb105e8ab42181cada31ff050fd0d2f590cc5f16c3"
   },
   "overrides": {
     "@vaadin/bundles": "$@vaadin/bundles",
@@ -167,6 +181,21 @@
     "@mui/material": "$@mui/material",
     "lit": "$lit",
     "@vaadin/hilla-lit-form": "$@vaadin/hilla-lit-form",
-    "@mui/icons-material": "$@mui/icons-material"
+    "@mui/icons-material": "$@mui/icons-material",
+    "@milkdown/core": "$@milkdown/core",
+    "@milkdown/ctx": "$@milkdown/ctx",
+    "@milkdown/preset-commonmark": "$@milkdown/preset-commonmark",
+    "@milkdown/prose": "$@milkdown/prose",
+    "@milkdown/react": "$@milkdown/react",
+    "@milkdown/theme-nord": "$@milkdown/theme-nord",
+    "@milkdown/transformer": "$@milkdown/transformer",
+    "@milkdown/plugin-history": "$@milkdown/plugin-history",
+    "@milkdown/plugin-listener": "$@milkdown/plugin-listener",
+    "@milkdown/preset-gfm": "$@milkdown/preset-gfm",
+    "@milkdown/plugin-clipboard": "$@milkdown/plugin-clipboard",
+    "@milkdown/plugin-emoji": "$@milkdown/plugin-emoji",
+    "@milkdown/plugin-prism": "$@milkdown/plugin-prism",
+    "@milkdown/plugin-upload": "$@milkdown/plugin-upload",
+    "lodash.debounce": "$lodash.debounce"
   }
 }

@@ -25,6 +25,7 @@ public class SecurityConfiguration extends VaadinWebSecurity {
         );
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(new AntPathRequestMatcher("/")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/api/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/public")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/images/*.png")).permitAll()
