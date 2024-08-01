@@ -1,0 +1,42 @@
+server:
+  port: 8080
+spring:
+  sql:
+    init:
+      mode: always
+  mustache:
+    check-template-location: 'false'
+  servlet:
+    multipart:
+      max-request-size: 100MB
+      max-file-size: 100MB
+  jpa:
+    defer-datasource-initialization: 'true'
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    open-in-view: false
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+  datasource:
+    url: jdbc:sqlite:./memo.db
+    driver-class-name: org.sqlite.JDBC
+    hikari:
+      connectionInitSql: PRAGMA foreign_keys = ON;
+logging:
+  level:
+    org:
+      atmosphere: warn
+#      hibernate:
+#        orm:
+#          jdbc:
+#            bind: trace
+vaadin:
+  launch-browser: 'true'
+  allowed-packages: com.vaadin,org.vaadin,io.github.dutianze
+  pnpm:
+    enable: 'true'
+
+

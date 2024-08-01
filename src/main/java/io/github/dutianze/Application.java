@@ -2,12 +2,13 @@ package io.github.dutianze;
 
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.theme.Theme;
-import io.github.dutianze.data.UserRepository;
+import io.github.dutianze.shared.UserRepository;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.sql.init.SqlDataSourceScriptDatabaseInitializer;
 import org.springframework.boot.autoconfigure.sql.init.SqlInitializationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.modulith.Modulithic;
 
 import javax.sql.DataSource;
 
@@ -17,6 +18,7 @@ import javax.sql.DataSource;
  * Use the @PWA annotation make the application installable on phones, tablets
  * and some desktop browsers.
  */
+@Modulithic(sharedModules = "shared")
 @SpringBootApplication
 @Theme(value = "yotsuba")
 public class Application implements AppShellConfigurator {
