@@ -1,7 +1,9 @@
+import { MilkdownProvider } from '@milkdown/react';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import SearchIcon from '@mui/icons-material/Search';
 import { Box, IconButton, Paper, TextField, Typography } from '@mui/material';
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
+import MilkdownEditor from 'Frontend/components/MilkdownEditor';
 import { NavLink } from 'react-router-dom';
 export const config: ViewConfig = {
   menu: { order: 5, icon: 'vaadin:phone' },
@@ -15,20 +17,9 @@ export default function AdminView() {
         <NavLink to="/notes/123">notes</NavLink>
 
         <Paper sx={{ p: 2, mb: 2 }}>
-          <TextField
-            variant="outlined"
-            placeholder="此刻的想法..."
-            fullWidth
-            multiline
-            rows={2}
-            InputProps={{
-              endAdornment: (
-                <IconButton>
-                  <SearchIcon />
-                </IconButton>
-              )
-            }}
-          />
+          <MilkdownProvider>
+            <MilkdownEditor maxHeight={400} />
+          </MilkdownProvider>
         </Paper>
         <Paper sx={{ p: 2, mb: 2 }}>
           <Typography>7分钟前</Typography>

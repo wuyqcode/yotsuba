@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  CssBaseline,
   Divider,
   Drawer,
   List,
@@ -59,8 +58,13 @@ export default function MainLayout() {
     )}`;
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
+    <Box
+      sx={{
+        display: 'flex',
+        width: '100%',
+        minHeight: '100vh'
+      }}
+    >
       <Drawer
         sx={{
           width: drawerWidth,
@@ -132,7 +136,12 @@ export default function MainLayout() {
       </Drawer>
       <Box
         component="main"
-        sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          backgroundColor: 'white',
+          minHeight: '100%'
+        }}
       >
         <Suspense>
           <Outlet />

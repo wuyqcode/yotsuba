@@ -10,11 +10,22 @@ vaadin-app-layout::part(navbar) {
 div[data-milkdown-root='true'] {
   height: 100%;
 }
-.milkdown {
+/* .milkdown {
   border: thick double #32a1ce;
   margin: 1rem 2rem;
-}
+} */
 
 .milkdown .editor {
   outline: none;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
 }
