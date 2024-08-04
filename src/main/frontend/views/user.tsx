@@ -1,9 +1,9 @@
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
 
 export const config: ViewConfig = {
-  menu: { order: 3, icon: 'line-awesome/svg/user-circle-solid.svg' },
+  menu: { order: 3, icon: 'vaadin:phone' },
   title: 'User',
-  rolesAllowed: ['USER'],
+  rolesAllowed: ['USER']
 };
 
 export default function UserView() {

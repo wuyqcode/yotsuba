@@ -1,9 +1,9 @@
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
 
 export const config: ViewConfig = {
-  menu: { order: 2, icon: 'line-awesome/svg/lock-solid.svg' },
+  menu: { order: 2, icon: 'vaadin:phone' },
   title: 'Auth',
-  loginRequired: true,
+  loginRequired: true
 };
 
 export default function AuthView() {

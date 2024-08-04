@@ -1,22 +1,22 @@
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
 
-import { useState, useRef } from 'react';
 import {
   Box,
   Button,
-  Typography,
+  Checkbox,
   Container,
-  Stack,
-  Grid,
   FormControl,
-  RadioGroup,
   FormControlLabel,
   FormLabel,
-  Checkbox
+  Grid,
+  RadioGroup,
+  Stack,
+  Typography
 } from '@mui/material';
+import { useRef, useState } from 'react';
 
 export const config: ViewConfig = {
-  menu: { order: 1, icon: 'line-awesome/svg/comment-solid.svg' },
+  menu: { order: 1, icon: 'vaadin:phone' },
   title: 'Public'
 };
 

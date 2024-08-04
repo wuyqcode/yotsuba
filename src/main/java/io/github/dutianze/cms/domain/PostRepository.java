@@ -1,4 +1,4 @@
-package io.github.dutianze.cms;
+package io.github.dutianze.cms.domain;
 
 import org.springframework.data.repository.CrudRepository;
 
@@ -6,6 +6,6 @@ import org.springframework.data.repository.CrudRepository;
  * @author dutianze
  * @date 2023/8/11
  */
-public interface MemoRepository extends CrudRepository<Memo, MemoId> {
+public interface PostRepository extends CrudRepository<Post, PostId> {
 
 }

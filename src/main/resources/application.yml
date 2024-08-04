@@ -15,13 +15,13 @@ spring:
     database-platform: org.hibernate.community.dialect.SQLiteDialect
     open-in-view: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
     show-sql: true
   datasource:
-    url: jdbc:sqlite:./memo.db
+    url: jdbc:sqlite:./yotsuba.db
     driver-class-name: org.sqlite.JDBC
     hikari:
       connectionInitSql: PRAGMA foreign_keys = ON;
@@ -38,5 +38,6 @@ vaadin:
   allowed-packages: com.vaadin,org.vaadin,io.github.dutianze
   pnpm:
     enable: 'true'
+  excludeUrls: /swagger-ui/**
 
 

@@ -1,8 +1,12 @@
-package io.github.dutianze.cms;
+package io.github.dutianze.cms.domain;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.jmolecules.ddd.types.AggregateRoot;
+import org.jmolecules.ddd.types.Association;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
+import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 
 /**
@@ -11,36 +15,29 @@ import java.time.LocalDateTime;
 public class Tag extends AbstractAggregateRoot<Tag> implements AggregateRoot<Tag, TagId>, Comparable<Tag> {
 
     private TagId id;
+
     private String name;
+
+    @Nullable
+    @CreationTimestamp
     private LocalDateTime createdAt;
+
+    @Nullable
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     public Tag(String name) {
         this.id = new TagId();
         this.name = name;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
     @Override
     public int compareTo(Tag o) {
-        return this.name.compareTo(o.getName());
+        return this.name.compareTo(o.name);
     }
 
     @Override
     public TagId getId() {
         return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
     }
 }

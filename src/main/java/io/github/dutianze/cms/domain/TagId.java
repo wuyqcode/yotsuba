@@ -1,4 +1,4 @@
-package io.github.dutianze.cms;
+package io.github.dutianze.cms.domain;
 
 import io.hypersistence.tsid.TSID;
 import org.jmolecules.ddd.types.Identifier;
@@ -6,15 +6,15 @@ import org.springframework.util.Assert;
 
 /**
  * @author dutianze
- * @date 金曜日/2024/07/26
+ * @date 月曜日/2024/07/29
  */
-public record MemoId(String id) implements Identifier {
+public record TagId(String id) implements Identifier {
 
-    public MemoId {
+    public TagId {
         Assert.notNull(id, "id must not be null");
     }
 
-    public MemoId() {
+    public TagId() {
         this(TSID.Factory.getTsid().toString());
     }
 }

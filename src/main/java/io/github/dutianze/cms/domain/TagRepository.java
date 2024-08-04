@@ -1,4 +1,4 @@
-package io.github.dutianze.cms;
+package io.github.dutianze.cms.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -6,6 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author dutianze
  * @date 2023/9/5
  */
-public interface ChannelRepository extends JpaRepository<Channel, String> {
-
+public interface TagRepository extends JpaRepository<Tag, String> {
 }

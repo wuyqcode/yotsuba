@@ -1,9 +1,9 @@
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
 
 export const config: ViewConfig = {
-  menu: { order: 4, icon: 'line-awesome/svg/user-check-solid.svg' },
+  menu: { order: 4, icon: 'vaadin:phone' },
   title: 'Admin',
-  rolesAllowed: ['ADMIN'],
+  rolesAllowed: ['ADMIN']
 };
 
 export default function AdminView() {

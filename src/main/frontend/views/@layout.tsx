@@ -1,22 +1,26 @@
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import DensityMediumTwoToneIcon from '@mui/icons-material/DensityMediumTwoTone';
-import { Box, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  CssBaseline,
+  Divider,
+  Drawer,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Toolbar
+} from '@mui/material';
 import {
   createMenuItems,
   useViewConfig
 } from '@vaadin/hilla-file-router/runtime.js';
 import { effect, signal } from '@vaadin/hilla-react-signals';
-import {
-  AppLayout,
-  DrawerToggle,
-  Icon,
-  SideNav,
-  SideNavItem
-} from '@vaadin/react-components';
-import { Button } from '@vaadin/react-components/Button.js';
+import { Icon } from '@vaadin/react-components';
 import { useAuth } from 'Frontend/util/auth.js';
 import { Suspense, useEffect, useState } from 'react';
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 const defaultTitle = document.title;
 const documentTitleSignal = signal('');
@@ -26,6 +30,8 @@ effect(() => {
 
 // Publish for Vaadin to use
 (window as any).Vaadin.documentTitleSignal = documentTitleSignal;
+
+const drawerWidth = 240;
 
 export default function MainLayout() {
   const currentTitle = useViewConfig()?.title ?? defaultTitle;
@@ -51,60 +57,46 @@ export default function MainLayout() {
         ''
       )
     )}`;
-  return (
-    <AppLayout primarySection="drawer">
-      <Box
-        sx={{ flexGrow: 1, zIndex: '999', position: 'relative' }}
-        slot="drawer"
-      >
-        <DrawerToggle>
-          <DensityMediumTwoToneIcon
-            fontSize="medium"
-            sx={{ userSelect: 'none', cursor: 'pointer' }}
-          />
-        </DrawerToggle>
-        <SideNav onNavigate={({ path }) => navigate(path!)} location={location}>
-          {createMenuItems().map(({ to, title, icon }) => (
-            <SideNavItem path={to} key={to}>
-              {icon ? <Icon src={icon} slot="prefix"></Icon> : <></>}
-              <Typography
-                sx={{
-                  userSelect: 'none',
-                  cursor: 'pointer'
-                }}
-              >
-                {title}
-              </Typography>
-            </SideNavItem>
-          ))}
-        </SideNav>
-      </Box>
 
-      <Box sx={{ flexGrow: 1 }} slot="navbar">
-        <Toolbar
-          disableGutters
-          variant="dense"
-          sx={{ padding: '0 16px 0 0', minHeight: '0' }}
-        >
-          <DrawerToggle>
-            <DensityMediumTwoToneIcon
-              fontSize="medium"
-              sx={{ userSelect: 'none', cursor: 'pointer' }}
-            />
-          </DrawerToggle>
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ flexGrow: 1, userSelect: 'none', cursor: 'pointer' }}
-            onClick={() => navigate('/')}
-          >
-            Yotsuba
-          </Typography>
+  return (
+    <Box sx={{ display: 'flex' }}>
+      <CssBaseline />
+      <Drawer
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+            boxSizing: 'border-box'
+          }
+        }}
+        variant="permanent"
+        anchor="left"
+      >
+        <Toolbar />
+        <Divider />
+        <List component="nav">
+          {createMenuItems().map(({ to, title, icon }) => (
+            <ListItemButton key={title} onClick={() => navigate(to)}>
+              <ListItemIcon>
+                <Icon icon={icon} />
+              </ListItemIcon>
+              <ListItemText primary={title} />
+            </ListItemButton>
+          ))}
+          <Divider sx={{ my: 1 }} />
           {state.user ? (
             <>
-              <div className="flex items-center" onClick={handleClick}>
-                <AccountCircle />
-              </div>
+              <ListItemButton onClick={handleClick}>
+                <ListItemIcon>
+                  <img
+                    src={profilePictureUrl}
+                    alt="Notification Icon"
+                    style={{ width: 24, height: 24 }}
+                  />
+                </ListItemIcon>
+                <ListItemText primary="Account" />
+              </ListItemButton>
               <Menu
                 id="basic-menu"
                 anchorEl={anchorEl}
@@ -128,13 +120,24 @@ export default function MainLayout() {
               </Menu>
             </>
           ) : (
-            <Link to="/login">Sign in</Link>
+            <ListItemButton onClick={() => navigate('/login')}>
+              <ListItemIcon>
+                <Icon icon={'vaadin:user'} />
+                {state.user}
+              </ListItemIcon>
+              <ListItemText primary="Sign in" />
+            </ListItemButton>
           )}
-        </Toolbar>
+        </List>
+      </Drawer>
+      <Box
+        component="main"
+        sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}
+      >
+        <Suspense>
+          <Outlet />
+        </Suspense>
       </Box>
-      <Suspense>
-        <Outlet />
-      </Suspense>
-    </AppLayout>
+    </Box>
   );
 }
