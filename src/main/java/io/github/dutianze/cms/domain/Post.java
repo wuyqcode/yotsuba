@@ -49,6 +49,7 @@ public class Post extends AbstractAggregateRoot<Post> implements AggregateRoot<P
     public Post(PostTitle postTitle, Tag... tags) {
         this.id = new PostId();
         this.title = postTitle;
+        this.postStatus = PostStatus.DRAFT;
         this.content = new PostContent("");
         this.tags = new TreeSet<>(List.of(tags));
     }
@@ -63,4 +64,25 @@ public class Post extends AbstractAggregateRoot<Post> implements AggregateRoot<P
         this.fileResources.add(fileResource);
         return fileResource.getURL();
     }
+
+    public void setTitle(PostTitle title) {
+        this.title = title;
+    }
+
+    public void setContent(PostContent content) {
+        this.content = content;
+    }
+
+    public PostTitle getTitle() {
+        return title;
+    }
+
+    public PostContent getContent() {
+        return content;
+    }
+
+    public PostStatus getPostStatus() {
+        return postStatus;
+    }
+
 }

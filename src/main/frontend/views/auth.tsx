@@ -1,7 +1,7 @@
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
 
 export const config: ViewConfig = {
-  menu: { order: 2, icon: 'vaadin:phone' },
+  menu: { order: 2, icon: 'HomeIcon' },
   title: 'Auth',
   loginRequired: true
 };

@@ -6,7 +6,7 @@ import { TextField } from '@vaadin/react-components/TextField.js';
 import { HelloWorldEndpoint } from 'Frontend/generated/endpoints.js';
 
 export const config: ViewConfig = {
-  menu: { order: 0, icon: 'vaadin:phone' },
+  menu: { order: 0, icon: 'HomeIcon' },
   title: 'Hello World'
 };
 

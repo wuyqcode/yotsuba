@@ -1,15 +1,15 @@
+import DescriptionIcon from '@mui/icons-material/Description';
+import HomeIcon from '@mui/icons-material/Home';
 import {
   Box,
   Button,
-  Divider,
-  Drawer,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   Menu,
   MenuItem,
-  Toolbar
+  Paper
 } from '@mui/material';
 import {
   createMenuItems,
@@ -20,7 +20,6 @@ import { Icon } from '@vaadin/react-components';
 import { useAuth } from 'Frontend/util/auth.js';
 import { Suspense, useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-
 const defaultTitle = document.title;
 const documentTitleSignal = signal('');
 effect(() => {
@@ -30,7 +29,16 @@ effect(() => {
 // Publish for Vaadin to use
 (window as any).Vaadin.documentTitleSignal = documentTitleSignal;
 
-const drawerWidth = 240;
+const renderIcon = (iconName?: string) => {
+  switch (iconName) {
+    case 'HomeIcon':
+      return <HomeIcon />;
+    case 'DescriptionIcon':
+      return <DescriptionIcon />;
+    default:
+      return null;
+  }
+};
 
 export default function MainLayout() {
   const currentTitle = useViewConfig()?.title ?? defaultTitle;
@@ -58,37 +66,15 @@ export default function MainLayout() {
     )}`;
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        width: '100%',
-        minHeight: '100vh'
-      }}
-    >
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width: drawerWidth,
-            boxSizing: 'border-box'
-          }
-        }}
-        variant="permanent"
-        anchor="left"
-      >
-        <Toolbar />
-        <Divider />
+    <Box sx={{ display: 'flex' }}>
+      <Box component="nav" sx={{ width: 200, flexShrink: 0 }}>
         <List component="nav">
           {createMenuItems().map(({ to, title, icon }) => (
             <ListItemButton key={title} onClick={() => navigate(to)}>
-              <ListItemIcon>
-                <Icon icon={icon} />
-              </ListItemIcon>
+              <ListItemIcon>{renderIcon(icon)}</ListItemIcon>
               <ListItemText primary={title} />
             </ListItemButton>
           ))}
-          <Divider sx={{ my: 1 }} />
           {state.user ? (
             <>
               <ListItemButton onClick={handleClick}>
@@ -133,19 +119,23 @@ export default function MainLayout() {
             </ListItemButton>
           )}
         </List>
-      </Drawer>
+      </Box>
       <Box
         component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          backgroundColor: 'white',
-          minHeight: '100%'
-        }}
+        sx={{ flexGrow: 1, padding: '8px', height: '100vh' }}
       >
-        <Suspense>
-          <Outlet />
-        </Suspense>
+        <Paper
+          sx={{
+            bgcolor: 'white',
+            borderRadius: 2,
+            height: '100%',
+            padding: '24px 3px'
+          }}
+        >
+          <Suspense>
+            <Outlet />
+          </Suspense>
+        </Paper>
       </Box>
     </Box>
   );

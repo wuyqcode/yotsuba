@@ -1,8 +1,8 @@
-import { CmdKey, Editor, defaultValueCtx, rootCtx } from '@milkdown/core';
+import { CmdKey, defaultValueCtx, Editor, rootCtx } from '@milkdown/core';
 import { clipboard } from '@milkdown/plugin-clipboard';
 import { history, redoCommand, undoCommand } from '@milkdown/plugin-history';
 import { listener, listenerCtx } from '@milkdown/plugin-listener';
-import { upload } from '@milkdown/plugin-upload';
+import { upload, uploadConfig } from '@milkdown/plugin-upload';
 import {
   commonmark,
   toggleEmphasisCommand,
@@ -14,7 +14,6 @@ import {
 import { gfm, toggleStrikethroughCommand } from '@milkdown/preset-gfm';
 import { Milkdown, useEditor } from '@milkdown/react';
 import { callCommand } from '@milkdown/utils';
-import { Edit, InsertDriveFile, Link, Tag } from '@mui/icons-material';
 import FormatBoldIcon from '@mui/icons-material/FormatBold';
 import FormatItalicIcon from '@mui/icons-material/FormatItalic';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
@@ -23,22 +22,74 @@ import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 import RedoIcon from '@mui/icons-material/Redo';
 import StrikethroughSIcon from '@mui/icons-material/StrikethroughS';
 import UndoIcon from '@mui/icons-material/Undo';
-import { Box, Button, IconButton, Stack } from '@mui/material';
-import { useState } from 'react';
+import { Box, IconButton, Stack } from '@mui/material';
+import Post from 'Frontend/generated/io/github/dutianze/cms/domain/Post';
+import PostContent from 'Frontend/generated/io/github/dutianze/cms/domain/valueobject/PostContent';
 
 interface EditorWithLimitProps {
-  maxHeight?: number;
+  post: Post;
+  setPost: any;
 }
 
-const MilkdownEditor = ({ maxHeight }: EditorWithLimitProps) => {
-  const [content, setContent] = useState('');
+const MilkdownEditor = ({ post, setPost }: EditorWithLimitProps) => {
+  const uploader: (files: FileList, schema: any) => Promise<any> = async (
+    files,
+    schema
+  ) => {
+    const images: File[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files.item(i);
+      if (!file) {
+        continue;
+      }
+
+      // You can handle whatever the file type you want, we handle image here.
+      if (!file.type.includes('image')) {
+        continue;
+      }
+
+      images.push(file);
+    }
+
+    const nodes: Node[] = await Promise.all(
+      images.map(async (image) => {
+        const formData = new FormData();
+        formData.append('postId', post.id.id);
+        formData.append('file', image);
+
+        const response = await fetch('/api/file-resource', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to upload image');
+        }
+
+        const src = await response.text();
+        const alt = image.name;
+
+        return schema.nodes.image.createAndFill({
+          src,
+          alt
+        }) as unknown as Node;
+      })
+    );
+
+    return nodes;
+  };
 
   const useMilkdownEditor = () =>
     useEditor((root) =>
       Editor.make()
         .config((ctx) => {
+          ctx.update(uploadConfig.key, (prev) => ({
+            ...prev,
+            uploader
+          }));
           ctx.set(rootCtx, root);
-          ctx.set(defaultValueCtx, content);
+          ctx.set(defaultValueCtx, post?.content?.content ?? '');
           ctx
             .get(listenerCtx)
             .mounted((ctx) => {
@@ -48,7 +99,10 @@ const MilkdownEditor = ({ maxHeight }: EditorWithLimitProps) => {
               ) as HTMLDivElement;
               wrapper.onclick = () => editor?.focus();
             })
-            .markdownUpdated((_, markdown) => setContent(markdown));
+            .markdownUpdated((_, markdown) => {
+              const contentObject: PostContent = { content: markdown };
+              setPost((prevPost) => ({ ...prevPost, content: contentObject }));
+            });
         })
         .use(commonmark)
         .use(listener)
@@ -67,10 +121,8 @@ const MilkdownEditor = ({ maxHeight }: EditorWithLimitProps) => {
   return (
     <Box
       sx={{
-        position: 'relative',
         height: '100%',
-        display: 'flex',
-        flexDirection: 'column'
+        width: 'calc(100vw - 500px)'
       }}
     >
       <Stack
@@ -81,7 +133,6 @@ const MilkdownEditor = ({ maxHeight }: EditorWithLimitProps) => {
         sx={{
           borderBottom: 1,
           borderColor: 'divider',
-          width: '100%',
           position: 'sticky',
           top: 0,
           zIndex: 1
@@ -114,46 +165,7 @@ const MilkdownEditor = ({ maxHeight }: EditorWithLimitProps) => {
           </IconButton>
         </Stack>
       </Stack>
-      <Box
-        sx={{
-          height: '100%',
-          width: '100%',
-          overflow: 'auto',
-          overscrollBehavior: 'none',
-          maxHeight: maxHeight
-        }}
-      >
-        <Milkdown />
-      </Box>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          borderTop: '1px solid #e0e0e0',
-          paddingTop: 1
-        }}
-      >
-        <Box>
-          <IconButton>
-            <Tag />
-          </IconButton>
-          <IconButton>
-            <Edit />
-          </IconButton>
-          <IconButton>
-            <InsertDriveFile />
-          </IconButton>
-          <IconButton>
-            <Link />
-          </IconButton>
-        </Box>
-        <Box>
-          <Button variant="contained" color="primary" sx={{ marginLeft: 1 }}>
-            保存
-          </Button>
-        </Box>
-      </Box>
+      <Milkdown />
     </Box>
   );
 };

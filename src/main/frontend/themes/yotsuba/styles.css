@@ -9,11 +9,19 @@ vaadin-app-layout::part(navbar) {
 }
 div[data-milkdown-root='true'] {
   height: 100%;
+  width: 100%;
 }
-/* .milkdown {
-  border: thick double #32a1ce;
-  margin: 1rem 2rem;
-} */
+
+.milkdown {
+  width: 100%;
+}
+
+.milkdown img {
+  max-width: 90%;
+  max-height: 90%;
+  height: auto;
+  width: auto;
+}
 
 .milkdown .editor {
   outline: none;
@@ -25,7 +33,9 @@ div[data-milkdown-root='true'] {
   box-sizing: border-box;
 }
 
+html,
 body {
   width: 100%;
   min-height: 100vh;
+  background-color: #f1f5f9;
 }
