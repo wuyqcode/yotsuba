@@ -1,25 +1,34 @@
-import DescriptionIcon from '@mui/icons-material/Description';
-import HomeIcon from '@mui/icons-material/Home';
+import React, { useState, useEffect, Suspense } from 'react';
 import {
+  AppBar,
+  Avatar,
   Box,
-  Button,
+  IconButton,
   List,
+  ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Paper,
+  Toolbar,
+  Typography,
   Menu,
   MenuItem,
-  Paper
+  Button
 } from '@mui/material';
-import {
-  createMenuItems,
-  useViewConfig
-} from '@vaadin/hilla-file-router/runtime.js';
+import DescriptionIcon from '@mui/icons-material/Description';
+import HomeIcon from '@mui/icons-material/Home';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import EditIcon from '@mui/icons-material/Edit';
+import MenuIcon from '@mui/icons-material/Menu';
+import { Outlet } from 'react-router-dom';
+import { useViewConfig } from '@vaadin/hilla-file-router/runtime.js';
 import { effect, signal } from '@vaadin/hilla-react-signals';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { createMenuItems } from '@vaadin/hilla-file-router/runtime.js';
 import { Icon } from '@vaadin/react-components';
 import { useAuth } from 'Frontend/util/auth.js';
-import { Suspense, useEffect, useState } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+
 const defaultTitle = document.title;
 const documentTitleSignal = signal('');
 effect(() => {
@@ -45,10 +54,21 @@ export default function MainLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [navOpen, setNavOpen] = useState(true);
   const open = Boolean(anchorEl);
+
+  const history = Array.from(
+    { length: 50 },
+    (_, index) => `History Item ${index + 1}`
+  );
+
   useEffect(() => {
     documentTitleSignal.value = currentTitle;
   }, [currentTitle]);
+
+  const toggleNav = () => {
+    setNavOpen((pre) => !pre);
+  };
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -66,73 +86,132 @@ export default function MainLayout() {
     )}`;
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <Box component="nav" sx={{ width: 200, flexShrink: 0 }}>
-        <List component="nav">
-          {createMenuItems().map(({ to, title, icon }) => (
-            <ListItemButton key={title} onClick={() => navigate(to)}>
-              <ListItemIcon>{renderIcon(icon)}</ListItemIcon>
-              <ListItemText primary={title} />
-            </ListItemButton>
-          ))}
-          {state.user ? (
-            <>
-              <ListItemButton onClick={handleClick}>
-                <ListItemIcon>
-                  <img
-                    src={profilePictureUrl}
-                    alt="Notification Icon"
-                    style={{ width: 24, height: 24 }}
-                  />
-                </ListItemIcon>
-                <ListItemText primary="Account" />
-              </ListItemButton>
-              <Menu
-                id="basic-menu"
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleClose}
-                MenuListProps={{
-                  'aria-labelledby': 'basic-button'
-                }}
-              >
-                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                <MenuItem onClick={handleClose}>
-                  <Button
-                    onClick={async () => {
-                      await logout();
-                      document.location.reload();
-                    }}
-                  >
-                    Sign out
-                  </Button>
-                </MenuItem>
-              </Menu>
-            </>
-          ) : (
-            <ListItemButton onClick={() => navigate('/login')}>
-              <ListItemIcon>
-                <Icon icon={'vaadin:user'} />
-                {state.user}
-              </ListItemIcon>
-              <ListItemText primary="Sign in" />
-            </ListItemButton>
-          )}
-        </List>
-      </Box>
-      <Box
-        component="main"
-        sx={{ flexGrow: 1, padding: '8px', height: '100vh' }}
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+        justifyContent: 'space-between',
+        boxSizing: 'border-box',
+        backgroundColor: '#f5f5f5'
+      }}
+    >
+      <AppBar
+        position="fixed"
+        sx={{
+          backgroundColor: 'white',
+          color: 'black',
+          boxShadow: 'none',
+          borderBottom: '1px solid #ddd',
+          height: '50px'
+        }}
       >
-        <Paper
+        <Toolbar variant="dense">
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            sx={{
+              mr: 2,
+              '&:focus': {
+                outline: 'none'
+              }
+            }}
+            onClick={toggleNav}
+          >
+            <MenuIcon />
+          </IconButton>
+          <EditIcon sx={{ mr: 1 }} />
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            ChatGPT 4.0
+          </Typography>
+          <Avatar sx={{ ml: 2, width: '32px', height: '32px' }}>
+            {state.user ? (
+              <Box onClick={handleClick}>
+                <img
+                  src={profilePictureUrl}
+                  alt="Notification Icon"
+                  style={{ width: 24, height: 24 }}
+                />
+                <Menu
+                  id="basic-menu"
+                  anchorEl={anchorEl}
+                  open={open}
+                  onClose={handleClose}
+                  MenuListProps={{
+                    'aria-labelledby': 'basic-button'
+                  }}
+                >
+                  <MenuItem onClick={handleClose}>Profile</MenuItem>
+                  <MenuItem onClick={handleClose}>
+                    <Button
+                      onClick={async () => {
+                        await logout();
+                        document.location.reload();
+                      }}
+                    >
+                      Sign out
+                    </Button>
+                  </MenuItem>
+                </Menu>
+              </Box>
+            ) : (
+              <Box onClick={() => navigate('/login')}>
+                <Icon icon={'vaadin:user'} />
+              </Box>
+            )}
+          </Avatar>
+        </Toolbar>
+      </AppBar>
+      <Box
+        sx={{ display: 'flex', flexGrow: 1, mt: '50px', overflow: 'hidden' }}
+      >
+        <List
           sx={{
-            bgcolor: 'white',
-            borderRadius: 2,
-            height: '100%',
-            padding: '24px 3px'
+            flexShrink: 0,
+            overflowX: 'hidden',
+            backgroundColor: '#f5f5f5',
+            transition: 'width 0.1s ease, visibility 0.1s ease',
+            width: navOpen ? '200px' : '0',
+            visibility: navOpen ? 'visible' : 'hidden',
+            height: '100vh',
+            overflowY: 'auto'
           }}
         >
-          <Suspense>
+          {createMenuItems().map(({ to, title, icon }) => (
+            <ListItem key={title} onClick={() => navigate(to)}>
+              <ListItemIcon>{renderIcon(icon)}</ListItemIcon>
+              <ListItemText primary={title} />
+            </ListItem>
+          ))}
+          {history.map((item, index) => (
+            <ListItem key={index}>
+              <ListItemText primary={item} />
+            </ListItem>
+          ))}
+        </List>
+        <Paper
+          elevation={3}
+          sx={{
+            flexGrow: 1,
+            margin: '16px',
+            padding: '16px',
+            overflow: 'auto',
+            borderRadius: '8px',
+            '&::-webkit-scrollbar': {
+              width: '20px'
+            },
+            '&::-webkit-scrollbar-track': {
+              backgroundColor: 'transparent'
+            },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundImage: `url('https://i.ibb.co/1RHr40z/248599.png')`,
+              backgroundRepeat: 'no-repeat, no-repeat',
+              backgroundSize: '20px'
+            }
+          }}
+        >
+          <Suspense fallback={<div>Loading...</div>}>
             <Outlet />
           </Suspense>
         </Paper>

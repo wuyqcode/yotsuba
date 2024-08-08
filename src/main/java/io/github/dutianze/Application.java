@@ -1,6 +1,7 @@
 package io.github.dutianze;
 
 import com.vaadin.flow.component.page.AppShellConfigurator;
+import com.vaadin.flow.theme.NoTheme;
 import com.vaadin.flow.theme.Theme;
 import io.github.dutianze.shared.UserRepository;
 import org.springframework.boot.SpringApplication;
@@ -20,7 +21,7 @@ import javax.sql.DataSource;
  */
 @Modulithic(sharedModules = "shared")
 @SpringBootApplication
-@Theme(value = "yotsuba")
+@NoTheme
 public class Application implements AppShellConfigurator {
 
     public static void main(String[] args) {
