@@ -81,7 +81,7 @@ const MilkdownEditor: React.FC<MilkdownEditorProps> = ({
   const editor = useEditor((root) =>
     Editor.make()
       .config((ctx) => {
-        ctx.set(rootCtx, root);
+        ctx.set(rootCtx, '#ReactEditor');
         ctx.set(defaultValueCtx, content);
         ctx.get(listenerCtx).markdownUpdated((ctx, markdown, prevMarkdown) => {
           onChange(markdown);
@@ -106,7 +106,11 @@ const MilkdownEditor: React.FC<MilkdownEditorProps> = ({
       .use(history)
   );
 
-  return <ReactEditor editor={editor} />;
+  return (
+    <div id="ReactEditor">
+      <ReactEditor editor={editor} />
+    </div>
+  );
 };
 
 export default MilkdownEditor;

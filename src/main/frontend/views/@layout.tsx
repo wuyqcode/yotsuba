@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import {
   AppBar,
   Avatar,
@@ -6,10 +6,8 @@ import {
   IconButton,
   List,
   ListItem,
-  ListItemButton,
   ListItemIcon,
   ListItemText,
-  Paper,
   Toolbar,
   Typography,
   Menu,
@@ -18,7 +16,6 @@ import {
 } from '@mui/material';
 import DescriptionIcon from '@mui/icons-material/Description';
 import HomeIcon from '@mui/icons-material/Home';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import EditIcon from '@mui/icons-material/Edit';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Outlet } from 'react-router-dom';
@@ -190,31 +187,18 @@ export default function MainLayout() {
             </ListItem>
           ))}
         </List>
-        <Paper
-          elevation={3}
+        <Box
           sx={{
             flexGrow: 1,
-            margin: '16px',
             padding: '16px',
             overflow: 'auto',
-            borderRadius: '8px',
-            '&::-webkit-scrollbar': {
-              width: '20px'
-            },
-            '&::-webkit-scrollbar-track': {
-              backgroundColor: 'transparent'
-            },
-            '&::-webkit-scrollbar-thumb': {
-              backgroundImage: `url('https://i.ibb.co/1RHr40z/248599.png')`,
-              backgroundRepeat: 'no-repeat, no-repeat',
-              backgroundSize: '20px'
-            }
+            borderRadius: '8px'
           }}
         >
           <Suspense fallback={<div>Loading...</div>}>
             <Outlet />
           </Suspense>
-        </Paper>
+        </Box>
       </Box>
     </Box>
   );
