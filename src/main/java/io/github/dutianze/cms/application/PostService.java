@@ -5,8 +5,8 @@ import com.vaadin.hilla.Endpoint;
 import io.github.dutianze.cms.domain.Post;
 import io.github.dutianze.cms.domain.PostId;
 import io.github.dutianze.cms.domain.PostRepository;
-import io.github.dutianze.cms.domain.valueobject.PostContent;
 import io.github.dutianze.cms.domain.valueobject.PostTitle;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -35,10 +35,15 @@ public class PostService {
     }
 
     @Transactional
-    public void updatePost(PostId id, PostTitle title, PostContent content) {
-        Post post = postRepository.findById(id).orElseThrow();
-        post.setTitle(title);
-        post.setContent(content);
-        postRepository.save(post);
+    public void updatePost(Post post) {
+        Post existingPost = postRepository.findById(post.getId())
+                                          .orElseThrow(() -> new EntityNotFoundException(
+                                                  "Post not found with id: " + post.getId()));
+
+        existingPost.setTitle(post.getTitle());
+        existingPost.setCover(post.getCover());
+        existingPost.setContent(post.getContent());
+
+        postRepository.save(existingPost);
     }
 }

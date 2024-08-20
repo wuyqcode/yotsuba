@@ -18,11 +18,13 @@ import { ReactEditor, useEditor } from '@milkdown/react';
 import { nes } from './nes';
 
 interface MilkdownEditorProps {
+  postId: string;
   content: string;
   onChange: (content: string) => void;
 }
 
 const MilkdownEditor: React.FC<MilkdownEditorProps> = ({
+  postId,
   content,
   onChange
 }) => {
@@ -47,12 +49,16 @@ const MilkdownEditor: React.FC<MilkdownEditorProps> = ({
       images.map(async (image) => {
         const formData = new FormData();
         formData.append('file', image);
+        formData.append('postId', postId);
 
         try {
-          const response = await fetch('http://localhost:8080/images/upload', {
-            method: 'POST',
-            body: formData
-          });
+          const response = await fetch(
+            'http://localhost:8080/api/file-resource',
+            {
+              method: 'POST',
+              body: formData
+            }
+          );
 
           if (!response.ok) {
             throw new Error('Image upload failed');

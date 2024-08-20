@@ -4,7 +4,7 @@ import org.jmolecules.ddd.types.ValueObject;
 
 /**
  * @author dutianze
- * @date 2024/8/3
+ * @date 2024/8/20
  */
-public record PostTitle(String title) implements ValueObject {
+public record PostCover(String cover) implements ValueObject {
 }

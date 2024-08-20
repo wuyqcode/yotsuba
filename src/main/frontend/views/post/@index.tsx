@@ -3,7 +3,11 @@ import SearchIcon from '@mui/icons-material/Search';
 import {
   Box,
   Button,
+  Card,
+  CardContent,
+  CardMedia,
   Container,
+  Grid,
   IconButton,
   Paper,
   Tab,
@@ -22,6 +26,70 @@ export const config: ViewConfig = {
   },
   title: '文章'
 };
+
+const cardData = [
+  {
+    title: 'Card 1',
+    description: 'This is the description for card 1.',
+    imageUrl: 'https://via.placeholder.com/150'
+  },
+  {
+    title: 'Card 2',
+    description: 'This is the description for card 2.',
+    imageUrl: 'https://via.placeholder.com/150'
+  },
+  {
+    title: 'Card 2',
+    description: 'This is the description for card 2.',
+    imageUrl: 'https://via.placeholder.com/150'
+  },
+  {
+    title: 'Card 2',
+    description: 'This is the description for card 2.',
+    imageUrl: 'https://via.placeholder.com/150'
+  },
+  {
+    title: 'Card 2',
+    description: 'This is the description for card 2.',
+    imageUrl: 'https://via.placeholder.com/150'
+  },
+  {
+    title: 'Card 2',
+    description: 'This is the description for card 2.',
+    imageUrl: 'https://via.placeholder.com/150'
+  },
+  {
+    title: 'Card 2',
+    description: 'This is the description for card 2.',
+    imageUrl: 'https://via.placeholder.com/150'
+  },
+  {
+    title: 'Card 2',
+    description: 'This is the description for card 2.',
+    imageUrl: 'https://via.placeholder.com/150'
+  },
+  {
+    title: 'Card 2',
+    description: 'This is the description for card 2.',
+    imageUrl: 'https://via.placeholder.com/150'
+  },
+  {
+    title: 'Card 2',
+    description: 'This is the description for card 2.',
+    imageUrl: 'https://via.placeholder.com/150'
+  },
+  {
+    title: 'Card 2',
+    description: 'This is the description for card 2.',
+    imageUrl: 'https://via.placeholder.com/150'
+  },
+  {
+    title: 'Card 3',
+    description: 'This is the description for card 3.',
+    imageUrl: 'https://via.placeholder.com/150'
+  }
+  // 添加更多卡片数据
+];
 
 function TabPanel(props: any) {
   const { children, value, index, ...other } = props;
@@ -88,7 +156,34 @@ export default function AdminView() {
               <Tab label="草稿" />
             </Tabs>
             <TabPanel value={tabValue} index={0}>
-              list
+              <Grid container spacing={2}>
+                {cardData.map((card, index) => (
+                  <Grid item xs={12} sm={6} md={3} key={index}>
+                    <Card
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        height: '100%'
+                      }}
+                    >
+                      <CardMedia
+                        component="img"
+                        height="140"
+                        image={card.imageUrl}
+                        alt={card.title}
+                      />
+                      <CardContent>
+                        <Typography variant="h5" component="div">
+                          {card.title}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {card.description}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
             </TabPanel>
             <TabPanel value={tabValue} index={1}>
               已发布的文章

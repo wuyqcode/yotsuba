@@ -1,29 +1,22 @@
-import { PhotoCamera } from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  Chip,
-  CssBaseline,
-  IconButton,
-  Paper,
-  Stack,
-  TextField
-} from '@mui/material';
+import { Box, Button, Chip, IconButton, Paper, TextField } from '@mui/material';
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
-import MilkdownEditor from 'Frontend/components/MilkdownEditor';
-import { PostService } from 'Frontend/generated/endpoints';
-import Post from 'Frontend/generated/io/github/dutianze/cms/domain/Post';
-import PostId from 'Frontend/generated/io/github/dutianze/cms/domain/PostId';
-import PostContent from 'Frontend/generated/io/github/dutianze/cms/domain/valueobject/PostContent';
 import {
   ChangeEvent,
   useEffect,
   useState,
   KeyboardEvent,
-  useRef,
-  useCallback
+  useCallback,
+  FormEvent
 } from 'react';
 import { useParams } from 'react-router-dom';
+import ImageIcon from '@mui/icons-material/Image';
+import DeleteIcon from '@mui/icons-material/Delete';
+import MilkdownEditor from 'Frontend/components/MilkdownEditor';
+import Post from 'Frontend/generated/io/github/dutianze/cms/domain/Post';
+import { PostService } from 'Frontend/generated/endpoints';
+import PostId from 'Frontend/generated/io/github/dutianze/cms/domain/PostId';
+import PostContent from 'Frontend/generated/io/github/dutianze/cms/domain/valueobject/PostContent';
+import PostCover from 'Frontend/generated/io/github/dutianze/cms/domain/valueobject/PostCover';
 
 export const config: ViewConfig = {
   menu: { exclude: true }
@@ -31,14 +24,16 @@ export const config: ViewConfig = {
 
 export default function MilkdownEditorWrapper() {
   const { postId } = useParams();
-  const [post, setPost] = useState<Post | undefined>(undefined);
+  if (!postId) {
+    throw new Error('postId is required but not found');
+  }
+
+  const [post, setPost] = useState<Post>();
   const [title, setTitle] = useState<string>('Hello World');
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState<string>('');
-  const [image, setImage] = useState(null);
-
   const [paperHeight, setPaperHeight] = useState<number>(0);
-
+  const [hovered, setHovered] = useState(false);
   const measuredRef = useCallback((node: any) => {
     if (node !== null) {
       setPaperHeight(node.getBoundingClientRect().height);
@@ -60,18 +55,15 @@ export default function MilkdownEditorWrapper() {
     }
   }, [postId]);
 
-  if (!post || !setPost) {
-    return <div>Post ID is missing</div>;
-  }
-
   const onChange = (content: string) => {
     const contentObject: PostContent = { content: content };
-    setPost({ ...post, content: contentObject });
+    setPost((prevPost) =>
+      prevPost ? { ...prevPost, content: contentObject } : prevPost
+    );
   };
 
   const handleSave = () => {
-    console.log('Title:', title);
-    console.log('Tags:', tags);
+    PostService.updatePost(post);
   };
 
   const handleAddTag = () => {
@@ -86,7 +78,9 @@ export default function MilkdownEditorWrapper() {
   };
 
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setTitle(e.target.value);
+    setPost((prevPost) =>
+      prevPost ? { ...prevPost, title: { title: e.target.value } } : prevPost
+    );
   };
 
   const handleTagInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -98,6 +92,58 @@ export default function MilkdownEditorWrapper() {
       setTags([...tags, tagInput.trim()]);
       setTagInput('');
     }
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event?.target?.files?.[0]) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', event.target.files[0]);
+    formData.append('postId', postId);
+    console.log(formData);
+
+    fetch('http://localhost:8080/api/file-resource', {
+      method: 'POST',
+      body: formData
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to upload image');
+        }
+        return response.text();
+      })
+      .then((imageUrl) => {
+        const postCoverObject: PostCover = { cover: imageUrl };
+        setPost((prevPost) => {
+          if (prevPost) {
+            return {
+              ...prevPost,
+              cover: postCoverObject
+            };
+          } else {
+            return undefined;
+          }
+        });
+      })
+      .catch((error) => {
+        console.error('Failed to upload image:', error);
+      });
+  };
+
+  const handleImageClear = () => {
+    const postCoverObject: PostCover = { cover: undefined };
+    setPost((prevPost) => {
+      if (prevPost) {
+        return {
+          ...prevPost,
+          cover: postCoverObject
+        };
+      } else {
+        return undefined;
+      }
+    });
   };
 
   return (
@@ -123,104 +169,125 @@ export default function MilkdownEditorWrapper() {
         }
       }}
     >
-      <MilkdownEditor
-        content={post?.content?.content ?? ''}
-        onChange={onChange}
-      />
-      <CssBaseline />
+      {postId && post && (
+        <>
+          <MilkdownEditor
+            postId={postId}
+            content={post?.content?.content ?? ''}
+            onChange={onChange}
+          />
 
-      <Paper
-        elevation={3}
-        ref={measuredRef}
-        sx={{
-          flexGrow: 0,
-          width: '260px',
-          maxWidth: '260px',
-          padding: 2,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 2
-        }}
-      >
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSave}
-          sx={{ alignSelf: 'center' }}
-        >
-          Save
-        </Button>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100px',
-            width: '100px',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            overflow: 'hidden'
-          }}
-        >
-          {image ? (
-            <img
-              src={image}
-              alt="Uploaded"
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          ) : (
-            <IconButton
+          <Paper
+            elevation={3}
+            ref={measuredRef}
+            sx={{
+              flexGrow: 0,
+              width: '260px',
+              maxWidth: '260px',
+              padding: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 2
+            }}
+          >
+            <Button
+              variant="contained"
               color="primary"
-              aria-label="upload picture"
-              component="label"
+              onClick={handleSave}
+              sx={{ alignSelf: 'end' }}
             >
-              <input
-                type="file"
-                accept="image/*"
-                hidden
-                // onChange={handleImageUpload}
-              />
-              <PhotoCamera />
-            </IconButton>
-          )}
-        </Box>
-        <TextField
-          label="Title"
-          value={title}
-          onChange={handleTitleChange}
-          margin="normal"
-          size="small"
-        />
-        <TextField
-          label="Add a tag"
-          value={tagInput}
-          onChange={handleTagInputChange}
-          onKeyDown={handleTagInputKeyDown}
-          margin="normal"
-          size="small"
-        />
-        <Box
-          display="flex"
-          flexWrap="wrap"
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{
-            overflowY: 'auto'
-          }}
-        >
-          {tags.map((tag, index) => (
-            <Chip
-              key={index}
+              Save
+            </Button>
+            <Box
+              component={'label'}
               sx={{
-                height: 'auto'
+                position: 'relative',
+                width: '100%',
+                aspectRatio: '1 / 1',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '1px dashed grey',
+                cursor: 'pointer'
               }}
-              label={tag}
-              onDelete={handleDeleteTag(tag)}
+              htmlFor="contained-button-file"
+              onMouseEnter={() => setHovered(true)}
+              onMouseLeave={() => setHovered(false)}
+            >
+              {post.cover.cover ? (
+                <Box
+                  component="img"
+                  src={post.cover.cover}
+                  sx={{
+                    width: '100%',
+                    objectFit: 'cover',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                />
+              ) : (
+                <ImageIcon sx={{ fontSize: 48, color: 'grey' }} />
+              )}
+
+              <input
+                accept="image/*"
+                style={{ display: 'none' }}
+                id="contained-button-file"
+                type="file"
+                onChange={handleImageUpload}
+              />
+              {post.cover.cover && hovered && (
+                <IconButton
+                  onClick={handleImageClear}
+                  sx={{
+                    position: 'absolute',
+                    bottom: 0,
+                    right: 0,
+                    backgroundColor: 'white',
+                    borderRadius: '50%',
+                    boxShadow: 3
+                  }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              )}
+            </Box>
+            <TextField
+              label="Title"
+              value={post.title.title}
+              onChange={handleTitleChange}
+              margin="normal"
+              size="small"
             />
-          ))}
-        </Box>
-      </Paper>
+            <TextField
+              label="Add a tag"
+              value={tagInput}
+              onChange={handleTagInputChange}
+              onKeyDown={handleTagInputKeyDown}
+              margin="normal"
+              size="small"
+            />
+            <Box
+              sx={{
+                width: '100%',
+                overflowY: 'auto',
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'flex-start',
+                alignContent: 'flex-start',
+                flex: '1 0 0',
+                gap: '4px'
+              }}
+            >
+              {tags.map((tag, index) => (
+                <Chip key={index} label={tag} onDelete={handleDeleteTag(tag)} />
+              ))}
+            </Box>
+          </Paper>
+        </>
+      )}
     </Box>
   );
 }

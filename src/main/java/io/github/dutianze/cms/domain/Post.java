@@ -1,6 +1,7 @@
 package io.github.dutianze.cms.domain;
 
 import io.github.dutianze.cms.domain.valueobject.PostContent;
+import io.github.dutianze.cms.domain.valueobject.PostCover;
 import io.github.dutianze.cms.domain.valueobject.PostStatus;
 import io.github.dutianze.cms.domain.valueobject.PostTitle;
 import jakarta.persistence.CascadeType;
@@ -27,6 +28,8 @@ public class Post extends AbstractAggregateRoot<Post> implements AggregateRoot<P
 
     private PostTitle title;
 
+    private PostCover cover;
+
     private PostContent content;
 
     private PostStatus postStatus = PostStatus.DRAFT;
@@ -49,6 +52,7 @@ public class Post extends AbstractAggregateRoot<Post> implements AggregateRoot<P
     public Post(PostTitle postTitle, Tag... tags) {
         this.id = new PostId();
         this.title = postTitle;
+        this.cover = new PostCover("");
         this.postStatus = PostStatus.DRAFT;
         this.content = new PostContent("");
         this.tags = new TreeSet<>(List.of(tags));
@@ -85,4 +89,11 @@ public class Post extends AbstractAggregateRoot<Post> implements AggregateRoot<P
         return postStatus;
     }
 
+    public PostCover getCover() {
+        return cover;
+    }
+
+    public void setCover(PostCover cover) {
+        this.cover = cover;
+    }
 }
