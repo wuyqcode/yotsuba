@@ -73,4 +73,55 @@ public class FileResource implements Entity<Post, FileResourceId>, Comparable<Fi
     public byte[] getData() {
         return data;
     }
+
+    public void setId(FileResourceId id) {
+        this.id = id;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
+    public Long getSize() {
+        return size;
+    }
+
+    public void setSize(Long size) {
+        this.size = size;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
+    }
+
+    public Association<Post, PostId> getPost() {
+        return post;
+    }
+
+    public void setPost(
+            Association<Post, PostId> post) {
+        this.post = post;
+    }
+
+    @Nullable
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(@Nullable LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    @Nullable
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(@Nullable LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

@@ -96,4 +96,54 @@ public class Post extends AbstractAggregateRoot<Post> implements AggregateRoot<P
     public void setCover(PostCover cover) {
         this.cover = cover;
     }
+
+    public void setId(PostId id) {
+        this.id = id;
+    }
+
+    public void setPostStatus(PostStatus postStatus) {
+        this.postStatus = postStatus;
+    }
+
+    public SortedSet<FileResource> getFileResources() {
+        return fileResources;
+    }
+
+    public void setFileResources(SortedSet<FileResource> fileResources) {
+        this.fileResources = fileResources;
+    }
+
+    public SortedSet<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(SortedSet<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public SortedSet<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(SortedSet<Tag> tags) {
+        this.tags = tags;
+    }
+
+    @Nullable
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(@Nullable LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    @Nullable
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(@Nullable LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

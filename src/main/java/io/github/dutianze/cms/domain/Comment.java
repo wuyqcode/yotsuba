@@ -46,4 +46,43 @@ public class Comment implements Entity<Post, CommentId>, Comparable<Comment> {
         }
         return this.createdAt.compareTo(o.createdAt);
     }
+
+    public void setId(CommentId id) {
+        this.id = id;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public Association<Post, PostId> getPost() {
+        return post;
+    }
+
+    public void setPost(
+            Association<Post, PostId> post) {
+        this.post = post;
+    }
+
+    @Nullable
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(@Nullable LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    @Nullable
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(@Nullable LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

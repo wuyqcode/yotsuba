@@ -1,22 +1,26 @@
-import { Box, Button, Chip, IconButton, Paper, TextField } from '@mui/material';
+import {
+  Box,
+  Button,
+  Chip,
+  IconButton,
+  Paper,
+  Stack,
+  TextField
+} from '@mui/material';
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
 import {
   ChangeEvent,
   useEffect,
   useState,
   KeyboardEvent,
-  useCallback,
-  FormEvent
+  useCallback
 } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import ImageIcon from '@mui/icons-material/Image';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MilkdownEditor from 'Frontend/components/MilkdownEditor';
-import Post from 'Frontend/generated/io/github/dutianze/cms/domain/Post';
 import { PostService } from 'Frontend/generated/endpoints';
-import PostId from 'Frontend/generated/io/github/dutianze/cms/domain/PostId';
-import PostContent from 'Frontend/generated/io/github/dutianze/cms/domain/valueobject/PostContent';
-import PostCover from 'Frontend/generated/io/github/dutianze/cms/domain/valueobject/PostCover';
+import PostDto from 'Frontend/generated/io/github/dutianze/cms/application/dto/PostDto';
 
 export const config: ViewConfig = {
   menu: { exclude: true }
@@ -27,9 +31,8 @@ export default function MilkdownEditorWrapper() {
   if (!postId) {
     throw new Error('postId is required but not found');
   }
-
-  const [post, setPost] = useState<Post>();
-  const [title, setTitle] = useState<string>('Hello World');
+  const navigate = useNavigate();
+  const [post, setPost] = useState<PostDto>();
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState<string>('');
   const [paperHeight, setPaperHeight] = useState<number>(0);
@@ -42,8 +45,7 @@ export default function MilkdownEditorWrapper() {
 
   useEffect(() => {
     if (postId) {
-      const postIdObject: PostId = { id: postId };
-      PostService.findById(postIdObject)
+      PostService.findById(postId)
         .then((data) => {
           if (data) {
             setPost(data);
@@ -56,14 +58,20 @@ export default function MilkdownEditorWrapper() {
   }, [postId]);
 
   const onChange = (content: string) => {
-    const contentObject: PostContent = { content: content };
     setPost((prevPost) =>
-      prevPost ? { ...prevPost, content: contentObject } : prevPost
+      prevPost ? { ...prevPost, content: content } : prevPost
     );
   };
 
-  const handleSave = () => {
-    PostService.updatePost(post);
+  const handleSave = (closeAfterSave = false) => {
+    PostService.updatePost(postId, post?.title, post?.cover, post?.content);
+    if (closeAfterSave) {
+      closePostEditor();
+    }
+  };
+
+  const closePostEditor = () => {
+    navigate('/post');
   };
 
   const handleAddTag = () => {
@@ -79,7 +87,7 @@ export default function MilkdownEditorWrapper() {
 
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPost((prevPost) =>
-      prevPost ? { ...prevPost, title: { title: e.target.value } } : prevPost
+      prevPost ? { ...prevPost, title: e.target.value } : prevPost
     );
   };
 
@@ -115,17 +123,9 @@ export default function MilkdownEditorWrapper() {
         return response.text();
       })
       .then((imageUrl) => {
-        const postCoverObject: PostCover = { cover: imageUrl };
-        setPost((prevPost) => {
-          if (prevPost) {
-            return {
-              ...prevPost,
-              cover: postCoverObject
-            };
-          } else {
-            return undefined;
-          }
-        });
+        setPost((prevPost) =>
+          prevPost ? { ...prevPost, cover: imageUrl } : undefined
+        );
       })
       .catch((error) => {
         console.error('Failed to upload image:', error);
@@ -133,17 +133,9 @@ export default function MilkdownEditorWrapper() {
   };
 
   const handleImageClear = () => {
-    const postCoverObject: PostCover = { cover: undefined };
-    setPost((prevPost) => {
-      if (prevPost) {
-        return {
-          ...prevPost,
-          cover: postCoverObject
-        };
-      } else {
-        return undefined;
-      }
-    });
+    setPost((prevPost) =>
+      prevPost ? { ...prevPost, cover: undefined } : prevPost
+    );
   };
 
   return (
@@ -173,7 +165,7 @@ export default function MilkdownEditorWrapper() {
         <>
           <MilkdownEditor
             postId={postId}
-            content={post?.content?.content ?? ''}
+            content={post?.content ?? ''}
             onChange={onChange}
           />
 
@@ -187,18 +179,31 @@ export default function MilkdownEditorWrapper() {
               padding: 2,
               display: 'flex',
               flexDirection: 'column',
-              alignItems: 'center',
+              alignItems: 'stretch',
               gap: 2
             }}
           >
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleSave}
-              sx={{ alignSelf: 'end' }}
+            <Stack
+              spacing={1}
+              direction="row"
+              justifyContent="flex-end"
+              alignItems="center"
             >
-              Save
-            </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={closePostEditor}
+              >
+                关闭
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleSave(false)}
+              >
+                保存
+              </Button>
+            </Stack>
             <Box
               component={'label'}
               sx={{
@@ -215,10 +220,10 @@ export default function MilkdownEditorWrapper() {
               onMouseEnter={() => setHovered(true)}
               onMouseLeave={() => setHovered(false)}
             >
-              {post.cover.cover ? (
+              {post.cover ? (
                 <Box
                   component="img"
-                  src={post.cover.cover}
+                  src={post.cover}
                   sx={{
                     width: '100%',
                     objectFit: 'cover',
@@ -238,7 +243,7 @@ export default function MilkdownEditorWrapper() {
                 type="file"
                 onChange={handleImageUpload}
               />
-              {post.cover.cover && hovered && (
+              {post.cover && hovered && (
                 <IconButton
                   onClick={handleImageClear}
                   sx={{
@@ -256,7 +261,7 @@ export default function MilkdownEditorWrapper() {
             </Box>
             <TextField
               label="Title"
-              value={post.title.title}
+              value={post.title}
               onChange={handleTitleChange}
               margin="normal"
               size="small"

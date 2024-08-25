@@ -19,6 +19,8 @@ import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
 import { PostService } from 'Frontend/generated/endpoints';
 import { SetStateAction, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+
 export const config: ViewConfig = {
   menu: {
     order: 5,
@@ -26,70 +28,6 @@ export const config: ViewConfig = {
   },
   title: '文章'
 };
-
-const cardData = [
-  {
-    title: 'Card 1',
-    description: 'This is the description for card 1.',
-    imageUrl: 'https://via.placeholder.com/150'
-  },
-  {
-    title: 'Card 2',
-    description: 'This is the description for card 2.',
-    imageUrl: 'https://via.placeholder.com/150'
-  },
-  {
-    title: 'Card 2',
-    description: 'This is the description for card 2.',
-    imageUrl: 'https://via.placeholder.com/150'
-  },
-  {
-    title: 'Card 2',
-    description: 'This is the description for card 2.',
-    imageUrl: 'https://via.placeholder.com/150'
-  },
-  {
-    title: 'Card 2',
-    description: 'This is the description for card 2.',
-    imageUrl: 'https://via.placeholder.com/150'
-  },
-  {
-    title: 'Card 2',
-    description: 'This is the description for card 2.',
-    imageUrl: 'https://via.placeholder.com/150'
-  },
-  {
-    title: 'Card 2',
-    description: 'This is the description for card 2.',
-    imageUrl: 'https://via.placeholder.com/150'
-  },
-  {
-    title: 'Card 2',
-    description: 'This is the description for card 2.',
-    imageUrl: 'https://via.placeholder.com/150'
-  },
-  {
-    title: 'Card 2',
-    description: 'This is the description for card 2.',
-    imageUrl: 'https://via.placeholder.com/150'
-  },
-  {
-    title: 'Card 2',
-    description: 'This is the description for card 2.',
-    imageUrl: 'https://via.placeholder.com/150'
-  },
-  {
-    title: 'Card 2',
-    description: 'This is the description for card 2.',
-    imageUrl: 'https://via.placeholder.com/150'
-  },
-  {
-    title: 'Card 3',
-    description: 'This is the description for card 3.',
-    imageUrl: 'https://via.placeholder.com/150'
-  }
-  // 添加更多卡片数据
-];
 
 function TabPanel(props: any) {
   const { children, value, index, ...other } = props;
@@ -114,6 +52,17 @@ function TabPanel(props: any) {
 export default function AdminView() {
   const [tabValue, setTabValue] = useState(0);
   const navigate = useNavigate();
+  const {
+    data: posts,
+    error,
+    isLoading
+  } = useQuery({
+    queryKey: ['posts'],
+    queryFn: () => PostService.getPosts(0, 10, '', '')
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
 
   const handleChange = (event: any, newValue: SetStateAction<number>) => {
     setTabValue(newValue);
@@ -157,27 +106,33 @@ export default function AdminView() {
             </Tabs>
             <TabPanel value={tabValue} index={0}>
               <Grid container spacing={2}>
-                {cardData.map((card, index) => (
+                {posts?.map((post, index) => (
                   <Grid item xs={12} sm={6} md={3} key={index}>
                     <Card
                       sx={{
                         display: 'flex',
                         flexDirection: 'column',
-                        height: '100%'
+                        height: '100%',
+                        '&:hover': {
+                          boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+                          transform: 'translateY(-5px)',
+                          transition: 'all 0.3s ease-in-out'
+                        }
                       }}
+                      onClick={() => navigate(`/post/${post?.id}`)}
                     >
                       <CardMedia
                         component="img"
                         height="140"
-                        image={card.imageUrl}
-                        alt={card.title}
+                        image={post?.cover}
+                        alt={post?.title}
                       />
                       <CardContent>
                         <Typography variant="h5" component="div">
-                          {card.title}
+                          {post?.title}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {card.description}
+                          {post?.content}
                         </Typography>
                       </CardContent>
                     </Card>
