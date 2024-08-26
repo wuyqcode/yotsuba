@@ -12,7 +12,9 @@ import {
   Typography,
   Menu,
   MenuItem,
-  Button
+  Button,
+  CardMedia,
+  Card
 } from '@mui/material';
 import DescriptionIcon from '@mui/icons-material/Description';
 import HomeIcon from '@mui/icons-material/Home';
@@ -53,11 +55,6 @@ export default function MainLayout() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [navOpen, setNavOpen] = useState(true);
   const open = Boolean(anchorEl);
-
-  const history = Array.from(
-    { length: 50 },
-    (_, index) => `History Item ${index + 1}`
-  );
 
   useEffect(() => {
     documentTitleSignal.value = currentTitle;
@@ -103,25 +100,37 @@ export default function MainLayout() {
           height: '50px'
         }}
       >
-        <Toolbar variant="dense">
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{
-              mr: 2,
-              '&:focus': {
-                outline: 'none'
-              }
-            }}
-            onClick={toggleNav}
-          >
-            <MenuIcon />
-          </IconButton>
-          <EditIcon sx={{ mr: 1 }} />
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            ChatGPT 4.0
-          </Typography>
+        <Toolbar
+          variant="dense"
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: '100%'
+          }}
+        >
+          <Box sx={{ display: 'flex' }}>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              sx={{
+                '&:focus': {
+                  outline: 'none'
+                }
+              }}
+              onClick={toggleNav}
+            >
+              <MenuIcon />
+            </IconButton>
+            <CardMedia
+              component="img"
+              height="50"
+              image={'images/icon.png'}
+              sx={{ width: 40, height: 40 }}
+              onClick={() => navigate('/')}
+            />
+          </Box>
           <Avatar sx={{ ml: 2, width: '32px', height: '32px' }}>
             {state.user ? (
               <Box onClick={handleClick}>
@@ -179,11 +188,6 @@ export default function MainLayout() {
             <ListItem key={title} onClick={() => navigate(to)}>
               <ListItemIcon>{renderIcon(icon)}</ListItemIcon>
               <ListItemText primary={title} />
-            </ListItem>
-          ))}
-          {history.map((item, index) => (
-            <ListItem key={index}>
-              <ListItemText primary={item} />
             </ListItem>
           ))}
         </List>
