@@ -7,7 +7,7 @@ import { cursor } from '@milkdown/plugin-cursor';
 import { listener, listenerCtx } from '@milkdown/plugin-listener';
 import { upload, uploadPlugin, Uploader } from '@milkdown/plugin-upload';
 import type { Node } from 'prosemirror-model';
-import React from 'react';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import {
   Editor,
   rootCtx,
@@ -28,6 +28,8 @@ const MilkdownEditor: React.FC<MilkdownEditorProps> = ({
   content,
   onChange
 }) => {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
   const uploader: Uploader = async (files, schema) => {
     const images: File[] = [];
 
@@ -89,9 +91,30 @@ const MilkdownEditor: React.FC<MilkdownEditorProps> = ({
       .config((ctx) => {
         ctx.set(rootCtx, '#ReactEditor');
         ctx.set(defaultValueCtx, content);
-        ctx.get(listenerCtx).markdownUpdated((ctx, markdown, prevMarkdown) => {
+        const listener = ctx.get(listenerCtx);
+        listener.markdownUpdated((ctx, markdown, prevMarkdown) => {
           onChange(markdown);
         });
+        listener.mounted((ctx) => {
+          const wrapper = wrapperRef.current as HTMLDivElement;
+          const editor = wrapper.querySelector(
+            ".editor[role='textbox']"
+          ) as HTMLDivElement;
+
+          if (editor) {
+            editor.focus();
+
+            // 将光标移动到内容的末尾
+            const range = document.createRange();
+            const selection = window.getSelection();
+
+            range.selectNodeContents(editor);
+            range.collapse(false); // 将range折叠到最后一个字符
+            selection?.removeAllRanges(); // 清除所有range
+            selection?.addRange(range); // 添加新的range
+          }
+        });
+
         ctx.update(editorViewOptionsCtx, (prev) => ({
           ...prev,
           editable: () => true
@@ -113,7 +136,7 @@ const MilkdownEditor: React.FC<MilkdownEditorProps> = ({
   );
 
   return (
-    <div id="ReactEditor">
+    <div id="ReactEditor" ref={wrapperRef}>
       <ReactEditor editor={editor} />
     </div>
   );

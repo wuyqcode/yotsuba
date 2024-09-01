@@ -1,17 +1,12 @@
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import SearchIcon from '@mui/icons-material/Search';
+import DeleteIcon from '@mui/icons-material/Delete';
 import {
   Box,
-  Button,
   Card,
   CardContent,
   CardMedia,
-  Container,
   Grid,
   IconButton,
-  Paper,
-  Tab,
-  Tabs,
   TextField,
   Typography
 } from '@mui/material';
@@ -20,6 +15,7 @@ import { PostService } from 'Frontend/generated/endpoints';
 import { SetStateAction, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import AddIcon from '@mui/icons-material/Add';
 
 export const config: ViewConfig = {
   menu: {
@@ -29,44 +25,21 @@ export const config: ViewConfig = {
   title: '文章'
 };
 
-function TabPanel(props: any) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-}
-
 export default function AdminView() {
   const [tabValue, setTabValue] = useState(0);
   const navigate = useNavigate();
+  const [searchText, setSearchText] = useState('');
   const {
     data: posts,
     error,
     isLoading
   } = useQuery({
-    queryKey: ['posts'],
-    queryFn: () => PostService.getPosts(0, 10, '', '')
+    queryKey: ['posts', searchText],
+    queryFn: () => PostService.searchMessages(searchText, 0, 10)
   });
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
-
-  const handleChange = (event: any, newValue: SetStateAction<number>) => {
-    setTabValue(newValue);
-  };
 
   const createPost = async () => {
     const newPostId = await PostService.createPost();
@@ -75,113 +48,124 @@ export default function AdminView() {
     navigate(`/post/${newPostId}`);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter') {
+      setSearchText((event.target as HTMLInputElement).value);
+      console.log('Search Text:', (event.target as HTMLInputElement).value);
+    }
+  };
+
   return (
-    <Box sx={{ display: 'flex', flexGrow: 1, height: '100%' }}>
+    <Box
+      sx={{
+        padding: '20px'
+      }}
+    >
       <Box
         sx={{
-          flexGrow: 1,
-          height: '100%'
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          flexDirection: 'column',
+          marginBottom: '20px'
         }}
       >
-        <Container>
-          <Button variant="contained" color="primary" onClick={createPost}>
-            新建文章
-          </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            style={{ marginLeft: '8px' }}
-          >
-            导入
-          </Button>
-          <Box sx={{ width: '100%', typography: 'body1', marginTop: '16px' }}>
-            <Tabs
-              value={tabValue}
-              onChange={handleChange}
-              aria-label="basic tabs example"
-            >
-              <Tab label="所有文章" />
-              <Tab label="已发布" />
-              <Tab label="草稿" />
-            </Tabs>
-            <TabPanel value={tabValue} index={0}>
-              <Grid container spacing={2}>
-                {posts?.map((post, index) => (
-                  <Grid item xs={12} sm={6} md={3} key={index}>
-                    <Card
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        height: '100%',
-                        '&:hover': {
-                          boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
-                          transform: 'translateY(-5px)',
-                          transition: 'all 0.3s ease-in-out'
-                        }
-                      }}
-                      onClick={() => navigate(`/post/${post?.id}`)}
-                    >
-                      <CardMedia
-                        component="img"
-                        height="140"
-                        image={post?.cover}
-                        alt={post?.title}
-                      />
-                      <CardContent>
-                        <Typography variant="h5" component="div">
-                          {post?.title}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {post?.content}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
-            </TabPanel>
-            <TabPanel value={tabValue} index={1}>
-              已发布的文章
-            </TabPanel>
-            <TabPanel value={tabValue} index={2}>
-              草稿文章
-            </TabPanel>
-            <TabPanel value={tabValue} index={3}>
-              定时发布的文章
-            </TabPanel>
-          </Box>
-        </Container>
-      </Box>
-      <Box sx={{ width: 300, ml: 3 }}>
-        <Paper sx={{ p: 2, mb: 2 }}>
+        <Typography variant="h4" sx={{ marginBottom: '10px' }}>
+          任意の検索 <span style={{ color: '#e91e63' }}>POST</span>
+        </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            maxWidth: '600px',
+            width: '100%'
+          }}
+        >
           <TextField
             variant="outlined"
-            placeholder="搜索 Memos"
-            fullWidth
+            placeholder="+ を使用して複数のキーワードを組み合わせる"
+            sx={{
+              borderRadius: '50px',
+              width: '100%',
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '50px'
+              },
+              '& .MuiOutlinedInput-input': {
+                padding: '10px 15px'
+              }
+            }}
+            onKeyDown={handleKeyDown}
             InputProps={{
               endAdornment: (
-                <IconButton>
-                  <SearchIcon />
-                </IconButton>
+                <>
+                  <IconButton>
+                    <SearchIcon />
+                  </IconButton>
+                  <IconButton>
+                    <DeleteIcon />
+                  </IconButton>
+                </>
               )
             }}
           />
-        </Paper>
-        <Paper sx={{ p: 2, mb: 2 }}>
-          <Typography variant="h6">2024年8月</Typography>
-          <CalendarTodayIcon />
-          <Typography>75 memos in 7 days</Typography>
-        </Paper>
-        <Paper sx={{ p: 2, mb: 2 }}>
-          <Typography variant="h6">标签</Typography>
-          <Typography>#features (6)</Typography>
-          <Typography>#todo (5)</Typography>
-          <Typography>#test (3)</Typography>
-          <Typography>#france (2)</Typography>
-          <Typography>#hello (2)</Typography>
-          <Typography>#facebook #work #world</Typography>
-        </Paper>
+          <IconButton
+            sx={{ marginLeft: '10px' }} // 设置按钮和输入框之间的间距
+            onClick={createPost} // 你可以在这里添加按钮点击事件处理函数
+          >
+            <AddIcon />
+          </IconButton>
+        </Box>
+        <Typography
+          sx={{ marginTop: '10px', color: '#ffb74d', fontSize: '14px' }}
+        >
+          java, aws, python
+        </Typography>
       </Box>
+
+      <Grid container spacing={2}>
+        {posts?.map((post, index) => (
+          <Grid item xs={12} sm={6} md={3} key={index}>
+            <Card
+              sx={{
+                color: 'white',
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+                minWidth: '200px', // 设置最小宽度
+                '&:hover': {
+                  boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+                  transform: 'translateY(-5px)',
+                  transition: 'all 0.3s ease-in-out'
+                }
+              }}
+            >
+              <CardMedia
+                component="img"
+                height="140"
+                image={post?.cover}
+                alt={post?.title}
+                onClick={() => navigate(`/post/${post?.id}`)}
+              />
+              <CardContent
+                sx={{
+                  flexGrow: 1,
+                  maxHeight: '100px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  color: 'white'
+                }}
+              >
+                <Typography variant="body1" component="div">
+                  {post?.title}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {post?.content}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
     </Box>
   );
 }

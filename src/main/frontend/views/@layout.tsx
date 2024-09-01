@@ -14,7 +14,8 @@ import {
   MenuItem,
   Button,
   CardMedia,
-  Card
+  Card,
+  Drawer
 } from '@mui/material';
 import DescriptionIcon from '@mui/icons-material/Description';
 import HomeIcon from '@mui/icons-material/Home';
@@ -53,7 +54,7 @@ export default function MainLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [navOpen, setNavOpen] = useState(true);
+  const [navOpen, setNavOpen] = useState(false);
   const open = Boolean(anchorEl);
 
   useEffect(() => {
@@ -172,25 +173,33 @@ export default function MainLayout() {
       <Box
         sx={{ display: 'flex', flexGrow: 1, mt: '50px', overflow: 'hidden' }}
       >
-        <List
+        <Drawer
+          variant="temporary"
+          open={navOpen}
+          onClose={toggleNav}
           sx={{
-            flexShrink: 0,
-            overflowX: 'hidden',
-            backgroundColor: '#f5f5f5',
-            transition: 'width 0.1s ease, visibility 0.1s ease',
-            width: navOpen ? '200px' : '0',
-            visibility: navOpen ? 'visible' : 'hidden',
-            height: '100vh',
-            overflowY: 'auto'
+            '& .MuiDrawer-paper': {
+              width: '200px',
+              backgroundColor: '#f5f5f5'
+            }
           }}
         >
-          {createMenuItems().map(({ to, title, icon }) => (
-            <ListItem key={title} onClick={() => navigate(to)}>
-              <ListItemIcon>{renderIcon(icon)}</ListItemIcon>
-              <ListItemText primary={title} />
-            </ListItem>
-          ))}
-        </List>
+          <List>
+            {createMenuItems().map(({ to, title, icon }) => (
+              <ListItem
+                button
+                key={title}
+                onClick={() => {
+                  navigate(to);
+                  toggleNav();
+                }}
+              >
+                <ListItemIcon>{renderIcon(icon)}</ListItemIcon>
+                <ListItemText primary={title} />
+              </ListItem>
+            ))}
+          </List>
+        </Drawer>
         <Box
           sx={{
             flexGrow: 1,

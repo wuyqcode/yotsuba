@@ -194,14 +194,21 @@ export default function MilkdownEditorWrapper() {
                 color="primary"
                 onClick={closePostEditor}
               >
-                关闭
+                close
               </Button>
               <Button
                 variant="contained"
                 color="primary"
                 onClick={() => handleSave(false)}
               >
-                保存
+                save
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleSave(true)}
+              >
+                Done
               </Button>
             </Stack>
             <Box
