@@ -32,10 +32,10 @@ logging:
   level:
     org:
       atmosphere: warn
-#      hibernate:
-#        orm:
-#          jdbc:
-#            bind: trace
+      hibernate:
+        orm:
+          jdbc:
+            bind: trace
 vaadin:
   launch-browser: 'true'
   allowed-packages: com.vaadin,org.vaadin,io.github.dutianze

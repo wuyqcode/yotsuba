@@ -1,4 +1,5 @@
-CREATE VIRTUAL TABLE fts5_post USING fts5(id UNINDEXED, title, content, content='post');
+CREATE VIRTUAL TABLE fts5_post USING fts5(id UNINDEXED, title, content, content='post', tokenize='trigram');
+CREATE VIRTUAL TABLE fts5_post_vocab USING fts5vocab( fts5_post , row );
 
 CREATE TRIGGER post_before_update
 BEFORE UPDATE ON post BEGIN

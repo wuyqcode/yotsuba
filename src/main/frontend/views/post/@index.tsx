@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
 import { PostService } from 'Frontend/generated/endpoints';
-import { SetStateAction, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import AddIcon from '@mui/icons-material/Add';
@@ -26,16 +26,18 @@ export const config: ViewConfig = {
 };
 
 export default function AdminView() {
-  const [tabValue, setTabValue] = useState(0);
   const navigate = useNavigate();
   const [searchText, setSearchText] = useState('');
   const {
     data: posts,
     error,
-    isLoading
+    isLoading,
+    refetch
   } = useQuery({
-    queryKey: ['posts', searchText],
-    queryFn: () => PostService.searchMessages(searchText, 0, 10)
+    queryKey: ['posts'],
+    queryFn: () => PostService.searchMessages(searchText, 0, 10),
+    refetchOnMount: 'always',
+    refetchOnReconnect: 'always'
   });
 
   if (isLoading) return <div>Loading...</div>;
@@ -50,9 +52,12 @@ export default function AdminView() {
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter') {
-      setSearchText((event.target as HTMLInputElement).value);
-      console.log('Search Text:', (event.target as HTMLInputElement).value);
+      refetch();
     }
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(event.target.value);
   };
 
   return (
@@ -94,6 +99,8 @@ export default function AdminView() {
                 padding: '10px 15px'
               }
             }}
+            value={searchText}
+            onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             InputProps={{
               endAdornment: (

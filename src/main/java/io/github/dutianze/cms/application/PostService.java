@@ -1,11 +1,10 @@
 package io.github.dutianze.cms.application;
 
+import com.google.common.collect.Lists;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.hilla.Endpoint;
 import io.github.dutianze.cms.application.dto.PostDto;
-import io.github.dutianze.cms.domain.Post;
-import io.github.dutianze.cms.domain.PostId;
-import io.github.dutianze.cms.domain.PostRepository;
+import io.github.dutianze.cms.domain.*;
 import io.github.dutianze.cms.domain.valueobject.PostContent;
 import io.github.dutianze.cms.domain.valueobject.PostCover;
 import io.github.dutianze.cms.domain.valueobject.PostTitle;
@@ -17,6 +16,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 /**
  * @author dutianze
  * @date 2024/8/4
@@ -26,8 +30,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final FTS5PostVocabRepository fts5PostVocabRepository;
 
-    public PostService(PostRepository postRepository) {this.postRepository = postRepository;}
+    public PostService(PostRepository postRepository, FTS5PostVocabRepository fts5PostVocabRepository) {
+        this.postRepository = postRepository;
+        this.fts5PostVocabRepository = fts5PostVocabRepository;
+    }
 
     public PostDto findById(String id) {
         Post post = postRepository.findById(new PostId(id)).orElseThrow(
@@ -43,7 +51,26 @@ public class PostService {
             return posts.map(PostDto::fromEntity);
         }
         try {
-            return postRepository.searchPost(searchText, pageable).map(PostDto::fromEntity);
+            String terms = Arrays.stream(searchText.split(" "))
+                                 .flatMap(word -> Lists
+                                         .partition(word.chars()
+                                                        .mapToObj(c -> String.valueOf((char) c))
+                                                        .collect(Collectors.toList()), 3)
+                                         .stream())
+                                 .map(partition -> String.join("", partition))
+                                 .map(keyword -> fts5PostVocabRepository
+                                         .findAll(FTS5PostVocabRepository.searchByKeywords(List.of(keyword)))
+                                         .stream()
+                                         .map(FTS5PostVocab::getTerm)
+                                         .map(term -> "\"" + term + "\"")
+                                         .collect(Collectors.joining(" OR ")))
+                                 .filter(StringUtils::isNoneEmpty)
+                                 .map(term -> "( " + term + " )")
+                                 .collect(Collectors.joining(" AND "));
+            if (StringUtils.isEmpty(terms)) {
+                return Page.empty();
+            }
+            return postRepository.searchPost(terms, pageable).map(PostDto::fromEntity);
         } catch (DataAccessResourceFailureException e) {
             postRepository.rebuild();
             Page<Post> posts = postRepository.searchPost(searchText, pageable);
