@@ -10,3 +10,9 @@ export type ColumnType = {
   title: string;
   taskIds: string[];
 };
+
+export interface BoardState {
+  columns: { [key: string]: ColumnType };
+  tasks: { [key: string]: TaskType };
+  columnOrder: string[];
+}

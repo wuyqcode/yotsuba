@@ -5,7 +5,8 @@ import {
   IconButton,
   Paper,
   Stack,
-  TextField
+  TextField,
+  Typography
 } from '@mui/material';
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
 import {
@@ -142,162 +143,181 @@ export default function MilkdownEditorWrapper() {
     <Box
       sx={{
         display: 'flex',
+        flexDirection: 'column',
         height: '100%',
-        border: '2px solid black',
         margin: 'auto',
-        fontFamily: 'Press Start 2P',
-        padding: 2,
-        background: 'rgba(68, 71, 90, 1)',
-        '& #ReactEditor': {
-          flexGrow: 1,
-          width: '100%',
-          overflowY: 'auto'
-        },
-        '& .milkdown': {
-          width: '100%',
-          height: `${paperHeight}px`,
-          maxHeight: `${paperHeight}px`,
-          overflowY: 'auto'
-        }
+        fontFamily: 'Press Start 2P'
       }}
     >
       {postId && post && (
         <>
-          <MilkdownEditor
-            postId={postId}
-            content={post?.content ?? ''}
-            onChange={onChange}
-          />
-
-          <Paper
-            elevation={3}
-            ref={measuredRef}
+          <Box
             sx={{
-              flexGrow: 0,
-              width: '260px',
-              maxWidth: '260px',
-              padding: 2,
               display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'stretch',
-              gap: 2
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 2
             }}
           >
-            <Stack
-              spacing={1}
-              direction="row"
-              justifyContent="flex-end"
-              alignItems="center"
-            >
-              <Button
-                variant="contained"
+            <Box sx={{ display: 'flex', alignItems: 'center', marginRight: 2 }}>
+              <Typography
+                variant="body1"
                 color="primary"
+                fontWeight="bold"
+                sx={{ marginRight: 1 }}
                 onClick={closePostEditor}
               >
-                close
-              </Button>
+                post /
+              </Typography>
+              <TextField
+                label="Title"
+                value={post.title}
+                onChange={handleTitleChange}
+                size="small"
+                sx={{ maxWidth: '300px' }}
+              />
+            </Box>
+            <Stack direction="row" spacing={1}>
               <Button
                 variant="contained"
-                color="primary"
-                onClick={() => handleSave(false)}
+                color="secondary"
+                onClick={closePostEditor}
               >
-                save
+                Cancel
               </Button>
               <Button
                 variant="contained"
                 color="primary"
                 onClick={() => handleSave(true)}
               >
-                Done
+                Save
               </Button>
             </Stack>
-            <Box
-              component={'label'}
-              sx={{
-                position: 'relative',
-                width: '100%',
-                aspectRatio: '1 / 1',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                border: '1px dashed grey',
-                cursor: 'pointer'
-              }}
-              htmlFor="contained-button-file"
-              onMouseEnter={() => setHovered(true)}
-              onMouseLeave={() => setHovered(false)}
-            >
-              {post.cover ? (
-                <Box
-                  component="img"
-                  src={post.cover}
-                  sx={{
-                    width: '100%',
-                    objectFit: 'cover',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                />
-              ) : (
-                <ImageIcon sx={{ fontSize: 48, color: 'grey' }} />
-              )}
+          </Box>
 
-              <input
-                accept="image/*"
-                style={{ display: 'none' }}
-                id="contained-button-file"
-                type="file"
-                onChange={handleImageUpload}
-              />
-              {post.cover && hovered && (
-                <IconButton
-                  onClick={handleImageClear}
-                  sx={{
-                    position: 'absolute',
-                    bottom: 0,
-                    right: 0,
-                    backgroundColor: 'white',
-                    borderRadius: '50%',
-                    boxShadow: 3
-                  }}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              )}
-            </Box>
-            <TextField
-              label="Title"
-              value={post.title}
-              onChange={handleTitleChange}
-              margin="normal"
-              size="small"
-            />
-            <TextField
-              label="Add a tag"
-              value={tagInput}
-              onChange={handleTagInputChange}
-              onKeyDown={handleTagInputKeyDown}
-              margin="normal"
-              size="small"
-            />
-            <Box
-              sx={{
+          <Box
+            sx={{
+              display: 'flex',
+              height: '100%',
+              fontFamily: 'Press Start 2P',
+              '& #ReactEditor': {
+                flexGrow: 1,
                 width: '100%',
-                overflowY: 'auto',
+                overflowY: 'auto'
+              },
+              '& .milkdown': {
+                width: '100%',
+                height: `${paperHeight}px`,
+                maxHeight: `${paperHeight}px`,
+                overflowY: 'auto'
+              }
+            }}
+          >
+            <MilkdownEditor
+              postId={postId}
+              content={post?.content ?? ''}
+              onChange={onChange}
+            />
+
+            <Paper
+              elevation={3}
+              ref={measuredRef}
+              sx={{
+                flexGrow: 0,
+                width: '260px',
+                maxWidth: '260px',
+                padding: 2,
                 display: 'flex',
-                flexWrap: 'wrap',
-                justifyContent: 'flex-start',
-                alignContent: 'flex-start',
-                flex: '1 0 0',
-                gap: '4px'
+                flexDirection: 'column',
+                alignItems: 'stretch',
+                gap: 2
               }}
             >
-              {tags.map((tag, index) => (
-                <Chip key={index} label={tag} onDelete={handleDeleteTag(tag)} />
-              ))}
-            </Box>
-          </Paper>
+              <Box
+                component={'label'}
+                sx={{
+                  position: 'relative',
+                  width: '100%',
+                  aspectRatio: '1 / 1',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '1px dashed grey',
+                  cursor: 'pointer'
+                }}
+                htmlFor="contained-button-file"
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
+              >
+                {post.cover ? (
+                  <Box
+                    component="img"
+                    src={post.cover}
+                    sx={{
+                      width: '100%',
+                      objectFit: 'cover',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  />
+                ) : (
+                  <ImageIcon sx={{ fontSize: 48, color: 'grey' }} />
+                )}
+
+                <input
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  id="contained-button-file"
+                  type="file"
+                  onChange={handleImageUpload}
+                />
+                {post.cover && hovered && (
+                  <IconButton
+                    onClick={handleImageClear}
+                    sx={{
+                      position: 'absolute',
+                      bottom: 0,
+                      right: 0,
+                      backgroundColor: 'white',
+                      borderRadius: '50%',
+                      boxShadow: 3
+                    }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                )}
+              </Box>
+              <TextField
+                label="Add a tag"
+                value={tagInput}
+                onChange={handleTagInputChange}
+                onKeyDown={handleTagInputKeyDown}
+                margin="normal"
+                size="small"
+              />
+              <Box
+                sx={{
+                  width: '100%',
+                  overflowY: 'auto',
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  justifyContent: 'flex-start',
+                  alignContent: 'flex-start',
+                  flex: '1 0 0',
+                  gap: '4px'
+                }}
+              >
+                {tags.map((tag, index) => (
+                  <Chip
+                    key={index}
+                    label={tag}
+                    onDelete={handleDeleteTag(tag)}
+                  />
+                ))}
+              </Box>
+            </Paper>
+          </Box>
         </>
       )}
     </Box>

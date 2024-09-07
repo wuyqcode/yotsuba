@@ -15,7 +15,8 @@ import {
   Button,
   CardMedia,
   Card,
-  Drawer
+  Drawer,
+  ListItemButton
 } from '@mui/material';
 import DescriptionIcon from '@mui/icons-material/Description';
 import HomeIcon from '@mui/icons-material/Home';
@@ -186,8 +187,7 @@ export default function MainLayout() {
         >
           <List>
             {createMenuItems().map(({ to, title, icon }) => (
-              <ListItem
-                button
+              <ListItemButton
                 key={title}
                 onClick={() => {
                   navigate(to);
@@ -196,7 +196,7 @@ export default function MainLayout() {
               >
                 <ListItemIcon>{renderIcon(icon)}</ListItemIcon>
                 <ListItemText primary={title} />
-              </ListItem>
+              </ListItemButton>
             ))}
           </List>
         </Drawer>

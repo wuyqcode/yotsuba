@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -27,6 +26,7 @@ import java.util.stream.Collectors;
  */
 @Endpoint
 @AnonymousAllowed
+@Transactional(readOnly = true)
 public class PostService {
 
     private final PostRepository postRepository;
@@ -43,7 +43,6 @@ public class PostService {
         return PostDto.fromEntity(post);
     }
 
-    @Transactional
     public Page<PostDto> searchMessages(String searchText, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         if (StringUtils.isEmpty(searchText)) {

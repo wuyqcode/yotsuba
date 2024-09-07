@@ -1,105 +1,95 @@
-import React, { useState } from 'react';
-import { TaskType } from './types';
 import { Draggable } from 'react-beautiful-dnd';
 import {
-  Card,
-  CardContent,
+  Paper,
   Typography,
-  TextField,
-  Button,
-  Box
+  IconButton,
+  Box,
+  Checkbox,
+  Chip,
+  Avatar
 } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { TaskType } from './types';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 
-export type TaskProps = {
+interface Props {
   task: TaskType;
   index: number;
-  onEditTask: (id: string, title: string, description: string) => void;
-  onDeleteTask: (id: string) => void;
-};
+  onEdit: () => void;
+  onDelete: () => void;
+}
 
-const Task: React.FC<TaskProps> = ({
-  task,
-  index,
-  onEditTask,
-  onDeleteTask
-}) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [newTitle, setNewTitle] = useState(task.title);
-  const [newDescription, setNewDescription] = useState(task.description);
-
-  const handleSave = () => {
-    onEditTask(task.id, newTitle, newDescription);
-    setIsEditing(false);
-  };
-
+const Task = ({ task, index, onEdit, onDelete }: Props) => {
   return (
     <Draggable draggableId={task.id} index={index}>
       {(provided) => (
-        <Card
-          sx={{ marginBottom: '10px' }}
+        <Paper
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
+          sx={{ mb: 1, p: 2, borderRadius: '8px', boxShadow: 3 }}
         >
-          <CardContent>
-            {isEditing ? (
-              <>
-                <Box sx={{ marginBottom: '16px' }}>
-                  <TextField
-                    fullWidth
-                    label="Title"
-                    value={newTitle}
-                    onChange={(e) => setNewTitle(e.target.value)}
-                    margin="normal"
-                    multiline
-                    variant="outlined"
-                  />
-                </Box>
-                <Box sx={{ marginBottom: '16px' }}>
-                  <TextField
-                    fullWidth
-                    label="Description"
-                    value={newDescription}
-                    onChange={(e) => setNewDescription(e.target.value)}
-                    margin="normal"
-                    variant="outlined"
-                    multiline
-                    rows={4}
-                  />
-                </Box>
-                <Box sx={{ textAlign: 'right' }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSave}
-                    sx={{ padding: '10px 20px' }} // Adds more padding for a better look
-                  >
-                    Save
-                  </Button>
-                </Box>
-              </>
-            ) : (
-              <>
-                <Typography variant="h6">{task.title}</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {task.description}
-                </Typography>
-                <Box sx={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                  <Button variant="outlined" onClick={() => setIsEditing(true)}>
-                    Edit
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={() => onDeleteTask(task.id)}
-                  >
-                    Delete
-                  </Button>
-                </Box>
-              </>
-            )}
-          </CardContent>
-        </Card>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}
+          >
+            <Typography variant="h6">{task.title}</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <IconButton size="small" onClick={onEdit}>
+                <EditIcon fontSize="small" />
+              </IconButton>
+              <IconButton size="small" onClick={onDelete}>
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          </Box>
+
+          {task.description && (
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              {task.description}
+            </Typography>
+          )}
+
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}
+          >
+            {/* Adding label style */}
+            <Chip
+              label="SPACE TRAVEL PARTNERS"
+              color="warning"
+              variant="outlined"
+            />
+
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Checkbox
+                icon={<CheckBoxOutlineBlankIcon />}
+                checkedIcon={<CheckBoxIcon />}
+                size="small"
+              />
+              <Typography
+                variant="body2"
+                sx={{ mx: 1, display: 'flex', alignItems: 'center' }}
+              >
+                <ArrowUpwardIcon fontSize="small" sx={{ color: 'red' }} />
+                <span>5</span>
+              </Typography>
+              <Avatar
+                src="/path-to-profile-pic.jpg"
+                sx={{ width: 24, height: 24 }}
+              />
+            </Box>
+          </Box>
+        </Paper>
       )}
     </Draggable>
   );

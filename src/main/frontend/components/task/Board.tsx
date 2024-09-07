@@ -1,101 +1,74 @@
 import { useState } from 'react';
-import { ColumnType, TaskType } from './types';
+import { ColumnType, TaskType, BoardState } from './types';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import {
   Box,
   Button,
   TextField,
-  Typography,
-  Card,
-  CardContent
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material';
 import Column from './Column';
 
-type BoardState = {
-  columns: {
-    [key: string]: ColumnType;
-  };
-  tasks: {
-    [key: string]: TaskType;
-  };
-  columnOrder: string[];
-};
-
-// Initial data for the board state
+// 修改初始数据结构
 const initialData: BoardState = {
   columns: {
-    'column-1': {
-      id: 'column-1',
-      title: 'To Do',
-      taskIds: ['task-1', 'task-2']
-    },
-    'column-2': { id: 'column-2', title: 'In Progress', taskIds: [] },
-    'column-3': { id: 'column-3', title: 'Done', taskIds: [] }
+    todo: { id: 'todo', title: 'TO DO', taskIds: [] },
+    inProgress: { id: 'inProgress', title: 'IN PROGRESS', taskIds: [] },
+    inReview: { id: 'inReview', title: 'IN REVIEW', taskIds: [] },
+    done: { id: 'done', title: 'DONE', taskIds: [] }
   },
-  tasks: {
-    'task-1': { id: 'task-1', title: 'Task 1', description: 'Description 1' },
-    'task-2': { id: 'task-2', title: 'Task 2', description: 'Description 2' }
-  },
-  columnOrder: ['column-1', 'column-2', 'column-3']
+  tasks: {},
+  columnOrder: ['todo', 'inProgress', 'inReview', 'done']
 };
 
 const Board = () => {
   // State to manage the board data
   const [data, setData] = useState<BoardState>(initialData);
-  const [newTaskTitle, setNewTaskTitle] = useState('');
-  const [newTaskDescription, setNewTaskDescription] = useState('');
+  const [editingTask, setEditingTask] = useState<TaskType | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
 
-  // Function to handle adding a new task
-  const handleAddTask = () => {
-    const newTaskId = `task-${Date.now()}`;
-    const newTask: TaskType = {
-      id: newTaskId,
-      title: newTaskTitle,
-      description: newTaskDescription
-    };
-
-    const newTasks = {
-      ...data.tasks,
-      [newTaskId]: newTask
-    };
-
-    const newTaskIds = Array.from(data.columns['column-1'].taskIds);
-    newTaskIds.push(newTaskId);
-
-    const newColumn = {
-      ...data.columns['column-1'],
-      taskIds: newTaskIds
-    };
-
-    const newState = {
-      ...data,
-      tasks: newTasks,
-      columns: {
-        ...data.columns,
-        [newColumn.id]: newColumn
-      }
-    };
-
-    setData(newState);
-    setNewTaskTitle('');
-    setNewTaskDescription('');
+  // 修改打开对话框的函数
+  const openDialog = (mode: 'add' | 'edit', task?: TaskType) => {
+    setDialogMode(mode);
+    setEditingTask(
+      mode === 'add' ? { id: '', title: '', description: '' } : task || null
+    );
+    setIsDialogOpen(true);
   };
 
-  // Function to handle editing an existing task
-  const handleEditTask = (id: string, title: string, description: string) => {
-    const newTask = { ...data.tasks[id], title, description };
+  // 修改保存任务的函数
+  const handleSaveTask = () => {
+    if (editingTask) {
+      if (dialogMode === 'add') {
+        // 添加新任务
+        const newTaskId = `task-${Date.now()}`;
+        const newTask: TaskType = {
+          ...editingTask,
+          id: newTaskId
+        };
 
-    const newTasks = {
-      ...data.tasks,
-      [id]: newTask
-    };
+        // 更新状态
+        setData((prevData) => {
+          const newTasks = { ...prevData.tasks, [newTaskId]: newTask };
+          const newColumns = { ...prevData.columns };
+          newColumns.todo.taskIds.push(newTaskId);
 
-    const newState = {
-      ...data,
-      tasks: newTasks
-    };
-
-    setData(newState);
+          return {
+            ...prevData,
+            tasks: newTasks,
+            columns: newColumns
+          };
+        });
+      } else {
+        // 更新现有任务
+        // ... 更新任务的逻辑 ...
+      }
+    }
+    setIsDialogOpen(false);
   };
 
   // Function to handle deleting a task
@@ -189,61 +162,81 @@ const Board = () => {
     setData(newState);
   };
 
-  /*
-    `DragDropContext` is the main component that enables drag-and-drop functionality.
-    It wraps the part of the app where drag-and-drop will occur 
-  */
-  return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Box sx={{ padding: '2rem', textAlign: 'center' }}>
-        <Typography variant="h4">Drag and Drop Board</Typography>
+  const handleEditTask = (task: TaskType) => {
+    openDialog('edit', task);
+  };
 
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            marginBottom: '2rem'
-          }}
-        >
-          <Box sx={{ maxWidth: '600px', width: '100%', textAlign: 'left' }}>
-            <TextField
-              fullWidth
-              label="Task Title"
-              variant="outlined"
-              value={newTaskTitle}
-              onChange={(e) => setNewTaskTitle(e.target.value)}
-              margin="normal"
-            />
-            <TextField
-              fullWidth
-              label="Task Description"
-              variant="outlined"
-              value={newTaskDescription}
-              onChange={(e) => setNewTaskDescription(e.target.value)}
-              margin="normal"
-            />
+  const handleAddTask = (columnId: string) => {
+    openDialog('add');
+  };
+
+  const renderColumnHeaderContent = (columnId: string) => {
+    const commonStyles = { margin: '0 0 8px 0' };
+
+    switch (columnId) {
+      case 'todo':
+        return (
+          <Box
+            sx={{
+              ...commonStyles,
+              display: 'flex',
+              alignItems: 'center',
+              position: 'relative'
+            }}
+          >
+            <span style={{ flex: 1, textAlign: 'center' }}>待办任务</span>
             <Button
               variant="contained"
-              color="primary"
-              fullWidth
-              onClick={handleAddTask}
+              size="small"
+              onClick={() => openDialog('add')}
+              sx={{
+                position: 'absolute',
+                right: 0,
+                minWidth: 0,
+                width: '24px',
+                height: '24px',
+                p: 0
+              }}
             >
-              Add Task
+              +
             </Button>
           </Box>
-        </Box>
+        );
+      case 'inProgress':
+        return <Box sx={commonStyles}>进行中的任务</Box>;
+      case 'inReview':
+        return <Box sx={commonStyles}>待审核的任务</Box>;
+      case 'done':
+        return <Box sx={commonStyles}>已完成的任务</Box>;
+      default:
+        return null;
+    }
+  };
 
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%', // 设置整个Board组件高度为100%视口高度
+        overflow: 'hidden' // 防止出现滚动条
+      }}
+    >
+      <DragDropContext onDragEnd={onDragEnd}>
         <Box
           sx={{
             display: 'flex',
-            gap: '2rem',
-            justifyContent: 'space-around',
-            flexWrap: 'wrap'
+            gap: 2,
+            overflowX: 'auto',
+            flexGrow: 1, // 允许这个Box占据剩余的垂直空间
+            height: '100%' // 设置高度为100%
           }}
         >
           {data.columnOrder.map((columnId) => {
             const column = data.columns[columnId];
-            const tasks = column.taskIds.map((taskId) => data.tasks[taskId]);
+            const tasks = column.taskIds
+              .map((taskId) => data.tasks[taskId])
+              .filter((task): task is TaskType => task !== undefined); // 添加这个过滤器
             return (
               <Column
                 key={column.id}
@@ -251,12 +244,53 @@ const Board = () => {
                 tasks={tasks}
                 onEditTask={handleEditTask}
                 onDeleteTask={handleDeleteTask}
+                onAddTask={() => handleAddTask(columnId)} // 修改这一行
+                renderHeaderContent={renderColumnHeaderContent(columnId)}
               />
             );
           })}
         </Box>
-      </Box>
-    </DragDropContext>
+      </DragDropContext>
+
+      <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+        <DialogTitle>
+          {dialogMode === 'add' ? '创建新任务' : '编辑任务'}
+        </DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="标题"
+            fullWidth
+            value={editingTask?.title || ''}
+            onChange={(e) =>
+              setEditingTask((prev) =>
+                prev ? { ...prev, title: e.target.value } : null
+              )
+            }
+          />
+          <TextField
+            margin="dense"
+            label="描述"
+            fullWidth
+            multiline
+            rows={4}
+            value={editingTask?.description || ''}
+            onChange={(e) =>
+              setEditingTask((prev) =>
+                prev ? { ...prev, description: e.target.value } : null
+              )
+            }
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsDialogOpen(false)}>取消</Button>
+          <Button onClick={handleSaveTask}>
+            {dialogMode === 'add' ? '创建' : '保存'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };
 
