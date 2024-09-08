@@ -100,7 +100,7 @@
 			<optional>true</optional>
 		</dependency>
 
-<!--     jmolecules-->
+		<!--     jmolecules-->
 		<dependency>
 			<groupId>org.jmolecules.integrations</groupId>
 			<artifactId>jmolecules-starter-ddd</artifactId>

@@ -77,12 +77,12 @@ public class Post extends AbstractAggregateRoot<Post> implements AggregateRoot<P
         this.content = content;
     }
 
-    public PostTitle getTitle() {
-        return title;
+    public String getTitle() {
+        return title.title();
     }
 
-    public PostContent getContent() {
-        return content;
+    public String getContent() {
+        return content.content();
     }
 
     public PostStatus getPostStatus() {
@@ -145,5 +145,13 @@ public class Post extends AbstractAggregateRoot<Post> implements AggregateRoot<P
 
     public void setUpdatedAt(@Nullable LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public void afterCreated() {
+        registerEvent(new PostCreated(id));
+    }
+
+    public void afterUpdated() {
+        registerEvent(new PostUpdate(id));
     }
 }

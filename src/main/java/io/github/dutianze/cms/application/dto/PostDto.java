@@ -27,9 +27,9 @@ public record PostDto(
     public static PostDto fromEntity(Post post) {
         return new PostDto(
                 post.getId().id(),
-                post.getTitle().title(),
+                post.getTitle(),
                 post.getCover().cover(),
-                post.getContent().content(),
+                post.getContent(),
                 post.getPostStatus(),
                 post.getFileResources().stream()
                     .map(FileResourceDto::fromEntity)

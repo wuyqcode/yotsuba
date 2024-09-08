@@ -7,7 +7,7 @@ import { HelloWorldEndpoint } from 'Frontend/generated/endpoints.js';
 
 export const config: ViewConfig = {
   menu: { order: 0, icon: 'HomeIcon' },
-  title: 'Hello World'
+  title: 'Home'
 };
 
 export default function HelloWorldView() {

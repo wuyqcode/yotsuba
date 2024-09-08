@@ -17,7 +17,7 @@ import { useRef, useState } from 'react';
 
 export const config: ViewConfig = {
   menu: { order: 1, icon: 'HomeIcon' },
-  title: 'Public'
+  title: 'Epub'
 };
 
 const ImageUpload = () => {

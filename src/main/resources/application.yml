@@ -13,7 +13,7 @@ spring:
   jpa:
     defer-datasource-initialization: false
     database-platform: org.hibernate.community.dialect.SQLiteDialect
-    open-in-view: true
+#    open-in-view: true
     hibernate:
       ddl-auto: none # create none
     properties:
@@ -23,8 +23,8 @@ spring:
   datasource:
     url: jdbc:sqlite:./yotsuba.db
     driver-class-name: org.sqlite.JDBC
-    hikari:
-      connectionInitSql: PRAGMA foreign_keys = ON;
+#    hikari:
+#      connectionInitSql: PRAGMA foreign_keys = ON;
   flyway:
     baseline-on-migrate: true
     enabled: true

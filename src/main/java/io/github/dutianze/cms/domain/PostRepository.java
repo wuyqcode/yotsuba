@@ -26,7 +26,7 @@ public interface PostRepository extends CrudRepository<Post, PostId> {
     @Query(value = """
             SELECT p.*, bm25(fts5_post) AS score
             FROM post p
-            JOIN fts5_post fts5_post ON p.id = fts5_post.id
+            JOIN fts5_post ON p.id = fts5_post.id
             WHERE fts5_post MATCH :searchText
             ORDER BY score ASC
             """,

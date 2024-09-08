@@ -10,7 +10,6 @@ import io.github.dutianze.cms.domain.valueobject.PostCover;
 import io.github.dutianze.cms.domain.valueobject.PostTitle;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -49,37 +48,32 @@ public class PostService {
             Page<Post> posts = postRepository.findAll(pageable);
             return posts.map(PostDto::fromEntity);
         }
-        try {
-            String terms = Arrays.stream(searchText.split(" "))
-                                 .flatMap(word -> Lists
-                                         .partition(word.chars()
-                                                        .mapToObj(c -> String.valueOf((char) c))
-                                                        .collect(Collectors.toList()), 3)
-                                         .stream())
-                                 .map(partition -> String.join("", partition))
-                                 .map(keyword -> fts5PostVocabRepository
-                                         .findAll(FTS5PostVocabRepository.searchByKeywords(List.of(keyword)))
-                                         .stream()
-                                         .map(FTS5PostVocab::getTerm)
-                                         .map(term -> "\"" + term + "\"")
-                                         .collect(Collectors.joining(" OR ")))
-                                 .filter(StringUtils::isNoneEmpty)
-                                 .map(term -> "( " + term + " )")
-                                 .collect(Collectors.joining(" AND "));
-            if (StringUtils.isEmpty(terms)) {
-                return Page.empty();
-            }
-            return postRepository.searchPost(terms, pageable).map(PostDto::fromEntity);
-        } catch (DataAccessResourceFailureException e) {
-            postRepository.rebuild();
-            Page<Post> posts = postRepository.searchPost(searchText, pageable);
-            return posts.map(PostDto::fromEntity);
+        String terms = Arrays.stream(searchText.split(" "))
+                             .flatMap(word -> Lists
+                                     .partition(word.chars()
+                                                    .mapToObj(c -> String.valueOf((char) c))
+                                                    .collect(Collectors.toList()), 3)
+                                     .stream())
+                             .map(partition -> String.join("", partition))
+                             .map(keyword -> fts5PostVocabRepository
+                                     .findAll(FTS5PostVocabRepository.searchByKeywords(List.of(keyword)))
+                                     .stream()
+                                     .map(FTS5PostVocab::getTerm)
+                                     .map(term -> "\"" + term + "\"")
+                                     .collect(Collectors.joining(" OR ")))
+                             .filter(StringUtils::isNoneEmpty)
+                             .map(term -> "( " + term + " )")
+                             .collect(Collectors.joining(" AND "));
+        if (StringUtils.isEmpty(terms)) {
+            return Page.empty();
         }
+        return postRepository.searchPost(terms, pageable).map(PostDto::fromEntity);
     }
 
     @Transactional
     public String createPost() {
         Post post = new Post(new PostTitle("untitled"));
+        post.afterCreated();
         Post savedPost = postRepository.save(post);
         return savedPost.getId().id();
     }
@@ -93,7 +87,7 @@ public class PostService {
         existingPost.setTitle(new PostTitle(title));
         existingPost.setCover(new PostCover(cover));
         existingPost.setContent(new PostContent(content));
-
+        existingPost.afterUpdated();
         postRepository.save(existingPost);
     }
 }
