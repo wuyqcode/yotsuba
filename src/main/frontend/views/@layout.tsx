@@ -22,6 +22,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import HomeIcon from '@mui/icons-material/Home';
 import EditIcon from '@mui/icons-material/Edit';
 import MenuIcon from '@mui/icons-material/Menu';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { Outlet } from 'react-router-dom';
 import { useViewConfig } from '@vaadin/hilla-file-router/runtime.js';
 import { effect, signal } from '@vaadin/hilla-react-signals';
@@ -95,10 +96,13 @@ export default function MainLayout() {
       <AppBar
         position="fixed"
         sx={{
-          backgroundColor: 'white',
+          background: 'rgba(255, 255, 255, 0.2)',
+          backdropFilter: 'blur(5px)',
+          WebkitBackdropFilter: 'blur(5px)',
+          boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+          border: '1px solid rgba(255, 255, 255, 0.3)',
           color: 'black',
-          boxShadow: 'none',
-          borderBottom: '1px solid #ddd',
+          borderRadius: '10px',
           height: '50px'
         }}
       >
@@ -175,13 +179,25 @@ export default function MainLayout() {
         sx={{ display: 'flex', flexGrow: 1, mt: '50px', overflow: 'hidden' }}
       >
         <Drawer
-          variant="temporary"
+          variant="persistent"
+          anchor="left"
           open={navOpen}
-          onClose={toggleNav}
           sx={{
+            width: navOpen ? 200 : 0,
+            flexShrink: 0,
             '& .MuiDrawer-paper': {
-              width: '200px',
-              backgroundColor: '#f5f5f5'
+              width: 200,
+              boxSizing: 'border-box',
+              background: 'rgba(255, 255, 255, 0.2)',
+              boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+              backdropFilter: 'blur(5px)',
+              WebkitBackdropFilter: 'blur(5px)',
+              borderRadius: '10px',
+              marginTop: '5px',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              transition: 'width 0.3s ease-in-out',
+              top: '50px',
+              height: 'calc(100% - 50px)'
             }
           }}
         >
@@ -191,7 +207,6 @@ export default function MainLayout() {
                 key={title}
                 onClick={() => {
                   navigate(to);
-                  toggleNav();
                 }}
               >
                 <ListItemIcon>{renderIcon(icon)}</ListItemIcon>
@@ -203,9 +218,7 @@ export default function MainLayout() {
         <Box
           sx={{
             flexGrow: 1,
-            padding: '16px',
-            overflow: 'auto',
-            borderRadius: '8px'
+            overflow: 'auto'
           }}
         >
           <Suspense fallback={<div>Loading...</div>}>

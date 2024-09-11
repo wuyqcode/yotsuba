@@ -146,7 +146,8 @@ export default function MilkdownEditorWrapper() {
         flexDirection: 'column',
         height: '100%',
         margin: 'auto',
-        fontFamily: 'Press Start 2P'
+        fontFamily: 'Press Start 2P',
+        padding: '16px'
       }}
     >
       {postId && post && (
