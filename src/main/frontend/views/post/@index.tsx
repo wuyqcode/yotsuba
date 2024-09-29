@@ -131,14 +131,13 @@ export default function AdminView() {
 
       <Grid container spacing={2}>
         {posts?.map((post, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index}>
+          <Grid item xs={12} sm={4} md={2} key={index}>
             <Card
               sx={{
-                color: 'white',
                 display: 'flex',
                 flexDirection: 'column',
-                height: '100%',
-                minWidth: '200px', // 设置最小宽度
+                height: '200px', // 固定卡片高度
+                width: '100%',
                 '&:hover': {
                   boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
                   transform: 'translateY(-5px)',
@@ -146,29 +145,66 @@ export default function AdminView() {
                 }
               }}
             >
-              <CardMedia
-                component="img"
-                height="140"
-                image={post?.cover}
-                alt={post?.title}
-                onClick={() => navigate(`/post/${post?.id}`)}
-              />
-              <CardContent
+              <Box
                 sx={{
-                  flexGrow: 1,
-                  maxHeight: '100px',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  color: 'white'
+                  position: 'relative',
+                  height: '100%',
+                  width: '100%'
                 }}
               >
-                <Typography variant="body1" component="div">
-                  {post?.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {post?.content}
-                </Typography>
-              </CardContent>
+                <CardMedia
+                  component="img"
+                  image={post?.cover}
+                  alt={post?.title}
+                  sx={{
+                    height: '100%',
+                    width: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'top center'
+                  }}
+                  onClick={() => navigate(`/post/${post?.id}`)}
+                />
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    width: '100%',
+                    background:
+                      'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%)',
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                    justifyContent: 'center',
+                    padding: '8px'
+                  }}
+                >
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'white',
+                      textAlign: 'center',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      fontSize: '14px',
+                      fontWeight: 'bold',
+                      letterSpacing: '0.5px',
+                      textShadow:
+                        '0 1px 2px rgba(0,0,0,0.8), 0 0 4px rgba(0,0,0,0.5)',
+                      padding: '4px 8px',
+                      borderRadius: '12px',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        transform: 'scale(1.05)'
+                      }
+                    }}
+                  >
+                    {post?.title}
+                  </Typography>
+                </Box>
+              </Box>
             </Card>
           </Grid>
         ))}

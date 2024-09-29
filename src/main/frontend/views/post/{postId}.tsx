@@ -37,7 +37,6 @@ export default function MilkdownEditorWrapper() {
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState<string>('');
   const [paperHeight, setPaperHeight] = useState<number>(0);
-  const [hovered, setHovered] = useState(false);
   const measuredRef = useCallback((node: any) => {
     if (node !== null) {
       setPaperHeight(node.getBoundingClientRect().height);
@@ -132,7 +131,9 @@ export default function MilkdownEditorWrapper() {
       });
   };
 
-  const handleImageClear = () => {
+  const handleImageClear = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
     setPost((prevPost) =>
       prevPost ? { ...prevPost, cover: undefined } : prevPost
     );
@@ -238,16 +239,15 @@ export default function MilkdownEditorWrapper() {
                 sx={{
                   position: 'relative',
                   width: '100%',
-                  aspectRatio: '1 / 1',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   border: '1px dashed grey',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  overflow: 'hidden',
+                  minHeight: '50px'
                 }}
                 htmlFor="contained-button-file"
-                onMouseEnter={() => setHovered(true)}
-                onMouseLeave={() => setHovered(false)}
               >
                 {post.cover ? (
                   <Box
@@ -255,10 +255,8 @@ export default function MilkdownEditorWrapper() {
                     src={post.cover}
                     sx={{
                       width: '100%',
-                      objectFit: 'cover',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
+                      height: 'auto',
+                      display: 'block'
                     }}
                   />
                 ) : (
@@ -272,13 +270,14 @@ export default function MilkdownEditorWrapper() {
                   type="file"
                   onChange={handleImageUpload}
                 />
-                {post.cover && hovered && (
+                {post.cover && (
                   <IconButton
                     onClick={handleImageClear}
                     sx={{
                       position: 'absolute',
                       bottom: 0,
                       right: 0,
+                      zIndex: 10,
                       backgroundColor: 'white',
                       borderRadius: '50%',
                       boxShadow: 3

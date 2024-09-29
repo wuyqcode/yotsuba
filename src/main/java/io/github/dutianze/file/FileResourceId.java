@@ -22,6 +22,9 @@ public record FileResourceId(String id) implements Identifier {
     }
 
     public static FileResourceId extractIdFromUrl(String url) {
+        if (StringUtils.isEmpty(url)) {
+            return new FileResourceId("");
+        }
         return new FileResourceId(StringUtils.substringAfterLast(url, "/"));
     }
 
