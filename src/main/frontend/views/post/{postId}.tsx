@@ -22,6 +22,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import MilkdownEditor from 'Frontend/components/MilkdownEditor';
 import { PostService } from 'Frontend/generated/endpoints';
 import PostDto from 'Frontend/generated/io/github/dutianze/cms/application/dto/PostDto';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const config: ViewConfig = {
   menu: { exclude: true }
@@ -42,6 +43,7 @@ export default function MilkdownEditorWrapper() {
       setPaperHeight(node.getBoundingClientRect().height);
     }
   }, []);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (postId) {
@@ -63,10 +65,24 @@ export default function MilkdownEditorWrapper() {
     );
   };
 
-  const handleSave = (closeAfterSave = false) => {
-    PostService.updatePost(postId, post?.title, post?.cover, post?.content);
-    if (closeAfterSave) {
-      closePostEditor();
+  const handleSave = async (closeAfterSave = false) => {
+    try {
+      await PostService.updatePost(
+        postId,
+        post?.title,
+        post?.cover,
+        post?.content
+      );
+
+      // 使 'posts' 查询失效，触发重新获取
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+
+      if (closeAfterSave) {
+        closePostEditor();
+      }
+    } catch (error) {
+      console.error('Failed to update post:', error);
+      // 这里可以添加错误处理，比如显示一个错误消息
     }
   };
 
