@@ -1,6 +1,5 @@
-package io.github.dutianze.cms.api;
+package io.github.dutianze.file;
 
-import io.github.dutianze.cms.domain.*;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,29 +19,26 @@ import java.util.Optional;
 @RequestMapping("/api/file-resource")
 public class FileResourceController {
 
-    private final PostRepository postRepository;
     private final FileResourceRepository fileResourceRepository;
 
-    public FileResourceController(PostRepository postRepository, FileResourceRepository fileResourceRepository) {
-        this.postRepository = postRepository;
+    public FileResourceController(FileResourceRepository fileResourceRepository) {
         this.fileResourceRepository = fileResourceRepository;
     }
 
     @Transactional
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> upload(@RequestParam("postId") PostId postId,
-                                         @RequestParam("file") MultipartFile file) throws IOException {
-
-        Post post = postRepository.findById(postId).orElseThrow();
+    public ResponseEntity<String> upload(@RequestParam MultipartFile file) throws IOException {
 
         String filename = Optional.ofNullable(file.getOriginalFilename()).orElse("unnamed");
-        String url = post.addFileResource(filename, file.getBytes());
-        return ResponseEntity.ok().body(url);
+        FileResource fileResource = new FileResource(null, filename, file.getBytes());
+
+        fileResourceRepository.save(fileResource);
+        return ResponseEntity.ok().body(fileResource.getId().getURL());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<InputStreamResource> download(@PathVariable("id") FileResourceId id) {
-        Optional<FileResource> noteImageOptional = fileResourceRepository.findById(id);
+    public ResponseEntity<InputStreamResource> download(@PathVariable("id") FileResourceId resourceId) {
+        Optional<FileResource> noteImageOptional = fileResourceRepository.findById(resourceId);
         return noteImageOptional
                 .map(FileResource::getData)
                 .map(ByteArrayInputStream::new)

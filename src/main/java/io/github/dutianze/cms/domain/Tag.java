@@ -3,7 +3,6 @@ package io.github.dutianze.cms.domain;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.jmolecules.ddd.types.AggregateRoot;
-import org.jmolecules.ddd.types.Association;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
 import javax.annotation.Nullable;

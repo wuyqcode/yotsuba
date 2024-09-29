@@ -1,4 +1,4 @@
-package io.github.dutianze.cms.application;
+package io.github.dutianze.cms.infrastructure;
 
 import io.github.dutianze.cms.domain.*;
 import org.slf4j.Logger;
@@ -12,13 +12,13 @@ import org.springframework.stereotype.Component;
  * @date 2024/9/8
  */
 @Component
-public class PostEventListener {
+public class PostFTS5EventListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(PostEventListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(PostFTS5EventListener.class);
     private final PostRepository postRepository;
     private final JdbcTemplate jdbcTemplate;
 
-    public PostEventListener(PostRepository postRepository, JdbcTemplate jdbcTemplate) {
+    public PostFTS5EventListener(PostRepository postRepository, JdbcTemplate jdbcTemplate) {
         this.postRepository = postRepository;
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -37,7 +37,7 @@ public class PostEventListener {
     }
 
     @ApplicationModuleListener
-    public void handle(PostUpdate event) {
+    public void handle(PostUpdatedEvent event) {
         PostId postId = event.postId();
         logger.info("PostUpdate event triggered for Post ID: {}", postId);
 

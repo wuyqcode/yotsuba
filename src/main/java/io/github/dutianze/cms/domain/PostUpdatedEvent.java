@@ -6,6 +6,6 @@ import org.jmolecules.event.types.DomainEvent;
  * @author dutianze
  * @date 2024/9/8
  */
-public record PostUpdate(PostId postId) implements DomainEvent {
+public record PostUpdatedEvent(PostId postId) implements DomainEvent {
 
 }

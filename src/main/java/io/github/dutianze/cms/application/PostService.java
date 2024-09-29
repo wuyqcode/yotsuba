@@ -6,8 +6,8 @@ import com.vaadin.hilla.Endpoint;
 import io.github.dutianze.cms.application.dto.PostDto;
 import io.github.dutianze.cms.domain.*;
 import io.github.dutianze.cms.domain.valueobject.PostContent;
-import io.github.dutianze.cms.domain.valueobject.PostCover;
 import io.github.dutianze.cms.domain.valueobject.PostTitle;
+import io.github.dutianze.file.FileResourceId;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -30,10 +30,13 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final FTS5PostVocabRepository fts5PostVocabRepository;
+    private final MarkdownExtractService markdownExtractService;
 
-    public PostService(PostRepository postRepository, FTS5PostVocabRepository fts5PostVocabRepository) {
+    public PostService(PostRepository postRepository, FTS5PostVocabRepository fts5PostVocabRepository,
+                       MarkdownExtractService markdownExtractService) {
         this.postRepository = postRepository;
         this.fts5PostVocabRepository = fts5PostVocabRepository;
+        this.markdownExtractService = markdownExtractService;
     }
 
     public PostDto findById(String id) {
@@ -81,13 +84,13 @@ public class PostService {
     @Transactional
     public void updatePost(String id, String title, String cover, String content) {
         Post existingPost = postRepository.findById(new PostId(id))
-                                          .orElseThrow(() -> new EntityNotFoundException(
-                                                  "Post not found with id: " + id));
+                                          .orElseThrow(
+                                                  () -> new EntityNotFoundException("Post not found with id: " + id));
 
-        existingPost.setTitle(new PostTitle(title));
-        existingPost.setCover(new PostCover(cover));
-        existingPost.setContent(new PostContent(content));
-        existingPost.afterUpdated();
+        existingPost.updatePostDetails(new PostTitle(title),
+                                       FileResourceId.extractIdFromUrl(cover),
+                                       new PostContent(content),
+                                       markdownExtractService);
         postRepository.save(existingPost);
     }
 }

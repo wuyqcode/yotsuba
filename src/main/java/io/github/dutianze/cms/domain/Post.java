@@ -1,12 +1,13 @@
 package io.github.dutianze.cms.domain;
 
 import io.github.dutianze.cms.domain.valueobject.PostContent;
-import io.github.dutianze.cms.domain.valueobject.PostCover;
 import io.github.dutianze.cms.domain.valueobject.PostStatus;
 import io.github.dutianze.cms.domain.valueobject.PostTitle;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToMany;
+import io.github.dutianze.file.FileResourceId;
+import io.github.dutianze.file.FileResourceReferenceAddedEvent;
+import io.github.dutianze.file.FileResourceReferenceRemovedEvent;
+import io.github.dutianze.shared.common.FileReferenceId;
+import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.jmolecules.ddd.types.AggregateRoot;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.AbstractAggregateRoot;
 import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -28,13 +30,13 @@ public class Post extends AbstractAggregateRoot<Post> implements AggregateRoot<P
 
     private PostTitle title;
 
-    private PostCover cover;
+//    @Embedded
+    @AttributeOverride(name = "id", column = @Column(name = "cover_resource_id"))
+    private FileResourceId cover;
 
     private PostContent content;
 
     private PostStatus postStatus = PostStatus.DRAFT;
-
-    private SortedSet<FileResource> fileResources = new TreeSet<>();
 
     private SortedSet<Comment> comments = new TreeSet<>();
 
@@ -52,7 +54,7 @@ public class Post extends AbstractAggregateRoot<Post> implements AggregateRoot<P
     public Post(PostTitle postTitle, Tag... tags) {
         this.id = new PostId();
         this.title = postTitle;
-        this.cover = new PostCover("");
+        this.cover = new FileResourceId("");
         this.postStatus = PostStatus.DRAFT;
         this.content = new PostContent("");
         this.tags = new TreeSet<>(List.of(tags));
@@ -63,18 +65,8 @@ public class Post extends AbstractAggregateRoot<Post> implements AggregateRoot<P
         return id;
     }
 
-    public String addFileResource(String filename, byte[] data) {
-        FileResource fileResource = new FileResource(this, filename, data);
-        this.fileResources.add(fileResource);
-        return fileResource.getURL();
-    }
-
     public void setTitle(PostTitle title) {
         this.title = title;
-    }
-
-    public void setContent(PostContent content) {
-        this.content = content;
     }
 
     public String getTitle() {
@@ -89,12 +81,8 @@ public class Post extends AbstractAggregateRoot<Post> implements AggregateRoot<P
         return postStatus;
     }
 
-    public PostCover getCover() {
+    public FileResourceId getCover() {
         return cover;
-    }
-
-    public void setCover(PostCover cover) {
-        this.cover = cover;
     }
 
     public void setId(PostId id) {
@@ -103,14 +91,6 @@ public class Post extends AbstractAggregateRoot<Post> implements AggregateRoot<P
 
     public void setPostStatus(PostStatus postStatus) {
         this.postStatus = postStatus;
-    }
-
-    public SortedSet<FileResource> getFileResources() {
-        return fileResources;
-    }
-
-    public void setFileResources(SortedSet<FileResource> fileResources) {
-        this.fileResources = fileResources;
     }
 
     public SortedSet<Comment> getComments() {
@@ -151,7 +131,38 @@ public class Post extends AbstractAggregateRoot<Post> implements AggregateRoot<P
         registerEvent(new PostCreated(id));
     }
 
-    public void afterUpdated() {
-        registerEvent(new PostUpdate(id));
+    private void handleFileResourceReference(Set<FileResourceId> oldResourceIds, Set<FileResourceId> newResourceIds) {
+        FileReferenceId fileReferenceId = new FileReferenceId(this.getId().id());
+        oldResourceIds.stream()
+                      .filter(fileResourceId -> !newResourceIds.contains(fileResourceId))
+                      .forEach(fileResourceId -> registerEvent(
+                              new FileResourceReferenceRemovedEvent(fileReferenceId, fileResourceId)));
+
+        newResourceIds.stream()
+                      .filter(resourceId -> !oldResourceIds.contains(resourceId))
+                      .forEach(resourceId -> registerEvent(
+                              FileResourceReferenceAddedEvent.forPostContent(fileReferenceId, resourceId)));
+    }
+
+    public void updatePostDetails(PostTitle title, FileResourceId cover, PostContent content,
+                                  MarkdownExtractService markdownExtractService) {
+        if (!this.cover.equals(cover)) {
+            FileReferenceId fileReferenceId = new FileReferenceId(this.getId().id());
+            registerEvent(new FileResourceReferenceRemovedEvent(fileReferenceId, this.cover));
+            registerEvent(FileResourceReferenceAddedEvent.forPostContent(fileReferenceId, cover));
+        }
+
+        if (!this.content.equals(content)) {
+            Set<FileResourceId> oldImageResourceIds =
+                    markdownExtractService.extractFileReferenceIds(this.content.content());
+            Set<FileResourceId> newImageResourceIds = markdownExtractService.extractFileReferenceIds(content.content());
+            handleFileResourceReference(oldImageResourceIds, newImageResourceIds);
+        }
+
+        registerEvent(new PostUpdatedEvent(id));
+
+        this.title = title;
+        this.cover = cover;
+        this.content = content;
     }
 }

@@ -23,7 +23,8 @@ spring:
   datasource:
     url: jdbc:sqlite:./yotsuba.db
     driver-class-name: org.sqlite.JDBC
-#    hikari:
+    hikari:
+      maximum-pool-size: 1
 #      connectionInitSql: PRAGMA foreign_keys = ON;
   flyway:
     baseline-on-migrate: true

@@ -28,12 +28,11 @@ public record PostDto(
         return new PostDto(
                 post.getId().id(),
                 post.getTitle(),
-                post.getCover().cover(),
+                post.getCover().getURL(),
                 post.getContent(),
                 post.getPostStatus(),
-                post.getFileResources().stream()
-                    .map(FileResourceDto::fromEntity)
-                    .collect(Collectors.toList()),
+                // TODO find file resource
+                List.of(),
                 post.getTags().stream()
                     .map(TagDto::fromEntity)
                     .collect(Collectors.toList()),

@@ -1,4 +1,4 @@
-package io.github.dutianze.cms.domain;
+package io.github.dutianze.file;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

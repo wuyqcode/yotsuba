@@ -1,6 +1,6 @@
 package io.github.dutianze.cms.application.dto;
 
-import io.github.dutianze.cms.domain.FileResource;
+import io.github.dutianze.file.FileResource;
 
 /**
  * @author dutianze
@@ -13,6 +13,7 @@ public record FileResourceDto(
 ) {
 
     public static FileResourceDto fromEntity(FileResource fileResource) {
-        return new FileResourceDto(fileResource.getId().id(), fileResource.getFilename(), fileResource.getURL());
+        return new FileResourceDto(fileResource.getId().id(), fileResource.getFilename(),
+                                   fileResource.getId().getURL());
     }
 }

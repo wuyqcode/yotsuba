@@ -1,21 +1,21 @@
-package io.github.dutianze.cms.domain;
+package io.github.dutianze.file;
 
-import org.apache.commons.lang3.StringUtils;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.jmolecules.ddd.types.Association;
-import org.jmolecules.ddd.types.Entity;
+import org.jmolecules.ddd.types.AggregateRoot;
 import org.springframework.util.unit.DataSize;
 
 import javax.annotation.Nullable;
-import java.net.URI;
 import java.time.LocalDateTime;
 
 /**
  * @author dutianze
  * @date 2023/9/3
  */
-public class FileResource implements Entity<Post, FileResourceId>, Comparable<FileResource> {
+public class FileResource implements AggregateRoot<FileResource, FileResourceId>, Comparable<FileResource> {
 
     private FileResourceId id;
 
@@ -25,7 +25,8 @@ public class FileResource implements Entity<Post, FileResourceId>, Comparable<Fi
 
     private byte[] data;
 
-    private Association<Post, PostId> post;
+    @AttributeOverride(name = "referenceId.id", column = @Column(name = "reference_id"))
+    private ReferenceInfo reference;
 
     @Nullable
     @CreationTimestamp
@@ -35,26 +36,14 @@ public class FileResource implements Entity<Post, FileResourceId>, Comparable<Fi
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public FileResource(Post post, String filename, byte[] data) {
+    public FileResource(ReferenceInfo reference, String filename, byte[] data) {
         this.id = new FileResourceId();
         this.filename = filename;
         this.data = data;
-        this.post = Association.forAggregate(post);
+        this.reference = reference;
         DataSize dataSize = DataSize.ofBytes(data.length);
         this.size = dataSize.toKilobytes();
         this.createdAt = LocalDateTime.now();
-    }
-
-    public FileResourceId getId(String url) {
-        if (StringUtils.isEmpty(url)) {
-            throw new RuntimeException("not found url");
-        }
-        URI uri = URI.create(url);
-        return new FileResourceId(StringUtils.substringAfterLast(uri.getPath(), "/"));
-    }
-
-    public String getURL() {
-        return String.format("/api/file-resource/%s", id.id());
     }
 
     @Override
@@ -98,15 +87,6 @@ public class FileResource implements Entity<Post, FileResourceId>, Comparable<Fi
         this.data = data;
     }
 
-    public Association<Post, PostId> getPost() {
-        return post;
-    }
-
-    public void setPost(
-            Association<Post, PostId> post) {
-        this.post = post;
-    }
-
     @Nullable
     public LocalDateTime getCreatedAt() {
         return createdAt;
@@ -123,5 +103,17 @@ public class FileResource implements Entity<Post, FileResourceId>, Comparable<Fi
 
     public void setUpdatedAt(@Nullable LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public void setReference(ReferenceInfo reference) {
+        this.reference = reference;
+    }
+
+    public void removeReference() {
+        this.reference = null;
+    }
+
+    public void linkReference(ReferenceInfo reference) {
+        this.reference = reference;
     }
 }

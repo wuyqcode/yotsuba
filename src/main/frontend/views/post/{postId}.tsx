@@ -110,7 +110,6 @@ export default function MilkdownEditorWrapper() {
 
     const formData = new FormData();
     formData.append('file', event.target.files[0]);
-    formData.append('postId', postId);
     console.log(formData);
 
     fetch('http://localhost:8080/api/file-resource', {

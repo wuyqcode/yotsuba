@@ -51,7 +51,6 @@ const MilkdownEditor: React.FC<MilkdownEditorProps> = ({
       images.map(async (image) => {
         const formData = new FormData();
         formData.append('file', image);
-        formData.append('postId', postId);
 
         try {
           const response = await fetch(
