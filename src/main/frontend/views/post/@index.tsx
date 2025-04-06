@@ -13,9 +13,9 @@ import {
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
 import { PostService } from 'Frontend/generated/endpoints';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import AddIcon from '@mui/icons-material/Add';
+import { useNavigate } from 'react-router';
 
 export const config: ViewConfig = {
   menu: {

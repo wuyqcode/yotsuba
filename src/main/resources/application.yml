@@ -13,22 +13,15 @@ spring:
   jpa:
     defer-datasource-initialization: false
     database-platform: org.hibernate.community.dialect.SQLiteDialect
-#    open-in-view: true
+    open-in-view: false
     hibernate:
       ddl-auto: none # create none
     properties:
       hibernate:
         format_sql: true
     show-sql: true
-  datasource:
-    url: jdbc:sqlite:./yotsuba.db
-    driver-class-name: org.sqlite.JDBC
-    hikari:
-      maximum-pool-size: 1
-#      connectionInitSql: PRAGMA foreign_keys = ON;
   flyway:
-    baseline-on-migrate: true
-    enabled: true
+    enabled: false
 logging:
   level:
     org:
@@ -42,6 +35,25 @@ vaadin:
   allowed-packages: com.vaadin,org.vaadin,io.github.dutianze
   pnpm:
     enable: 'true'
-  excludeUrls: /swagger-ui/**
-
-
+  exclude-urls: /swagger-ui/**
+modules:
+  primary:
+    datasource:
+      url: jdbc:sqlite:./yotsuba_primary.db
+      driver-class-name: org.sqlite.JDBC
+    jpa:
+      open-in-view: false
+      properties:
+        hibernate.search.enabled: true
+        hibernate.search.backend.type: lucene
+        hibernate.search.backend.directory.type: local-filesystem
+        hibernate.search.backend.directory.root: ./index
+        hibernate.search.backend.analysis.configurer: bean:customLuceneAnalysisConfigurer
+    flyway:
+      location: classpath:db/migration/primary
+  file:
+    datasource:
+      url: jdbc:sqlite:./yotsuba_file.db
+      driver-class-name: org.sqlite.JDBC
+    flyway:
+      location: classpath:db/migration/file

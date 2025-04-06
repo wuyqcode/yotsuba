@@ -23,13 +23,12 @@ import HomeIcon from '@mui/icons-material/Home';
 import EditIcon from '@mui/icons-material/Edit';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { Outlet } from 'react-router-dom';
 import { useViewConfig } from '@vaadin/hilla-file-router/runtime.js';
 import { effect, signal } from '@vaadin/hilla-react-signals';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { createMenuItems } from '@vaadin/hilla-file-router/runtime.js';
 import { Icon } from '@vaadin/react-components';
 import { useAuth } from 'Frontend/util/auth.js';
+import { Outlet, useLocation, useNavigate } from 'react-router';
 
 const defaultTitle = document.title;
 const documentTitleSignal = signal('');

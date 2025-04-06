@@ -16,13 +16,13 @@ import {
   KeyboardEvent,
   useCallback
 } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import ImageIcon from '@mui/icons-material/Image';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MilkdownEditor from 'Frontend/components/MilkdownEditor';
 import { PostService } from 'Frontend/generated/endpoints';
-import PostDto from 'Frontend/generated/io/github/dutianze/cms/application/dto/PostDto';
 import { useQueryClient } from '@tanstack/react-query';
+import PostDto from 'Frontend/generated/io/github/dutianze/yotsuba/cms/application/dto/PostDto';
+import { useNavigate, useParams } from 'react-router';
 
 export const config: ViewConfig = {
   menu: { exclude: true }
