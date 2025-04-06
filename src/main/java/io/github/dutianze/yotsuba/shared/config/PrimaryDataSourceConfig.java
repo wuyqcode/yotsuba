@@ -133,20 +133,6 @@ public class PrimaryDataSourceConfig {
                 .build();
     }
 
-//    /**
-//     * 创建主数据源的 EntityManager，用于执行实体管理操作。
-//     *
-//     * @param entityManagerFactory 主数据源的 EntityManagerFactory
-//     * @return 主数据源的 EntityManager 实例
-//     */
-//    @Primary
-//    @Bean(name = ENTITY_MANAGER)
-//    public EntityManager entityManager(@Qualifier(ENTITY_MANAGER_FACTORY) EntityManagerFactory
-//                                               entityManagerFactory) {
-//        return SharedEntityManagerCreator.createSharedEntityManager(entityManagerFactory);
-//    }
-
-
     /**
      * 创建主数据源的事务管理器，用于管理基于注解（如 @Transactional）的事务。
      *
