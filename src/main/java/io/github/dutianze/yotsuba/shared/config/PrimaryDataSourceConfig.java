@@ -1,5 +1,7 @@
 package io.github.dutianze.yotsuba.shared.config;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -14,6 +16,8 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.sqlite.SQLiteConfig;
+import org.sqlite.SQLiteOpenMode;
 
 import javax.sql.DataSource;
 
@@ -66,7 +70,7 @@ public class PrimaryDataSourceConfig {
      * @return 主数据源的 DataSourceProperties 实例
      */
     @Primary
-    @Bean
+    @Bean("primaryDataSourceProperties")
     @ConfigurationProperties(prefix = DATASOURCE)
     public DataSourceProperties primaryDataSourceProperties() {
         return new DataSourceProperties();
@@ -79,8 +83,20 @@ public class PrimaryDataSourceConfig {
      */
     @Primary
     @Bean(name = DATASOURCE)
-    public DataSource dataSource() {
-        return primaryDataSourceProperties().initializeDataSourceBuilder().build();
+    public DataSource dataSource(@Qualifier("primaryDataSourceProperties") DataSourceProperties dataSourceProperties) {
+        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setDriverClassName(dataSourceProperties.getDriverClassName());
+        hikariConfig.setJdbcUrl(dataSourceProperties.getUrl());
+        hikariConfig.setMaximumPoolSize(1);
+        hikariConfig.setConnectionTestQuery("SELECT 1");
+        SQLiteConfig config = new SQLiteConfig();
+        config.setOpenMode(SQLiteOpenMode.OPEN_URI);
+        config.setOpenMode(SQLiteOpenMode.FULLMUTEX);
+        config.setBusyTimeout(10000);
+        hikariConfig.setPoolName("primaryHikariCP");
+        hikariConfig.addDataSourceProperty(SQLiteConfig.Pragma.OPEN_MODE.pragmaName, config.getOpenModeFlags());
+        hikariConfig.addDataSourceProperty(SQLiteConfig.Pragma.JOURNAL_MODE.pragmaName, SQLiteConfig.JournalMode.WAL);
+        return new HikariDataSource(hikariConfig);
     }
 
     /**

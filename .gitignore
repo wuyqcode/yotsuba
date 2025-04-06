@@ -7,3 +7,5 @@ vite.generated.ts
 .idea
 *.db
 index
+*.db-shm
+*.db-wal
