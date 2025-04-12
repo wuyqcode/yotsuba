@@ -54,6 +54,7 @@ import 'reactjs-tiptap-editor/style.css';
 import 'katex/dist/katex.min.css';
 import 'easydrawer/styles.css';
 import { useUpload } from 'Frontend/hooks/useUpload';
+import { Box } from '@mui/material';
 
 locale.setLang('zh_CN');
 
@@ -159,6 +160,13 @@ const Editor: React.FC<EditorProps> = ({ content, onChange }) => {
       extensions={extensions}
       disabled={disable}
       dark={false}
+      toolbar={{
+        render: (props, toolbarItems, dom, containerDom) => {
+          return (
+            <Box style={{ position: 'sticky', top: 0, zIndex: 100, background: 'white' }}>{containerDom(dom)}</Box>
+          );
+        },
+      }}
     />
   );
 };

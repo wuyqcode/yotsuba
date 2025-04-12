@@ -172,22 +172,11 @@ export default function MilkdownEditorWrapper() {
               </Button>
             </Stack>
           </Box>
-
           <Box
             sx={{
-              display: 'flex',
-              height: '100%',
-              fontFamily: 'Press Start 2P',
-              '& #ReactEditor': {
-                flexGrow: 1,
-                width: '100%',
-                overflowY: 'auto',
-              },
-              '& .milkdown': {
-                width: '100%',
-                height: `${paperHeight}px`,
-                maxHeight: `${paperHeight}px`,
-                overflowY: 'auto',
+              overflow: 'auto',
+              '& .richtext-overflow-hidden': {
+                overflow: 'visible !important',
               },
             }}>
             <Editor content={post?.content ?? ''} onChange={onChange} />
