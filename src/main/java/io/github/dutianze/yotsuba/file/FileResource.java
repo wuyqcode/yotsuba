@@ -2,8 +2,8 @@ package io.github.dutianze.yotsuba.file;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.util.unit.DataSize;
@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table
+@NoArgsConstructor
 public class FileResource implements Comparable<FileResource> {
 
     @EmbeddedId

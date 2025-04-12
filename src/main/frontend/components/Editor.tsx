@@ -106,21 +106,13 @@ const Editor: React.FC<EditorProps> = ({ content, onChange }) => {
     }),
     Link,
     Image.configure({
-      upload: (files: File) => {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            resolve(URL.createObjectURL(files));
-          }, 500);
-        });
+      upload: (file: File) => {
+        return upload(file);
       },
     }),
     Video.configure({
-      upload: (files: File) => {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            resolve(URL.createObjectURL(files));
-          }, 500);
-        });
+      upload: (file: File) => {
+        return upload(file);
       },
     }),
     Blockquote,

@@ -2,8 +2,8 @@ package io.github.dutianze.yotsuba.cms.domain;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table
+@NoArgsConstructor
 public class Comment {
 
     @EmbeddedId

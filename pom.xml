@@ -76,6 +76,10 @@
 				</exclusion>
 				<exclusion>
 					<groupId>com.vaadin</groupId>
+					<artifactId>copilot</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.vaadin</groupId>
 					<artifactId>vaadin-icons-flow</artifactId>
 				</exclusion>
 				<exclusion>

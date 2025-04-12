@@ -8,8 +8,8 @@ spring:
     check-template-location: false
   servlet:
     multipart:
-      max-request-size: 100MB
-      max-file-size: 100MB
+      max-request-size: 200MB
+      max-file-size: 200MB
   jpa:
     defer-datasource-initialization: false
     database-platform: org.hibernate.community.dialect.SQLiteDialect

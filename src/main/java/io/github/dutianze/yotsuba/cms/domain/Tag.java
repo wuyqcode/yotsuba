@@ -3,6 +3,7 @@ package io.github.dutianze.yotsuba.cms.domain;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -16,6 +17,7 @@ import java.util.TreeSet;
 @Data
 @Entity
 @Table
+@NoArgsConstructor
 public class Tag implements Comparable<Tag> {
 
     @EmbeddedId
