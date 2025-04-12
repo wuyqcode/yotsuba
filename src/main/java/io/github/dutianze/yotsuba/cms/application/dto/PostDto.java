@@ -27,9 +27,9 @@ public record PostDto(
     public static PostDto fromEntity(Post post) {
         return new PostDto(
                 post.getId().id(),
-                post.getTitle(),
+                post.getTitle().title(),
                 post.getCover().getURL(),
-                post.getContent(),
+                post.getContent().content(),
                 post.getPostStatus(),
                 // TODO find file resource
                 List.of(),

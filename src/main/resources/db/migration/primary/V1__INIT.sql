@@ -14,7 +14,7 @@ create table comment (
     comments_id varchar(255),
     content varchar(255),
     id varchar(255) not null,
-    post varchar(255),
+    post_id varchar(255),
     primary key (id)
 );
 
@@ -40,10 +40,10 @@ create table post (
     primary key (id)
 );
 
-create table post_tags (
+create table post_tag (
     post_id varchar(255) not null,
-    tags_id varchar(255) not null,
-    primary key (post_id, tags_id)
+    tag_id varchar(255) not null,
+    primary key (post_id, tag_id)
 );
 
 create table tag (

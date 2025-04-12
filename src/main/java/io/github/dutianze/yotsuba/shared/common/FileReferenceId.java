@@ -1,10 +1,11 @@
 package io.github.dutianze.yotsuba.shared.common;
 
-import org.jmolecules.ddd.types.Identifier;
+import jakarta.persistence.Embeddable;
 
 /**
  * @author dutianze
  * @date 2024/9/29
  */
-public record FileReferenceId(String id) implements Identifier {
+@Embeddable
+public record FileReferenceId(String id) {
 }

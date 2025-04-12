@@ -2,8 +2,8 @@ package io.github.dutianze.yotsuba.file;
 
 import io.github.dutianze.yotsuba.shared.common.Constant;
 import io.hypersistence.tsid.TSID;
+import jakarta.persistence.Embeddable;
 import org.apache.commons.lang3.StringUtils;
-import org.jmolecules.ddd.types.Identifier;
 import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -11,7 +11,8 @@ import org.springframework.web.util.UriComponentsBuilder;
  * @author dutianze
  * @date 2024/7/31
  */
-public record FileResourceId(String id) implements Identifier {
+@Embeddable
+public record FileResourceId(String id) {
 
     public FileResourceId {
         Assert.notNull(id, "id must not be null");

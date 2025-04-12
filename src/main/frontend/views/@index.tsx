@@ -1,16 +1,6 @@
 import React, { useState } from 'react';
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
-import {
-  Button,
-  TextField,
-  Container,
-  Grid,
-  Typography,
-  Box,
-  InputAdornment,
-  Drawer,
-  IconButton
-} from '@mui/material';
+import { Button, TextField, Container, Typography, Box, InputAdornment, Drawer, IconButton, Grid } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
@@ -19,7 +9,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 export const config: ViewConfig = {
   menu: { order: 0, icon: 'HomeIcon' },
-  title: '主页'
+  title: '主页',
 };
 
 // 将 ShortcutProps 接口移到文件顶部
@@ -43,10 +33,9 @@ function Shortcut({ icon, label, onClick }: ShortcutProps) {
         m: 1,
         backgroundColor: 'transparent',
         '&:hover': {
-          backgroundColor: 'rgba(255, 255, 255, 0.1)'
-        }
-      }}
-    >
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        },
+      }}>
       <Box
         sx={{
           width: 48,
@@ -57,11 +46,10 @@ function Shortcut({ icon, label, onClick }: ShortcutProps) {
           justifyContent: 'center',
           alignItems: 'center',
           backgroundColor: 'transparent',
-          mb: 1
-        }}
-      >
+          mb: 1,
+        }}>
         {React.cloneElement(icon as React.ReactElement, {
-          style: { width: '100%', height: '100%', objectFit: 'cover' }
+          style: { width: '100%', height: '100%', objectFit: 'cover' },
         })}
       </Box>
       <Typography variant="caption" sx={{ fontSize: '0.8rem', color: 'white' }}>
@@ -76,15 +64,9 @@ const generateFakeShortcuts = (count: number) => {
   const fakeShortcuts = [];
   for (let i = 1; i <= count; i++) {
     fakeShortcuts.push({
-      icon: (
-        <img
-          src={`https://picsum.photos/24?random=${i}`}
-          alt={`图标 ${i}`}
-          width="24"
-        />
-      ),
+      icon: <img src={`https://picsum.photos/24?random=${i}`} alt={`图标 ${i}`} width="24" />,
       label: `网站 ${i}`,
-      url: `https://example.com/${i}`
+      url: `https://example.com/${i}`,
     });
   }
   return fakeShortcuts;
@@ -101,34 +83,22 @@ interface Shortcut {
 export default function HomeView() {
   const [shortcuts, setShortcuts] = useState([
     {
-      icon: (
-        <img
-          src="https://developer.mozilla.org/favicon-48x48.png"
-          alt="MDN"
-          width="24"
-        />
-      ),
+      icon: <img src="https://developer.mozilla.org/favicon-48x48.png" alt="MDN" width="24" />,
       label: 'MDN',
-      url: 'https://developer.mozilla.org'
+      url: 'https://developer.mozilla.org',
     },
     {
-      icon: (
-        <img
-          src="https://github.githubassets.com/favicons/favicon.svg"
-          alt="GitHub"
-          width="24"
-        />
-      ),
+      icon: <img src="https://github.githubassets.com/favicons/favicon.svg" alt="GitHub" width="24" />,
       label: 'GitHub',
-      url: 'https://github.com'
+      url: 'https://github.com',
     },
-    ...generateFakeShortcuts(100) // 生成48个假的快捷方式
+    ...generateFakeShortcuts(100), // 生成48个假的快捷方式
   ]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [newShortcut, setNewShortcut] = useState({
     label: '',
     url: '',
-    icon: ''
+    icon: '',
   });
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingShortcut, setEditingShortcut] = useState<Shortcut | null>(null);
@@ -152,15 +122,12 @@ export default function HomeView() {
           ...newShortcut,
           icon: (
             <img
-              src={
-                newShortcut.icon ||
-                `https://picsum.photos/24?random=${prevShortcuts.length + 1}`
-              }
+              src={newShortcut.icon || `https://picsum.photos/24?random=${prevShortcuts.length + 1}`}
               alt={newShortcut.label}
               width="24"
             />
-          )
-        }
+          ),
+        },
       ]);
       handleCloseDrawer();
     }
@@ -190,14 +157,12 @@ export default function HomeView() {
           <img
             src={
               (editingShortcut.icon as string) ||
-              `https://picsum.photos/24?random=${
-                (editingShortcut.index as number) + 1
-              }`
+              `https://picsum.photos/24?random=${(editingShortcut.index as number) + 1}`
             }
             alt={editingShortcut.label}
             width="24"
           />
-        )
+        ),
       };
       setShortcuts(updatedShortcuts);
       setEditingShortcut(null);
@@ -229,16 +194,13 @@ export default function HomeView() {
           backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.41), rgba(0, 0, 0, 0.41)), url("/images/homepage.jpeg")`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          zIndex: -1
-        }
+          zIndex: -1,
+        },
       }}
       onContextMenu={handleContextMenu}
       onClick={handleExitEditMode} // 添加这一行
     >
-      <Container
-        maxWidth="lg"
-        sx={{ mt: 4, flexGrow: 1, position: 'relative', zIndex: 1 }}
-      >
+      <Container maxWidth="lg" sx={{ mt: 4, flexGrow: 1, position: 'relative', zIndex: 1 }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
           <TextField
             placeholder="输入并搜索"
@@ -250,30 +212,25 @@ export default function HomeView() {
                 borderRadius: 50,
                 backgroundColor: 'white',
                 '& fieldset': {
-                  borderColor: '#dfe1e5'
+                  borderColor: '#dfe1e5',
                 },
                 '&:hover fieldset': {
-                  borderColor: '#dfe1e5'
-                }
-              }
+                  borderColor: '#dfe1e5',
+                },
+              },
             }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
                   <SearchIcon color="disabled" />
                 </InputAdornment>
-              )
+              ),
             }}
           />
         </Box>
-        <Grid
-          container
-          justifyContent="flex-start"
-          spacing={2}
-          sx={{ maxWidth: 1000, margin: '0 auto' }}
-        >
+        <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={2} sx={{ maxWidth: 1000, mx: 'auto' }}>
           {shortcuts.map((shortcut, index) => (
-            <Grid item xs={3} sm={2} md={1} key={index}>
+            <Box key={index} sx={{ width: { xs: '25%', sm: '12.5%', md: '8.33%' } }}>
               <ShortcutItem
                 shortcut={shortcut}
                 index={index}
@@ -281,15 +238,12 @@ export default function HomeView() {
                 onEdit={handleEditShortcut}
                 onDelete={handleDeleteShortcut}
               />
-            </Grid>
+            </Box>
           ))}
-          <Grid item xs={3} sm={2} md={1}>
-            <Shortcut
-              icon={<AddIcon />}
-              label="添加"
-              onClick={handleAddShortcut}
-            />
-          </Grid>
+
+          <Box sx={{ width: { xs: '25%', sm: '12.5%', md: '8.33%' } }}>
+            <Shortcut icon={<AddIcon />} label="添加" onClick={handleAddShortcut} />
+          </Box>
         </Grid>
       </Container>
       <Drawer anchor="right" open={isDrawerOpen} onClose={handleCloseDrawer}>
@@ -299,12 +253,9 @@ export default function HomeView() {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              mb: 2
-            }}
-          >
-            <Typography variant="h6">
-              {editingShortcut ? '编辑快捷方式' : '添加新快捷方式'}
-            </Typography>
+              mb: 2,
+            }}>
+            <Typography variant="h6">{editingShortcut ? '编辑快捷方式' : '添加新快捷方式'}</Typography>
             <IconButton onClick={handleCloseDrawer}>
               <CloseIcon />
             </IconButton>
@@ -317,7 +268,7 @@ export default function HomeView() {
               editingShortcut
                 ? setEditingShortcut({
                     ...editingShortcut,
-                    label: e.target.value
+                    label: e.target.value,
                   })
                 : setNewShortcut({ ...newShortcut, label: e.target.value })
             }
@@ -331,7 +282,7 @@ export default function HomeView() {
               editingShortcut
                 ? setEditingShortcut({
                     ...editingShortcut,
-                    url: e.target.value
+                    url: e.target.value,
                   })
                 : setNewShortcut({ ...newShortcut, url: e.target.value })
             }
@@ -345,7 +296,7 @@ export default function HomeView() {
               editingShortcut
                 ? setEditingShortcut({
                     ...editingShortcut,
-                    icon: e.target.value
+                    icon: e.target.value,
                   })
                 : setNewShortcut({ ...newShortcut, icon: e.target.value })
             }
@@ -355,8 +306,7 @@ export default function HomeView() {
             fullWidth
             variant="contained"
             onClick={editingShortcut ? handleSubmitEdit : handleSubmitShortcut}
-            sx={{ mt: 2 }}
-          >
+            sx={{ mt: 2 }}>
             确定
           </Button>
         </Box>
@@ -374,78 +324,67 @@ interface ShortcutItemProps {
   onDelete: (index: number) => void;
 }
 
-const ShortcutItem: React.FC<ShortcutItemProps> = React.memo(
-  ({ shortcut, index, isEditMode, onEdit, onDelete }) => {
-    const randomDelay = React.useMemo(() => Math.random() * 2, []);
+const ShortcutItem: React.FC<ShortcutItemProps> = React.memo(({ shortcut, index, isEditMode, onEdit, onDelete }) => {
+  const randomDelay = React.useMemo(() => Math.random() * 2, []);
 
-    return (
-      <Box
-        sx={{
-          position: 'relative',
-          animation: isEditMode
-            ? `shake 0.82s cubic-bezier(.36,.07,.19,.97) ${randomDelay}s infinite`
-            : 'none',
-          '@keyframes shake': {
-            '0%, 100%': {
-              transform: 'translate3d(0, 0, 0)'
-            },
-            '10%, 90%': {
-              transform: 'translate3d(-1px, 0, 0)'
-            },
-            '20%, 80%': {
-              transform: 'translate3d(2px, 0, 0)'
-            },
-            '30%, 50%, 70%': {
-              transform: 'translate3d(-4px, 0, 0)'
-            },
-            '40%, 60%': {
-              transform: 'translate3d(4px, 0, 0)'
-            }
-          }
-        }}
-      >
-        <Shortcut
-          icon={shortcut.icon}
-          label={shortcut.label}
-          onClick={() =>
-            isEditMode
-              ? onEdit(shortcut, index)
-              : window.open(shortcut.url, '_blank')
-          }
-        />
-        {isEditMode && (
-          <>
-            <IconButton
-              sx={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                backgroundColor: 'rgba(255,255,255,0.7)',
-                zIndex: 2,
-                width: '40px',
-                height: '40px'
-              }}
-              size="small"
-              onClick={() => onEdit(shortcut, index)}
-            >
-              <EditIcon fontSize="small" />
-            </IconButton>
-            <IconButton
-              sx={{
-                position: 'absolute',
-                bottom: 0,
-                right: 0,
-                backgroundColor: 'rgba(255,255,255,0.7)'
-              }}
-              size="small"
-              onClick={() => onDelete(index)}
-            >
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          </>
-        )}
-      </Box>
-    );
-  }
-);
+  return (
+    <Box
+      sx={{
+        position: 'relative',
+        animation: isEditMode ? `shake 0.82s cubic-bezier(.36,.07,.19,.97) ${randomDelay}s infinite` : 'none',
+        '@keyframes shake': {
+          '0%, 100%': {
+            transform: 'translate3d(0, 0, 0)',
+          },
+          '10%, 90%': {
+            transform: 'translate3d(-1px, 0, 0)',
+          },
+          '20%, 80%': {
+            transform: 'translate3d(2px, 0, 0)',
+          },
+          '30%, 50%, 70%': {
+            transform: 'translate3d(-4px, 0, 0)',
+          },
+          '40%, 60%': {
+            transform: 'translate3d(4px, 0, 0)',
+          },
+        },
+      }}>
+      <Shortcut
+        icon={shortcut.icon}
+        label={shortcut.label}
+        onClick={() => (isEditMode ? onEdit(shortcut, index) : window.open(shortcut.url, '_blank'))}
+      />
+      {isEditMode && (
+        <>
+          <IconButton
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              backgroundColor: 'rgba(255,255,255,0.7)',
+              zIndex: 2,
+              width: '40px',
+              height: '40px',
+            }}
+            size="small"
+            onClick={() => onEdit(shortcut, index)}>
+            <EditIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            sx={{
+              position: 'absolute',
+              bottom: 0,
+              right: 0,
+              backgroundColor: 'rgba(255,255,255,0.7)',
+            }}
+            size="small"
+            onClick={() => onDelete(index)}>
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </>
+      )}
+    </Box>
+  );
+});

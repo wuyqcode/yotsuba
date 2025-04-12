@@ -11,13 +11,13 @@ import {
   Grid,
   RadioGroup,
   Stack,
-  Typography
+  Typography,
 } from '@mui/material';
 import { useRef, useState } from 'react';
 
 export const config: ViewConfig = {
   menu: { order: 1, icon: 'HomeIcon' },
-  title: 'Epub'
+  title: 'Epub',
 };
 
 const ImageUpload = () => {
@@ -55,7 +55,7 @@ const ImageUpload = () => {
     try {
       const response = await fetch('/api/uploadEpub', {
         method: 'POST',
-        body: formData
+        body: formData,
       });
 
       if (response.ok) {
@@ -63,9 +63,7 @@ const ImageUpload = () => {
         const disposition = response.headers.get('content-disposition');
         let filename = file.name;
         if (disposition) {
-          filename = decodeURIComponent(
-            disposition.split('filename=')[1]
-          ).replace(/\+/g, ' ');
+          filename = decodeURIComponent(disposition.split('filename=')[1]).replace(/\+/g, ' ');
         }
         let blobURL = window.URL.createObjectURL(blob);
         let tempLink = document.createElement('a');
@@ -87,47 +85,46 @@ const ImageUpload = () => {
 
   return (
     <Container>
-      <Box textAlign="center">
+      <Box textAlign="center" mb={3}>
         <Typography variant="h4" gutterBottom>
           Epub Converter
         </Typography>
       </Box>
 
-      <Grid container spacing={3}>
-        <Grid item container xs={12} justifyContent="center">
-          <Stack>
-            <Button variant="contained" component="label">
-              Upload File
-              <input type="file" hidden onChange={handleFileChange} />
-            </Button>
-            {file && <Typography variant="body1">{file.name}</Typography>}
-          </Stack>
-        </Grid>
-        <Grid item container xs={12} justifyContent="center">
-          <FormControl component="fieldset">
-            <FormLabel component="legend">Select Output Format</FormLabel>
-            <RadioGroup value={outputFormat} onChange={handleFormatChange}>
-              <FormControlLabel
-                value="hiragana"
-                required
-                disabled
-                control={<Checkbox defaultChecked />}
-                label="追加平假名"
-              />
-              <FormControlLabel
-                value="english"
-                control={<Checkbox />}
-                label="追加英文"
-              />
-            </RadioGroup>
-          </FormControl>
-        </Grid>
-        <Grid item container xs={12} justifyContent="flex-end">
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Convert
+      {/* 上传区域 */}
+      <Box display="flex" justifyContent="center" mb={3}>
+        <Stack spacing={2}>
+          <Button variant="contained" component="label">
+            Upload File
+            <input type="file" hidden onChange={handleFileChange} />
           </Button>
-        </Grid>
-      </Grid>
+          {file && <Typography variant="body1">{file.name}</Typography>}
+        </Stack>
+      </Box>
+
+      {/* 选项区域 */}
+      <Box display="flex" justifyContent="center" mb={3}>
+        <FormControl component="fieldset">
+          <FormLabel component="legend">Select Output Format</FormLabel>
+          <RadioGroup value={outputFormat} onChange={handleFormatChange}>
+            <FormControlLabel
+              value="hiragana"
+              required
+              disabled
+              control={<Checkbox defaultChecked />}
+              label="追加平假名"
+            />
+            <FormControlLabel value="english" control={<Checkbox />} label="追加英文" />
+          </RadioGroup>
+        </FormControl>
+      </Box>
+
+      {/* 按钮区域 */}
+      <Box display="flex" justifyContent="flex-end">
+        <Button variant="contained" color="primary" onClick={handleSubmit}>
+          Convert
+        </Button>
+      </Box>
     </Container>
   );
 };

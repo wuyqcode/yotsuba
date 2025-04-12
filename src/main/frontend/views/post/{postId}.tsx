@@ -1,31 +1,16 @@
-import {
-  Box,
-  Button,
-  Chip,
-  IconButton,
-  Paper,
-  Stack,
-  TextField,
-  Typography
-} from '@mui/material';
+import { Box, Button, Chip, IconButton, Paper, Stack, TextField, Typography } from '@mui/material';
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
-import {
-  ChangeEvent,
-  useEffect,
-  useState,
-  KeyboardEvent,
-  useCallback
-} from 'react';
+import { ChangeEvent, useEffect, useState, KeyboardEvent, useCallback } from 'react';
 import ImageIcon from '@mui/icons-material/Image';
 import DeleteIcon from '@mui/icons-material/Delete';
-import MilkdownEditor from 'Frontend/components/MilkdownEditor';
+import Editor from 'Frontend/components/Editor';
 import { PostService } from 'Frontend/generated/endpoints';
 import { useQueryClient } from '@tanstack/react-query';
 import PostDto from 'Frontend/generated/io/github/dutianze/yotsuba/cms/application/dto/PostDto';
 import { useNavigate, useParams } from 'react-router';
 
 export const config: ViewConfig = {
-  menu: { exclude: true }
+  menu: { exclude: true },
 };
 
 export default function MilkdownEditorWrapper() {
@@ -60,19 +45,12 @@ export default function MilkdownEditorWrapper() {
   }, [postId]);
 
   const onChange = (content: string) => {
-    setPost((prevPost) =>
-      prevPost ? { ...prevPost, content: content } : prevPost
-    );
+    setPost((prevPost) => (prevPost ? { ...prevPost, content: content } : prevPost));
   };
 
   const handleSave = async (closeAfterSave = false) => {
     try {
-      await PostService.updatePost(
-        postId,
-        post?.title,
-        post?.cover,
-        post?.content
-      );
+      await PostService.updatePost(postId, post?.title, post?.cover, post?.content);
 
       // 使 'posts' 查询失效，触发重新获取
       queryClient.invalidateQueries({ queryKey: ['posts'] });
@@ -102,9 +80,7 @@ export default function MilkdownEditorWrapper() {
   };
 
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setPost((prevPost) =>
-      prevPost ? { ...prevPost, title: e.target.value } : prevPost
-    );
+    setPost((prevPost) => (prevPost ? { ...prevPost, title: e.target.value } : prevPost));
   };
 
   const handleTagInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -129,7 +105,7 @@ export default function MilkdownEditorWrapper() {
 
     fetch('http://localhost:8080/api/file-resource', {
       method: 'POST',
-      body: formData
+      body: formData,
     })
       .then((response) => {
         if (!response.ok) {
@@ -138,9 +114,7 @@ export default function MilkdownEditorWrapper() {
         return response.text();
       })
       .then((imageUrl) => {
-        setPost((prevPost) =>
-          prevPost ? { ...prevPost, cover: imageUrl } : undefined
-        );
+        setPost((prevPost) => (prevPost ? { ...prevPost, cover: imageUrl } : undefined));
       })
       .catch((error) => {
         console.error('Failed to upload image:', error);
@@ -150,9 +124,7 @@ export default function MilkdownEditorWrapper() {
   const handleImageClear = (event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
-    setPost((prevPost) =>
-      prevPost ? { ...prevPost, cover: undefined } : prevPost
-    );
+    setPost((prevPost) => (prevPost ? { ...prevPost, cover: undefined } : prevPost));
   };
 
   return (
@@ -163,9 +135,8 @@ export default function MilkdownEditorWrapper() {
         height: '100%',
         margin: 'auto',
         fontFamily: 'Press Start 2P',
-        padding: '16px'
-      }}
-    >
+        padding: '16px',
+      }}>
       {postId && post && (
         <>
           <Box
@@ -173,17 +144,15 @@ export default function MilkdownEditorWrapper() {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              marginBottom: 2
-            }}
-          >
+              marginBottom: 2,
+            }}>
             <Box sx={{ display: 'flex', alignItems: 'center', marginRight: 2 }}>
               <Typography
                 variant="body1"
                 color="primary"
                 fontWeight="bold"
                 sx={{ marginRight: 1 }}
-                onClick={closePostEditor}
-              >
+                onClick={closePostEditor}>
                 post /
               </Typography>
               <TextField
@@ -195,18 +164,10 @@ export default function MilkdownEditorWrapper() {
               />
             </Box>
             <Stack direction="row" spacing={1}>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={closePostEditor}
-              >
+              <Button variant="contained" color="secondary" onClick={closePostEditor}>
                 Cancel
               </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => handleSave(true)}
-              >
+              <Button variant="contained" color="primary" onClick={() => handleSave(true)}>
                 Save
               </Button>
             </Stack>
@@ -220,118 +181,16 @@ export default function MilkdownEditorWrapper() {
               '& #ReactEditor': {
                 flexGrow: 1,
                 width: '100%',
-                overflowY: 'auto'
+                overflowY: 'auto',
               },
               '& .milkdown': {
                 width: '100%',
                 height: `${paperHeight}px`,
                 maxHeight: `${paperHeight}px`,
-                overflowY: 'auto'
-              }
-            }}
-          >
-            <MilkdownEditor
-              postId={postId}
-              content={post?.content ?? ''}
-              onChange={onChange}
-            />
-
-            <Paper
-              elevation={3}
-              ref={measuredRef}
-              sx={{
-                flexGrow: 0,
-                width: '260px',
-                maxWidth: '260px',
-                padding: 2,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'stretch',
-                gap: 2
-              }}
-            >
-              <Box
-                component={'label'}
-                sx={{
-                  position: 'relative',
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '1px dashed grey',
-                  cursor: 'pointer',
-                  overflow: 'hidden',
-                  minHeight: '50px'
-                }}
-                htmlFor="contained-button-file"
-              >
-                {post.cover ? (
-                  <Box
-                    component="img"
-                    src={post.cover}
-                    sx={{
-                      width: '100%',
-                      height: 'auto',
-                      display: 'block'
-                    }}
-                  />
-                ) : (
-                  <ImageIcon sx={{ fontSize: 48, color: 'grey' }} />
-                )}
-
-                <input
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  id="contained-button-file"
-                  type="file"
-                  onChange={handleImageUpload}
-                />
-                {post.cover && (
-                  <IconButton
-                    onClick={handleImageClear}
-                    sx={{
-                      position: 'absolute',
-                      bottom: 0,
-                      right: 0,
-                      zIndex: 10,
-                      backgroundColor: 'white',
-                      borderRadius: '50%',
-                      boxShadow: 3
-                    }}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                )}
-              </Box>
-              <TextField
-                label="Add a tag"
-                value={tagInput}
-                onChange={handleTagInputChange}
-                onKeyDown={handleTagInputKeyDown}
-                margin="normal"
-                size="small"
-              />
-              <Box
-                sx={{
-                  width: '100%',
-                  overflowY: 'auto',
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  justifyContent: 'flex-start',
-                  alignContent: 'flex-start',
-                  flex: '1 0 0',
-                  gap: '4px'
-                }}
-              >
-                {tags.map((tag, index) => (
-                  <Chip
-                    key={index}
-                    label={tag}
-                    onDelete={handleDeleteTag(tag)}
-                  />
-                ))}
-              </Box>
-            </Paper>
+                overflowY: 'auto',
+              },
+            }}>
+            <Editor content={post?.content ?? ''} onChange={onChange} />
           </Box>
         </>
       )}

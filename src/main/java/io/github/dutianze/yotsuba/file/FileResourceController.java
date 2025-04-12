@@ -1,9 +1,10 @@
 package io.github.dutianze.yotsuba.file;
 
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,12 +26,14 @@ public class FileResourceController {
         this.fileResourceRepository = fileResourceRepository;
     }
 
-    @Transactional
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> upload(@RequestParam MultipartFile file) throws IOException {
 
         String filename = Optional.ofNullable(file.getOriginalFilename()).orElse("unnamed");
-        FileResource fileResource = new FileResource(null, filename, file.getBytes());
+        String contentType =
+                Optional.ofNullable(file.getContentType()).orElse(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+
+        FileResource fileResource = new FileResource(null, filename, contentType, file.getBytes());
 
         fileResourceRepository.save(fileResource);
         return ResponseEntity.ok().body(fileResource.getId().getURL());
@@ -40,12 +43,17 @@ public class FileResourceController {
     public ResponseEntity<InputStreamResource> download(@PathVariable("id") FileResourceId resourceId) {
         Optional<FileResource> noteImageOptional = fileResourceRepository.findById(resourceId);
         return noteImageOptional
-                .map(FileResource::getData)
-                .map(ByteArrayInputStream::new)
-                .map(InputStreamResource::new)
-                .map(streamResource -> ResponseEntity.ok()
-                                                     .contentType(MediaType.IMAGE_PNG)
-                                                     .body(streamResource))
+                .map(fileResource -> {
+                    InputStreamResource resource =
+                            new InputStreamResource(new ByteArrayInputStream(fileResource.getData()));
+                    return ResponseEntity
+                            .ok()
+                            .contentType(MediaType.parseMediaType(fileResource.getContentType()))
+                            .header(HttpHeaders.CONTENT_DISPOSITION,
+                                    ContentDisposition.attachment().filename(fileResource.getFilename()).build()
+                                                      .toString())
+                            .body(resource);
+                })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 

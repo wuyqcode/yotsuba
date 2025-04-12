@@ -34,7 +34,7 @@ vaadin:
   launch-browser: 'true'
   allowed-packages: com.vaadin,org.vaadin,io.github.dutianze
   pnpm:
-    enable: 'true'
+    enable: true
   exclude-urls: /swagger-ui/**
 modules:
   primary:
