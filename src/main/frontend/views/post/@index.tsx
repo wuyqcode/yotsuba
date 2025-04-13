@@ -136,7 +136,7 @@ export default function AdminView() {
       </GlassBox>
 
       {/* 列表区 */}
-      <GlassBox sx={{ p: 2 }}>
+      <GlassBox sx={{ p: 2, m: 2 }}>
         <Stack spacing={1}>
           {posts?.map((post, idx) => (
             <Box
