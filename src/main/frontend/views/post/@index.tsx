@@ -1,16 +1,18 @@
 import SearchIcon from '@mui/icons-material/Search';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Box, Card, CardContent, CardMedia, Grid, IconButton, TextField, Typography } from '@mui/material';
+import { Box, CardMedia, IconButton, Stack, TextField, Typography } from '@mui/material';
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
 import { PostService } from 'Frontend/generated/endpoints';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router';
+import { GlassBox } from 'Frontend/components/GlassBox';
+import React from 'react';
 
 export const config: ViewConfig = {
   menu: {
-    order: 5,
+    order: 2,
     icon: 'DescriptionIcon',
   },
   title: '文章',
@@ -51,140 +53,134 @@ export default function AdminView() {
     setSearchText(event.target.value);
   };
 
+  function handleSearch(): void {
+    throw new Error('Function not implemented.');
+  }
+
+  function handleClear(): void {
+    throw new Error('Function not implemented.');
+  }
+
+  function handleTagClick(tag: string): void {
+    throw new Error('Function not implemented.');
+  }
+
   return (
-    <Box
-      sx={{
-        padding: '20px',
-      }}>
-      <Box
+    <Fragment>
+      {/* 搜索区 */}
+      <GlassBox
         sx={{
+          position: 'sticky',
+          top: '0px',
+          zIndex: 1200,
           display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
           flexDirection: 'column',
-          marginBottom: '20px',
+          alignItems: 'center',
+          gap: 2, // 子元素间距 16px
+          m: 2, // 外边距 16px
+          p: 2, // 内边距 16px
         }}>
-        <Typography variant="h4" sx={{ marginBottom: '10px' }}>
-          任意の検索 <span style={{ color: '#e91e63' }}>POST</span>
+        <Typography variant="h4">
+          任意の検索{' '}
+          <Box component="span" sx={{ color: 'primary.main' }}>
+            POST
+          </Box>
         </Typography>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            maxWidth: '600px',
-            width: '100%',
-          }}>
+
+        {/* 输入框 + 操作区 */}
+        <Box sx={{ display: 'flex', gap: 1, width: '100%', maxWidth: 600 }}>
           <TextField
             variant="outlined"
             placeholder="+ を使用して複数のキーワードを組み合わせる"
-            sx={{
-              borderRadius: '50px',
-              width: '100%',
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '50px',
-              },
-              '& .MuiOutlinedInput-input': {
-                padding: '10px 15px',
-              },
-            }}
             value={searchText}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            InputProps={{
-              endAdornment: (
-                <>
-                  <IconButton>
-                    <SearchIcon />
-                  </IconButton>
-                  <IconButton>
-                    <DeleteIcon />
-                  </IconButton>
-                </>
-              ),
+            fullWidth
+            sx={{
+              '& .MuiOutlinedInput-root': { borderRadius: '50px' },
+              '& .MuiOutlinedInput-input': { py: 1, px: 2 },
             }}
           />
-          <IconButton
-            sx={{ marginLeft: '10px' }} // 设置按钮和输入框之间的间距
-            onClick={createPost} // 你可以在这里添加按钮点击事件处理函数
-          >
+          <IconButton color="primary" onClick={handleSearch}>
+            <SearchIcon />
+          </IconButton>
+          <IconButton color="error" onClick={handleClear} disabled={!searchText}>
+            <DeleteIcon />
+          </IconButton>
+          <IconButton color="success" onClick={createPost}>
             <AddIcon />
           </IconButton>
         </Box>
-        <Typography sx={{ marginTop: '10px', color: '#ffb74d', fontSize: '14px' }}>java, aws, python</Typography>
-      </Box>
 
-      <Grid spacing={2}>
-        {posts?.map((post, index) => (
-          <Card
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              height: '200px', // 固定卡片高度
-              width: '100%',
-              '&:hover': {
-                boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
-                transform: 'translateY(-5px)',
-                transition: 'all 0.3s ease-in-out',
-              },
-            }}>
+        {/* 推荐 tag */}
+        <Stack direction="row" spacing={1} flexWrap="wrap" justifyContent="center">
+          {['java', 'aws', 'python'].map((tag) => (
             <Box
+              key={tag}
+              onClick={() => handleTagClick(tag)}
               sx={{
-                position: 'relative',
-                height: '100%',
-                width: '100%',
+                px: 1.5,
+                py: 0.5,
+                borderRadius: 10,
+                fontSize: '12px',
+                cursor: 'pointer',
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                color: 'warning.main',
+                transition: 'all 0.2s',
+                '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.15)' },
               }}>
+              {tag}
+            </Box>
+          ))}
+        </Stack>
+      </GlassBox>
+
+      {/* 列表区 */}
+      <GlassBox sx={{ p: 2 }}>
+        <Stack spacing={1}>
+          {posts?.map((post, idx) => (
+            <Box
+              key={post?.id}
+              component="a"
+              href={`/post/${post?.id}`}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                px: 1,
+                py: 1.5,
+                borderBottom: idx !== posts.length - 1 ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                textDecoration: 'none',
+                color: 'inherit',
+                transition: 'all 0.2s ease',
+                '&:hover': { backgroundColor: 'rgba(255,255,255,0.05)' },
+              }}>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Typography variant="h6" noWrap>
+                  {post?.title}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {post?.createdAt}
+                </Typography>
+              </Box>
+
               <CardMedia
                 component="img"
                 image={post?.cover}
                 alt={post?.title}
                 sx={{
-                  height: '100%',
-                  width: '100%',
+                  width: 80,
+                  height: 80,
+                  borderRadius: 1,
                   objectFit: 'cover',
-                  objectPosition: 'top center',
+                  flexShrink: 0,
+                  ml: 2,
                 }}
-                onClick={() => navigate(`/post/${post?.id}`)}
               />
-              <Box
-                sx={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  width: '100%',
-                  background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%)',
-                  display: 'flex',
-                  alignItems: 'flex-end',
-                  justifyContent: 'center',
-                  padding: '8px',
-                }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: 'white',
-                    textAlign: 'center',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                    fontSize: '14px',
-                    fontWeight: 'bold',
-                    letterSpacing: '0.5px',
-                    textShadow: '0 1px 2px rgba(0,0,0,0.8), 0 0 4px rgba(0,0,0,0.5)',
-                    padding: '4px 8px',
-                    borderRadius: '12px',
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      transform: 'scale(1.05)',
-                    },
-                  }}>
-                  {post?.title}
-                </Typography>
-              </Box>
             </Box>
-          </Card>
-        ))}
-      </Grid>
-    </Box>
+          ))}
+        </Stack>
+      </GlassBox>
+    </Fragment>
   );
 }

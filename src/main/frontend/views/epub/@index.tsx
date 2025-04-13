@@ -14,9 +14,10 @@ import {
   Typography,
 } from '@mui/material';
 import { useRef, useState } from 'react';
+import { GlassBox } from 'Frontend/components/GlassBox';
 
 export const config: ViewConfig = {
-  menu: { order: 1, icon: 'HomeIcon' },
+  menu: { order: 3, icon: 'HomeIcon' },
   title: 'Epub',
 };
 
@@ -84,7 +85,7 @@ const ImageUpload = () => {
   };
 
   return (
-    <Container>
+    <GlassBox height={'100%'}>
       <Box textAlign="center" mb={3}>
         <Typography variant="h4" gutterBottom>
           Epub Converter
@@ -125,7 +126,7 @@ const ImageUpload = () => {
           Convert
         </Button>
       </Box>
-    </Container>
+    </GlassBox>
   );
 };
 

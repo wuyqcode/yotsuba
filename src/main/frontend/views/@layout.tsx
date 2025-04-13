@@ -1,28 +1,19 @@
 import { useState, useEffect, Suspense } from 'react';
 import {
-  AppBar,
   Avatar,
   Box,
   IconButton,
   List,
-  ListItem,
   ListItemIcon,
   ListItemText,
-  Toolbar,
-  Typography,
   Menu,
   MenuItem,
-  Button,
   CardMedia,
-  Card,
-  Drawer,
-  ListItemButton
+  ListItemButton,
 } from '@mui/material';
 import DescriptionIcon from '@mui/icons-material/Description';
 import HomeIcon from '@mui/icons-material/Home';
-import EditIcon from '@mui/icons-material/Edit';
 import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { useViewConfig } from '@vaadin/hilla-file-router/runtime.js';
 import { effect, signal } from '@vaadin/hilla-react-signals';
 import { createMenuItems } from '@vaadin/hilla-file-router/runtime.js';
@@ -75,10 +66,7 @@ export default function MainLayout() {
   const profilePictureUrl =
     state.user &&
     `data:image;base64,${btoa(
-      state.user.profilePicture.reduce(
-        (str, n) => str + String.fromCharCode((n + 256) % 256),
-        ''
-      )
+      state.user.profilePicture.reduce((str, n) => str + String.fromCharCode((n + 256) % 256), '')
     )}`;
 
   return (
@@ -86,144 +74,141 @@ export default function MainLayout() {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        height: '100vh',
-        justifyContent: 'space-between',
-        boxSizing: 'border-box',
-        backgroundColor: '#f5f5f5'
-      }}
-    >
-      <AppBar
-        position="fixed"
+        height: '100dvh',
+        gap: '3px',
+        '&::before': {
+          content: '""',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.41), rgba(0, 0, 0, 0.41)), url("/images/homepage.jpeg")`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          zIndex: -1,
+        },
+      }}>
+      {/* header */}
+      <Box
+        component="header"
         sx={{
+          height: '50px',
+          flexShrink: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          px: 2,
+          borderRadius: '10px',
+          zIndex: 1300,
           background: 'rgba(255, 255, 255, 0.2)',
           backdropFilter: 'blur(5px)',
           WebkitBackdropFilter: 'blur(5px)',
           boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
           border: '1px solid rgba(255, 255, 255, 0.3)',
           color: 'black',
-          borderRadius: '10px',
-          height: '50px'
-        }}
-      >
-        <Toolbar
-          variant="dense"
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            width: '100%'
-          }}
-        >
-          <Box sx={{ display: 'flex' }}>
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="menu"
-              sx={{
-                '&:focus': {
-                  outline: 'none'
-                }
-              }}
-              onClick={toggleNav}
-            >
-              <MenuIcon />
-            </IconButton>
-            <CardMedia
-              component="img"
-              height="50"
-              image={'images/icon.png'}
-              sx={{ width: 40, height: 40 }}
-              onClick={() => navigate('/')}
-            />
+        }}>
+        {/* leat LOGO + menu */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            onClick={toggleNav}
+            sx={{ '&:focus': { outline: 'none' } }}>
+            <MenuIcon />
+          </IconButton>
+
+          <CardMedia
+            component="img"
+            src="images/icon.png"
+            sx={{ width: 40, height: 40, cursor: 'pointer' }}
+            onClick={() => navigate('/')}
+          />
+        </Box>
+
+        {/* right Avatar or Icon */}
+        {state.user ? (
+          <Box sx={{ position: 'relative' }}>
+            <Avatar sx={{ width: 32, height: 32, cursor: 'pointer' }} onClick={handleClick}>
+              <img src={profilePictureUrl} alt="profile" style={{ width: 24, height: 24 }} />
+            </Avatar>
+
+            <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+              <MenuItem onClick={handleClose}>Profile</MenuItem>
+              <MenuItem
+                onClick={async () => {
+                  await logout();
+                  document.location.reload();
+                }}>
+                Sign out
+              </MenuItem>
+            </Menu>
           </Box>
-          <Avatar sx={{ ml: 2, width: '32px', height: '32px' }}>
-            {state.user ? (
-              <Box onClick={handleClick}>
-                <img
-                  src={profilePictureUrl}
-                  alt="Notification Icon"
-                  style={{ width: 24, height: 24 }}
-                />
-                <Menu
-                  id="basic-menu"
-                  anchorEl={anchorEl}
-                  open={open}
-                  onClose={handleClose}
-                  MenuListProps={{
-                    'aria-labelledby': 'basic-button'
-                  }}
-                >
-                  <MenuItem onClick={handleClose}>Profile</MenuItem>
-                  <MenuItem onClick={handleClose}>
-                    <Button
-                      onClick={async () => {
-                        await logout();
-                        document.location.reload();
-                      }}
-                    >
-                      Sign out
-                    </Button>
-                  </MenuItem>
-                </Menu>
-              </Box>
-            ) : (
-              <Box onClick={() => navigate('/login')}>
-                <Icon icon={'vaadin:user'} />
-              </Box>
-            )}
+        ) : (
+          <Avatar sx={{ width: 32, height: 32, cursor: 'pointer' }} onClick={() => navigate('/login')}>
+            <Icon icon="vaadin:user" />
           </Avatar>
-        </Toolbar>
-      </AppBar>
-      <Box
-        sx={{ display: 'flex', flexGrow: 1, mt: '50px', overflow: 'hidden' }}
-      >
-        <Drawer
-          variant="persistent"
-          anchor="left"
-          open={navOpen}
-          sx={{
-            width: navOpen ? 200 : 0,
-            flexShrink: 0,
-            '& .MuiDrawer-paper': {
-              width: 200,
-              boxSizing: 'border-box',
-              background: 'rgba(255, 255, 255, 0.2)',
-              boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
-              backdropFilter: 'blur(5px)',
-              WebkitBackdropFilter: 'blur(5px)',
-              borderRadius: '10px',
-              marginTop: '5px',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              transition: 'width 0.3s ease-in-out',
-              top: '50px',
-              height: 'calc(100% - 50px)'
-            }
-          }}
-        >
-          <List>
-            {createMenuItems().map(({ to, title, icon }) => (
-              <ListItemButton
-                key={title}
-                onClick={() => {
-                  navigate(to);
-                }}
-              >
-                <ListItemIcon>{renderIcon(icon)}</ListItemIcon>
-                <ListItemText primary={title} />
-              </ListItemButton>
-            ))}
-          </List>
-        </Drawer>
+        )}
+      </Box>
+
+      {/* navbar mask */}
+      {navOpen && (
         <Box
           sx={{
-            flexGrow: 1,
-            overflow: 'auto'
+            position: 'fixed',
+            inset: '0',
+            zIndex: 1100,
           }}
-        >
-          <Suspense fallback={<div>Loading...</div>}>
-            <Outlet />
-          </Suspense>
-        </Box>
+          onClick={() => setNavOpen(false)}
+        />
+      )}
+
+      {/* navbar */}
+      <Box
+        sx={{
+          position: 'fixed',
+          top: '50px',
+          left: 0,
+          width: 200,
+          height: 'calc(100% - 50px)',
+          background: 'rgba(255, 255, 255, 0.2)',
+          boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+          backdropFilter: 'blur(5px)',
+          WebkitBackdropFilter: 'blur(5px)',
+          borderRadius: '10px',
+          border: '1px solid rgba(255, 255, 255, 0.3)',
+          boxSizing: 'border-box',
+          marginTop: '5px',
+          transition: 'transform 0.3s ease-in-out',
+          transform: navOpen ? 'translateX(0)' : 'translateX(-100%)',
+          zIndex: 1201,
+        }}>
+        <List>
+          {createMenuItems().map(({ to, title, icon }) => (
+            <ListItemButton
+              key={title}
+              onClick={() => {
+                navigate(to);
+                setNavOpen(false);
+              }}>
+              <ListItemIcon>{renderIcon(icon)}</ListItemIcon>
+              <ListItemText primary={title} />
+            </ListItemButton>
+          ))}
+        </List>
+      </Box>
+
+      {/* content */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          overflowY: 'auto',
+        }}>
+        <Suspense fallback={<div>Loading...</div>}>
+          <Outlet />
+        </Suspense>
       </Box>
     </Box>
   );

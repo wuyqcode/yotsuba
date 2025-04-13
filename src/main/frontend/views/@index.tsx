@@ -8,7 +8,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 export const config: ViewConfig = {
-  menu: { order: 0, icon: 'HomeIcon' },
+  menu: { order: 1, icon: 'HomeIcon' },
   title: '主页',
 };
 
@@ -184,22 +184,9 @@ export default function HomeView() {
         flexDirection: 'column',
         position: 'relative',
         zIndex: 1,
-        '&::before': {
-          content: '""',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.41), rgba(0, 0, 0, 0.41)), url("/images/homepage.jpeg")`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          zIndex: -1,
-        },
       }}
       onContextMenu={handleContextMenu}
-      onClick={handleExitEditMode} // 添加这一行
-    >
+      onClick={handleExitEditMode}>
       <Container maxWidth="lg" sx={{ mt: 4, flexGrow: 1, position: 'relative', zIndex: 1 }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
           <TextField

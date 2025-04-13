@@ -27,6 +27,7 @@
     "lit": "3.2.1",
     "mermaid": "^8.14.0",
     "react": "18.3.1",
+    "react-arborist": "^3.4.3",
     "react-dom": "18.3.1",
     "react-router": "7.2.0",
     "reactjs-tiptap-editor": "^0.2.20"
@@ -90,7 +91,8 @@
     "@polymer/polymer": "$@polymer/polymer",
     "@vaadin/hilla-lit-form": "$@vaadin/hilla-lit-form",
     "@vaadin/hilla-react-form": "$@vaadin/hilla-react-form",
-    "@vaadin/hilla-react-signals": "$@vaadin/hilla-react-signals"
+    "@vaadin/hilla-react-signals": "$@vaadin/hilla-react-signals",
+    "react-arborist": "$react-arborist"
   },
   "vaadin": {
     "dependencies": {
@@ -147,6 +149,6 @@
       "workbox-core": "7.3.0",
       "workbox-precaching": "7.3.0"
     },
-    "hash": "9ef5e98616d3f3aa0859cb17895743cdfdf245e84570540602af92c11127abfb"
+    "hash": "5f1c6fc30c4614dbdbf0bf0b87445cd00fcb0741e2cb4b053800dced032486cc"
   }
 }
