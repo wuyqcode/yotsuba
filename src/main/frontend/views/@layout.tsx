@@ -20,6 +20,7 @@ import { createMenuItems } from '@vaadin/hilla-file-router/runtime.js';
 import { Icon } from '@vaadin/react-components';
 import { useAuth } from 'Frontend/util/auth.js';
 import { Outlet, useLocation, useNavigate } from 'react-router';
+import { GlassBox } from 'Frontend/components/GlassBox';
 
 const defaultTitle = document.title;
 const documentTitleSignal = signal('');
@@ -83,14 +84,14 @@ export default function MainLayout() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.41), rgba(0, 0, 0, 0.41)), url("/images/homepage.jpeg")`,
+          backgroundImage: `linear-gradient(135deg,rgb(65, 189, 166), #acb6e5)`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           zIndex: -1,
         },
       }}>
       {/* header */}
-      <Box
+      <GlassBox
         component="header"
         sx={{
           height: '50px',
@@ -98,15 +99,10 @@ export default function MainLayout() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          px: 2,
           borderRadius: '10px',
           zIndex: 1300,
-          background: 'rgba(255, 255, 255, 0.2)',
-          backdropFilter: 'blur(5px)',
-          WebkitBackdropFilter: 'blur(5px)',
-          boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
-          border: '1px solid rgba(255, 255, 255, 0.3)',
-          color: 'black',
+          p: 1,
+          m: '0 1 0 1',
         }}>
         {/* leat LOGO + menu */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -150,7 +146,7 @@ export default function MainLayout() {
             <Icon icon="vaadin:user" />
           </Avatar>
         )}
-      </Box>
+      </GlassBox>
 
       {/* navbar mask */}
       {navOpen && (
@@ -165,20 +161,13 @@ export default function MainLayout() {
       )}
 
       {/* navbar */}
-      <Box
+      <GlassBox
         sx={{
           position: 'fixed',
           top: '50px',
           left: 0,
           width: 200,
           height: 'calc(100% - 50px)',
-          background: 'rgba(255, 255, 255, 0.2)',
-          boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
-          backdropFilter: 'blur(5px)',
-          WebkitBackdropFilter: 'blur(5px)',
-          borderRadius: '10px',
-          border: '1px solid rgba(255, 255, 255, 0.3)',
-          boxSizing: 'border-box',
           marginTop: '5px',
           transition: 'transform 0.3s ease-in-out',
           transform: navOpen ? 'translateX(0)' : 'translateX(-100%)',
@@ -197,7 +186,7 @@ export default function MainLayout() {
             </ListItemButton>
           ))}
         </List>
-      </Box>
+      </GlassBox>
 
       {/* content */}
       <Box

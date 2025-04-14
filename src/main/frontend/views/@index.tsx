@@ -6,6 +6,7 @@ import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { GlassBox } from 'Frontend/components/GlassBox';
 
 export const config: ViewConfig = {
   menu: { order: 1, icon: 'HomeIcon' },
@@ -177,7 +178,7 @@ export default function HomeView() {
   }, [isEditMode]);
 
   return (
-    <Box
+    <GlassBox
       sx={{
         minHeight: '100vh',
         display: 'flex',
@@ -188,7 +189,7 @@ export default function HomeView() {
       onContextMenu={handleContextMenu}
       onClick={handleExitEditMode}>
       <Container maxWidth="lg" sx={{ mt: 4, flexGrow: 1, position: 'relative', zIndex: 1 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
+        <GlassBox sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
           <TextField
             placeholder="输入并搜索"
             variant="outlined"
@@ -214,10 +215,10 @@ export default function HomeView() {
               ),
             }}
           />
-        </Box>
+        </GlassBox>
         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={2} sx={{ maxWidth: 1000, mx: 'auto' }}>
           {shortcuts.map((shortcut, index) => (
-            <Box key={index} sx={{ width: { xs: '25%', sm: '12.5%', md: '8.33%' } }}>
+            <GlassBox key={index} sx={{ width: { xs: '25%', sm: '12.5%', md: '8.33%' } }}>
               <ShortcutItem
                 shortcut={shortcut}
                 index={index}
@@ -225,7 +226,7 @@ export default function HomeView() {
                 onEdit={handleEditShortcut}
                 onDelete={handleDeleteShortcut}
               />
-            </Box>
+            </GlassBox>
           ))}
 
           <Box sx={{ width: { xs: '25%', sm: '12.5%', md: '8.33%' } }}>
@@ -298,7 +299,7 @@ export default function HomeView() {
           </Button>
         </Box>
       </Drawer>
-    </Box>
+    </GlassBox>
   );
 }
 

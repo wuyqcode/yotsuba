@@ -76,9 +76,9 @@ export default function AdminView() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: 2, // 子元素间距 16px
-          m: 2, // 外边距 16px
-          p: 2, // 内边距 16px
+          gap: 1, // 子元素间距 16px
+          m: 1, // 外边距 16px
+          p: 1, // 内边距 16px
         }}>
         <Typography variant="h4">
           任意の検索{' '}
@@ -136,7 +136,7 @@ export default function AdminView() {
       </GlassBox>
 
       {/* 列表区 */}
-      <GlassBox sx={{ p: 2, m: 2 }}>
+      <GlassBox sx={{ p: 1, m: 1 }}>
         <Stack spacing={1}>
           {posts?.map((post, idx) => (
             <Box
@@ -149,17 +149,28 @@ export default function AdminView() {
                 justifyContent: 'space-between',
                 px: 1,
                 py: 1.5,
-                borderBottom: idx !== posts.length - 1 ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                borderBottom: idx !== posts.length - 1 ? '1px solid rgba(0, 0, 0, 0.2)' : 'none',
                 textDecoration: 'none',
                 color: 'inherit',
                 transition: 'all 0.2s ease',
                 '&:hover': { backgroundColor: 'rgba(255,255,255,0.05)' },
               }}>
               <Box sx={{ flex: 1, minWidth: 0 }}>
-                <Typography variant="h6" noWrap>
+                <Typography
+                  variant="h6"
+                  noWrap
+                  sx={{
+                    fontWeight: 600,
+                    textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                  }}>
                   {post?.title}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{
+                    textShadow: '0 1px 1px rgba(0,0,0,0.1)',
+                  }}>
                   {post?.createdAt}
                 </Typography>
               </Box>
@@ -174,7 +185,11 @@ export default function AdminView() {
                   borderRadius: 1,
                   objectFit: 'cover',
                   flexShrink: 0,
-                  ml: 2,
+                  ml: 3,
+                  transition: 'transform 0.2s ease',
+                  '&:hover': {
+                    transform: 'scale(1.05)',
+                  },
                 }}
               />
             </Box>
