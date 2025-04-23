@@ -6,86 +6,12 @@ import { PostService } from 'Frontend/generated/endpoints';
 import { useQueryClient } from '@tanstack/react-query';
 import PostDto from 'Frontend/generated/io/github/dutianze/yotsuba/cms/application/dto/PostDto';
 import { useNavigate, useParams } from 'react-router';
-import { Tree } from 'react-arborist';
-import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
-import FolderIcon from '@mui/icons-material/Folder';
 import { GlassBox } from 'Frontend/components/GlassBox';
+import FileExplorer from 'Frontend/components/FileExplorer';
 
 export const config: ViewConfig = {
   menu: { exclude: true },
 };
-
-export type TreeNode = {
-  id: string;
-  name: string;
-  type?: string;
-  children?: TreeNode[];
-};
-
-const moveNode = (data: any[], dragIds: string[], parentId: string | null, index: number): any[] => {
-  let dragged: any[] = [];
-
-  // 递归删除被拖动的节点
-  const remove = (nodes: any[]): any[] => {
-    return nodes
-      .map((node) => {
-        if (dragIds.includes(node.id)) {
-          dragged.push(node);
-          return null;
-        }
-        if (node.children) {
-          node.children = remove(node.children);
-        }
-        return node;
-      })
-      .filter(Boolean);
-  };
-
-  const newData = remove([...data]);
-
-  const insert = (nodes: any[]): boolean => {
-    for (const node of nodes) {
-      if (node.id === parentId) {
-        node.children = node.children || [];
-        node.children.splice(index, 0, ...dragged);
-        return true;
-      }
-      if (node.children && insert(node.children)) return true;
-    }
-    return false;
-  };
-
-  if (parentId) {
-    insert(newData);
-  } else {
-    newData.splice(index, 0, ...dragged);
-  }
-
-  return newData;
-};
-
-export const initialData: TreeNode[] = [
-  {
-    id: 'folder-1',
-    name: 'Folder 1',
-    type: 'folder',
-    children: [
-      { id: 'file-1', name: 'File A.txt', type: 'file' },
-      { id: 'file-2', name: 'File B.md', type: 'file' },
-    ],
-  },
-  {
-    id: 'folder-2',
-    name: 'Folder 2',
-    type: 'folder',
-    children: [],
-  },
-  {
-    id: 'file-3',
-    name: 'Root File.png',
-    type: 'file',
-  },
-];
 
 export default function MilkdownEditorWrapper() {
   const { postId } = useParams();
@@ -97,7 +23,6 @@ export default function MilkdownEditorWrapper() {
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState<string>('');
   const [paperHeight, setPaperHeight] = useState<number>(0);
-  const [treeData, setTreeData] = useState<TreeNode[]>(initialData);
 
   const measuredRef = useCallback((node: any) => {
     if (node !== null) {
@@ -208,51 +133,14 @@ export default function MilkdownEditorWrapper() {
       {/* 左侧 Tree */}
       <GlassBox
         sx={{
-          width: 260,
-          minWidth: 200,
+          width: 500,
           borderRight: '1px solid rgba(0,0,0,0.08)',
           overflowY: 'auto',
           overflowX: 'hidden',
           p: 2,
           boxSizing: 'border-box',
         }}>
-        <Tree
-          data={treeData}
-          padding={12}
-          rowHeight={36}
-          indent={20}
-          openByDefault
-          disableEdit
-          onMove={({ dragIds, parentId, index }) => {
-            const newData = moveNode(treeData, dragIds, parentId, index);
-            setTreeData(newData);
-          }}>
-          {({ node, style, dragHandle }) => {
-            const isFolder = node.children != null;
-
-            return (
-              <Box
-                ref={dragHandle} // 整行拖动
-                style={style}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  px: 1,
-                  py: 0.5,
-                  borderRadius: 1,
-                  cursor: 'grab',
-                  '&:hover': { backgroundColor: 'rgba(0,0,0,0.05)' },
-                }}>
-                {isFolder ? <FolderIcon fontSize="small" /> : <InsertDriveFileIcon fontSize="small" />}
-
-                <Typography variant="body2" noWrap>
-                  {node.data.name}
-                </Typography>
-              </Box>
-            );
-          }}
-        </Tree>
+        <FileExplorer />
       </GlassBox>
 
       {/* 右侧 编辑区 */}

@@ -1,56 +1,55 @@
 import { useState } from 'react';
 
-import RichTextEditor from 'reactjs-tiptap-editor';
+import RichTextEditor, { BaseKit } from 'reactjs-tiptap-editor';
 
 import { locale } from 'reactjs-tiptap-editor/locale-bundle';
 
-import {
-  Attachment,
-  BaseKit,
-  Blockquote,
-  Bold,
-  BulletList,
-  Clear,
-  Code,
-  CodeBlock,
-  Color,
-  ColumnActionButton,
-  Emoji,
-  ExportPdf,
-  ExportWord,
-  FontFamily,
-  FontSize,
-  FormatPainter,
-  Heading,
-  Highlight,
-  History,
-  HorizontalRule,
-  Iframe,
-  Image,
-  ImportWord,
-  Indent,
-  Italic,
-  Katex,
-  LineHeight,
-  Link,
-  Mention,
-  MoreMark,
-  OrderedList,
-  SearchAndReplace,
-  SlashCommand,
-  Strike,
-  Table,
-  TableOfContents,
-  TaskList,
-  TextAlign,
-  TextDirection,
-  Twitter,
-  Underline,
-  Video,
-  Drawer,
-} from 'reactjs-tiptap-editor/extension-bundle';
+import { Attachment } from 'reactjs-tiptap-editor/attachment';
+import { Blockquote } from 'reactjs-tiptap-editor/blockquote';
+import { Bold } from 'reactjs-tiptap-editor/bold';
+import { BulletList } from 'reactjs-tiptap-editor/bulletlist';
+import { Clear } from 'reactjs-tiptap-editor/clear';
+import { Code } from 'reactjs-tiptap-editor/code';
+import { CodeBlock } from 'reactjs-tiptap-editor/codeblock';
+import { Color } from 'reactjs-tiptap-editor/color';
+import { ColumnActionButton } from 'reactjs-tiptap-editor/multicolumn';
+import { Emoji } from 'reactjs-tiptap-editor/emoji';
+import { ExportPdf } from 'reactjs-tiptap-editor/exportpdf';
+import { ExportWord } from 'reactjs-tiptap-editor/exportword';
+import { FontFamily } from 'reactjs-tiptap-editor/fontfamily';
+import { FontSize } from 'reactjs-tiptap-editor/fontsize';
+import { FormatPainter } from 'reactjs-tiptap-editor/formatpainter';
+import { Heading } from 'reactjs-tiptap-editor/heading';
+import { Highlight } from 'reactjs-tiptap-editor/highlight';
+import { History } from 'reactjs-tiptap-editor/history';
+import { HorizontalRule } from 'reactjs-tiptap-editor/horizontalrule';
+import { Iframe } from 'reactjs-tiptap-editor/iframe';
+import { Image } from 'reactjs-tiptap-editor/image';
+import { ImportWord } from 'reactjs-tiptap-editor/importword';
+import { Indent } from 'reactjs-tiptap-editor/indent';
+import { Italic } from 'reactjs-tiptap-editor/italic';
+import { LineHeight } from 'reactjs-tiptap-editor/lineheight';
+import { Link } from 'reactjs-tiptap-editor/link';
+import { Mention } from 'reactjs-tiptap-editor/mention';
+import { MoreMark } from 'reactjs-tiptap-editor/moremark';
+import { OrderedList } from 'reactjs-tiptap-editor/orderedlist';
+import { SearchAndReplace } from 'reactjs-tiptap-editor/searchandreplace';
+import { SlashCommand } from 'reactjs-tiptap-editor/slashcommand';
+import { Strike } from 'reactjs-tiptap-editor/strike';
+import { Table } from 'reactjs-tiptap-editor/table';
+import { TableOfContents } from 'reactjs-tiptap-editor/tableofcontent';
+import { TaskList } from 'reactjs-tiptap-editor/tasklist';
+import { TextAlign } from 'reactjs-tiptap-editor/textalign';
+import { TextUnderline } from 'reactjs-tiptap-editor/textunderline';
+import { Video } from 'reactjs-tiptap-editor/video';
+import { TextDirection } from 'reactjs-tiptap-editor/textdirection';
+import { Drawer } from 'reactjs-tiptap-editor/drawer';
+import { Twitter } from 'reactjs-tiptap-editor/twitter';
 
 import 'reactjs-tiptap-editor/style.css';
+import 'prism-code-editor-lightweight/layout.css';
+import 'prism-code-editor-lightweight/themes/github-dark.css';
+
 import 'katex/dist/katex.min.css';
 import 'easydrawer/styles.css';
 import { useUpload } from 'Frontend/hooks/useUpload';
@@ -87,10 +86,9 @@ const Editor: React.FC<EditorProps> = ({ content, onChange }) => {
     FontSize,
     Bold,
     Italic,
-    Underline,
+    TextUnderline,
     Strike,
     MoreMark,
-    Katex,
     Emoji,
     Color.configure({ spacer: true }),
     Highlight,
@@ -162,9 +160,7 @@ const Editor: React.FC<EditorProps> = ({ content, onChange }) => {
       dark={false}
       toolbar={{
         render: (props, toolbarItems, dom, containerDom) => {
-          return (
-            <Box style={{ position: 'sticky', top: 0, zIndex: 100, background: 'white' }}>{containerDom(dom)}</Box>
-          );
+          return <Box sx={{ position: 'sticky', top: 0, zIndex: 100, background: 'white' }}>{containerDom(dom)}</Box>;
         },
       }}
     />
