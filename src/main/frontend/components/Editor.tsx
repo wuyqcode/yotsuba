@@ -54,8 +54,7 @@ import 'katex/dist/katex.min.css';
 import 'easydrawer/styles.css';
 import { useUpload } from 'Frontend/hooks/useUpload';
 import { Box } from '@mui/material';
-
-locale.setLang('zh_CN');
+import { GlassBox } from './GlassBox';
 
 interface EditorProps {
   content: string;
@@ -66,6 +65,7 @@ const Editor: React.FC<EditorProps> = ({ content, onChange }) => {
   const [disable, setDisable] = useState(false);
 
   const { upload, loading } = useUpload();
+  locale.setLang('zh_CN');
 
   const extensions = [
     BaseKit.configure({
@@ -160,12 +160,6 @@ const Editor: React.FC<EditorProps> = ({ content, onChange }) => {
       dark={false}
       removeDefaultWrapper={true}
       contentClass={'editor'}
-      maxHeight={'500px'}
-      toolbar={{
-        render: (props, toolbarItems, dom, containerDom) => {
-          return <Box sx={{ position: 'sticky', top: 0, zIndex: 100, background: 'white' }}>{containerDom(dom)}</Box>;
-        },
-      }}
     />
   );
 };

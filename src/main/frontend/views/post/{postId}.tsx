@@ -129,7 +129,7 @@ export default function MilkdownEditorWrapper() {
   };
 
   return (
-    <Box sx={{ display: 'flex', height: '100%', p: 2, gap: 2 }}>
+    <Box sx={{ display: 'flex', height: '100%', p: 1, gap: 1 }}>
       {/* 左侧 Tree */}
       <GlassBox
         sx={{
@@ -144,7 +144,15 @@ export default function MilkdownEditorWrapper() {
       </GlassBox>
 
       {/* 右侧 编辑区 */}
-      <GlassBox sx={{ flexGrow: 1, display: 'flex', p: 2, flexDirection: 'column', overflow: 'hidden' }}>
+      <GlassBox
+        sx={{
+          flexGrow: 1,
+          display: 'flex',
+          p: 2,
+          flexDirection: 'column',
+          overflow: 'hidden',
+          backgroundColor: 'white ',
+        }}>
         {postId && post && (
           <>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -198,6 +206,9 @@ export default function MilkdownEditorWrapper() {
                   flex: '1 1 auto',
                   overflow: 'auto',
                   minHeight: 0,
+                  '.ProseMirror': {
+                    padding: '4px !important',
+                  },
                 },
               }}>
               {/* 富文本编辑器区域 */}

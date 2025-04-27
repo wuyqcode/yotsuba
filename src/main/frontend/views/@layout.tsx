@@ -84,7 +84,7 @@ export default function MainLayout() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundImage: `linear-gradient(135deg,rgb(65, 189, 166), #acb6e5)`,
+          backgroundImage: `linear-gradient(135deg,rgb(249, 249, 249),rgb(249, 249, 249))`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           zIndex: -1,
