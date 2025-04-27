@@ -1,0 +1,353 @@
+[
+  {
+    "category": "游戏平台",
+    "icon": "GameOutline",
+    "items": [
+      {
+        "name": "Steam",
+        "url": "https://store.steampowered.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/store.steampowered.com.png"
+      },
+      {
+        "name": "Epic游戏商城",
+        "url": "https://store.epicgames.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/store.epicgames.com.png"
+      },
+      {
+        "name": "bilibili游戏",
+        "url": "https://game.bilibili.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2022/10/www.bilibili.com_.webp"
+      },
+      {
+        "name": "TapTap",
+        "url": "https://www.taptap.cn",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2023/08/www.taptap.cn_.png"
+      }
+    ]
+  },
+  {
+    "category": "蔚蓝档案",
+    "icon": "HuntOutline",
+    "items": [
+      {
+        "name": "碧蓝档案剧情站",
+        "url": "https://blue-archive.io",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2024/07/1720823439-blue-archive.io_.png"
+      },
+      {
+        "name": "基沃托斯古书馆",
+        "url": "https://kivo.fun",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2024/01/kivo.wiki_.png"
+      },
+      {
+        "name": "什亭之匣",
+        "url": "https://arona.icu",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2023/11/arona.icu_.jpg"
+      },
+      {
+        "name": "蔚蓝档案标题生成器",
+        "url": "https://tmp.nulla.top/ba-logo",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2023/10/tmp.nulla_.top_.png"
+      },
+      {
+        "name": "Blue Archive Character Planner",
+        "url": "https://ba.gc.gg",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2023/09/ba.gc_.gg_.png"
+      },
+      {
+        "name": "BlueArchive素材早見表",
+        "url": "https://ba.game-db.tw",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2023/09/ba.game-db.tw_.png"
+      },
+      {
+        "name": "Schale",
+        "url": "https://schaledb.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2023/08/schale.gg_.png"
+      },
+      {
+        "name": "碧蓝档案wiki-GameKee",
+        "url": "https://ba.gamekee.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2024/01/ba.gamekee.com_.png"
+      }
+    ]
+  },
+  {
+    "category": "游戏工具",
+    "icon": "BookOutline",
+    "items": [
+      {
+        "name": "风灵月影",
+        "url": "https://flingtrainer.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2025/04/1743876744-flingtrainer.com_.png"
+      },
+      {
+        "name": "Steam Card Exchange",
+        "url": "https://www.steamcardexchange.net",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2025/04/1743874639-www.steamcardexchange.net_.jpg"
+      },
+      {
+        "name": "Human Benchmark",
+        "url": "https://humanbenchmark.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2024/10/1728055917-humanbenchmark.com_.png"
+      },
+      {
+        "name": "Gamepad Tester",
+        "url": "https://hardwaretester.com/gamepad",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2024/02/hardwaretester.com_.png"
+      },
+      {
+        "name": "SteamDB",
+        "url": "https://steamdb.info",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2023/08/steamdb.info_.png"
+      }
+    ]
+  },
+  {
+    "category": "游戏下载",
+    "icon": "GameOutline",
+    "items": [
+      {
+        "name": "傻狗本狗の小破站",
+        "url": "https://www.sharelikes.com.cn",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2024/01/sharelikes.com.cn_.png"
+      },
+      {
+        "name": "游戏星空",
+        "url": "https://gamestarfield.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2024/01/gamestarfield.com_.png"
+      },
+      {
+        "name": "Steam0资源网",
+        "url": "https://steam0.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2023/07/steam0.com_.png"
+      },
+      {
+        "name": "资源避难所",
+        "url": "https://www.flysheep6.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2023/06/www.flysheep6.com_.jpg"
+      },
+      {
+        "name": "小妖怪分享",
+        "url": "https://www.xyg688.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2023/04/www.xyg688.com_.png"
+      },
+      {
+        "name": "FitGirl Repacks",
+        "url": "https://fitgirl-repacks.site",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2022/12/fitgirl-repacks.site_.webp"
+      },
+      {
+        "name": "掌机迷",
+        "url": "http://www.gbarom.cn",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2022/11/www.gbarom.cn_.webp"
+      },
+      {
+        "name": "91TVG",
+        "url": "https://www.tekqart.com/forum.php",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2022/06/www.91tvg.com_.png"
+      },
+      {
+        "name": "BYRUTOR",
+        "url": "https://byrutgame.org",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/byrut.org.png"
+      },
+      {
+        "name": "Switch520",
+        "url": "https://www.gamer520.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2022/11/xxxxx520.com_.webp"
+      }
+    ]
+  },
+  {
+    "category": "MOD下载",
+    "icon": "InjectionOutline",
+    "items": [
+      {
+        "name": "GameBanana",
+        "url": "https://gamebanana.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2023/09/gamebanana.com_.png"
+      },
+      {
+        "name": "NexusMods",
+        "url": "https://www.nexusmods.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2023/01/www.nexusmods.com_.webp"
+      },
+      {
+        "name": "ModWorkshop",
+        "url": "https://modworkshop.net",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2023/01/modworkshop.net_.png"
+      }
+    ]
+  },
+  {
+    "category": "在线游戏",
+    "icon": "GameOutline",
+    "items": [
+      {
+        "name": "小霸王游戏",
+        "url": "https://www.yikm.net",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/ymnet.png"
+      },
+      {
+        "name": "io游戏",
+        "url": "https://www.io233.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2022/10/www.io233.com_.webp"
+      },
+      {
+        "name": "中文家用游戏博物馆",
+        "url": "http://www.famicn.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/no.png"
+      },
+      {
+        "name": "在线 DOS 游戏/Flash 保存计划",
+        "url": "https://dos.zczc.cz",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/dos.zczc.cz.png"
+      }
+    ]
+  },
+  {
+    "category": "高清壁纸",
+    "icon": "PhotoOutline",
+    "items": [
+      {
+        "name": "DeviantArt",
+        "url": "https://www.deviantart.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/www.deviantart.com.png"
+      },
+      {
+        "name": "WallpaperCave",
+        "url": "https://wallpapercave.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/wallpapercave.com.png"
+      },
+      {
+        "name": "unsplash",
+        "url": "https://unsplash.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/unsplash.com.png"
+      },
+      {
+        "name": "Piqsels",
+        "url": "https://www.piqsels.com/zh",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/www.piqsels.com.png"
+      },
+      {
+        "name": "WallHere",
+        "url": "https://wallhere.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/wallhere.com.png"
+      },
+      {
+        "name": "HDqwalls",
+        "url": "https://hdqwalls.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/no.png"
+      },
+      {
+        "name": "WallpaperUP",
+        "url": "https://www.wallpaperup.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/www.wallpaperup.com.png"
+      },
+      {
+        "name": "Wallroom",
+        "url": "https://wallroom.io",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/wallroom.io.png"
+      },
+      {
+        "name": "backiee",
+        "url": "https://backiee.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/backiee.com.png"
+      },
+      {
+        "name": "Wallpaper Abyss",
+        "url": "https://wall.alphacoders.com/?lang=Chinese",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/wall.alphacoders.com.png"
+      },
+      {
+        "name": "Wallpapers",
+        "url": "https://wallhaven.cc",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/wallhaven.cc.png"
+      }
+    ]
+  },
+  {
+    "category": "论坛",
+    "icon": "NoticeOutline",
+    "items": [
+      {
+        "name": "X岛匿名版",
+        "url": "https://www.nmbxd1.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/adnmb3.com.png"
+      },
+      {
+        "name": "stage1",
+        "url": "https://bbs.sarab1st.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/bbs.sarab1st.com.ico"
+      },
+      {
+        "name": "NGA玩家社区",
+        "url": "https://bbs.nga.cn",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/bbs.nga.cn.ico"
+      }
+    ]
+  },
+  {
+    "category": "BT磁力",
+    "icon": "DownloadOutline",
+    "items": [
+      {
+        "name": "RARBG",
+        "url": "https://rargb.to",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2023/12/rargb.to_.png"
+      },
+      {
+        "name": "1337x",
+        "url": "https://www.1377x.to",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2023/01/www.1377x.to_.png"
+      },
+      {
+        "name": "海盗湾",
+        "url": "https://thepiratebay.org/index.html",
+        "icon": "https://www.acgbox.link/wp-content/uploads/2023/01/torrindex.net_.webp"
+      },
+      {
+        "name": "RuTracker",
+        "url": "http://rutracker.org",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/rutracker.org.png"
+      }
+    ]
+  },
+  {
+    "category": "直播",
+    "icon": "VideoOutline",
+    "items": [
+      {
+        "name": "哔哩哔哩直播",
+        "url": "https://live.bilibili.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/www.bilibili.com.ico"
+      },
+      {
+        "name": "Twitch",
+        "url": "https://www.twitch.tv",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/www.twitch.tv.ico"
+      },
+      {
+        "name": "虎牙直播",
+        "url": "https://www.huya.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/www.huya.com.ico"
+      },
+      {
+        "name": "斗鱼直播",
+        "url": "https://www.douyu.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/www.douyu.com.png"
+      }
+    ]
+  },
+  {
+    "category": "数码",
+    "icon": "PokeOutline",
+    "items": [
+      {
+        "name": "IT之家",
+        "url": "https://www.ithome.com",
+        "icon": "https://www.acgbox.link/wp-content/uploads/favicon/www.ithome.com.png"
+      }
+    ]
+  }
+]
