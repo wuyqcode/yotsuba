@@ -80,12 +80,6 @@ function DotIcon() {
     />
   );
 }
-declare module 'react' {
-  interface CSSProperties {
-    '--tree-view-color'?: string;
-    '--tree-view-bg-color'?: string;
-  }
-}
 
 const TreeItemRoot = styled('li')(({ theme }) => ({
   listStyle: 'none',

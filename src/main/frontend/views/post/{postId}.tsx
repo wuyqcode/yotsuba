@@ -133,12 +133,12 @@ export default function MilkdownEditorWrapper() {
       {/* 左侧 Tree */}
       <GlassBox
         sx={{
-          width: 500,
+          width: 260,
+          flexShrink: 0,
           borderRight: '1px solid rgba(0,0,0,0.08)',
           overflowY: 'auto',
           overflowX: 'hidden',
           p: 2,
-          boxSizing: 'border-box',
         }}>
         <FileExplorer />
       </GlassBox>
@@ -176,7 +176,30 @@ export default function MilkdownEditorWrapper() {
               </Stack>
             </Box>
 
-            <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
+            <Box
+              sx={{
+                flexGrow: 1,
+                overflow: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                '.reactjs-tiptap-editor': {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: '100%',
+                  width: '100%',
+                  '& > *': {
+                    display: 'contents',
+                    '& > *': {
+                      display: 'contents',
+                    },
+                  },
+                },
+                '.editor': {
+                  flex: '1 1 auto',
+                  overflow: 'auto',
+                  minHeight: 0,
+                },
+              }}>
               {/* 富文本编辑器区域 */}
               <Editor content={post?.content ?? ''} onChange={onChange} />
             </Box>

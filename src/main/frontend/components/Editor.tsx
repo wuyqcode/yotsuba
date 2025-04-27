@@ -158,6 +158,9 @@ const Editor: React.FC<EditorProps> = ({ content, onChange }) => {
       extensions={extensions}
       disabled={disable}
       dark={false}
+      removeDefaultWrapper={true}
+      contentClass={'editor'}
+      maxHeight={'500px'}
       toolbar={{
         render: (props, toolbarItems, dom, containerDom) => {
           return <Box sx={{ position: 'sticky', top: 0, zIndex: 100, background: 'white' }}>{containerDom(dom)}</Box>;
