@@ -10,7 +10,6 @@
     "@mui/material": "^7.0.2",
     "@mui/x-tree-view": "8.0.0-beta.3",
     "@polymer/polymer": "3.5.2",
-    "@tanstack/react-query": "^5.72.2",
     "@vaadin/bundles": "24.7.1",
     "@vaadin/common-frontend": "0.0.19",
     "@vaadin/hilla-file-router": "24.7.1",
@@ -72,7 +71,6 @@
     "@emotion/styled": "$@emotion/styled",
     "@mui/icons-material": "$@mui/icons-material",
     "@mui/material": "$@mui/material",
-    "@tanstack/react-query": "$@tanstack/react-query",
     "mermaid": "$mermaid",
     "reactjs-tiptap-editor": "$reactjs-tiptap-editor",
     "@vaadin/bundles": "$@vaadin/bundles",
@@ -155,6 +153,6 @@
       "workbox-core": "7.3.0",
       "workbox-precaching": "7.3.0"
     },
-    "hash": "8054b5241f9e9a82e61b59fe13f3cd552ef03f06f75d87d4cc3797e0fa41d053"
+    "hash": "5d4bcca25ee4b0d07b9ed26bb87ac0736f0eab6d53002b7c897cc54c251010ba"
   }
 }

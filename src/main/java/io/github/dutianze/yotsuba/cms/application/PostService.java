@@ -2,6 +2,7 @@ package io.github.dutianze.yotsuba.cms.application;
 
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.hilla.Endpoint;
+import io.github.dutianze.yotsuba.cms.application.dto.PageDto;
 import io.github.dutianze.yotsuba.cms.application.dto.PostDto;
 import io.github.dutianze.yotsuba.cms.domain.MarkdownExtractService;
 import io.github.dutianze.yotsuba.cms.domain.Post;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -47,14 +49,14 @@ public class PostService {
         return PostDto.fromEntity(post);
     }
 
-    public Page<PostDto> searchMessages(String searchText, int page, int size) {
+    public PageDto<PostDto> searchMessages(String searchText, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         if (StringUtils.isEmpty(searchText)) {
             Page<Post> posts = postRepository.findAll(pageable);
-            return posts.map(PostDto::fromEntity);
+            return PageDto.from(posts.map(PostDto::fromEntity));
         }
         Page<Post> postPage = postSearch.search(searchText, pageable);
-        return postPage.map(PostDto::fromEntity);
+        return PageDto.from(postPage.map(PostDto::fromEntity));
     }
 
     @Transactional

@@ -29,9 +29,6 @@ importers:
       '@polymer/polymer':
         specifier: 3.5.2
         version: 3.5.2
-      '@tanstack/react-query':
-        specifier: ^5.72.2
-        version: 5.72.2(react@18.3.1)
       '@vaadin/bundles':
         specifier: 24.7.1
         version: 24.7.1(keeb32fyemtz7jk3x4foy46ebe)
@@ -2073,14 +2070,6 @@ packages:
 
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
-
-  '@tanstack/query-core@5.72.2':
-    resolution: {integrity: sha512-fxl9/0yk3mD/FwTmVEf1/H6N5B975H0luT+icKyX566w6uJG0x6o+Yl+I38wJRCaogiMkstByt+seXfDbWDAcA==}
-
-  '@tanstack/react-query@5.72.2':
-    resolution: {integrity: sha512-SVNHzyBUYiis+XiCl+8yiPZmMYei2AKYY94wM/zpvB5l1jxqOo82FQTziSJ4pBi96jtYqvYrTMxWynmbQh3XKw==}
-    peerDependencies:
-      react: ^18 || ^19
 
   '@tiptap/core@2.11.7':
     resolution: {integrity: sha512-zN+NFFxLsxNEL8Qioc+DL6b8+Tt2bmRbXH22Gk6F6nD30x83eaUSFlSv3wqvgyCq3I1i1NO394So+Agmayx6rQ==}
@@ -8263,13 +8252,6 @@ snapshots:
   '@swc/helpers@0.5.15':
     dependencies:
       tslib: 2.8.1
-
-  '@tanstack/query-core@5.72.2': {}
-
-  '@tanstack/react-query@5.72.2(react@18.3.1)':
-    dependencies:
-      '@tanstack/query-core': 5.72.2
-      react: 18.3.1
 
   '@tiptap/core@2.11.7(@tiptap/pm@2.11.7)':
     dependencies:

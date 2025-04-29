@@ -15,21 +15,12 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import HomeIcon from '@mui/icons-material/Home';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useViewConfig } from '@vaadin/hilla-file-router/runtime.js';
-import { effect, signal } from '@vaadin/hilla-react-signals';
 import { createMenuItems } from '@vaadin/hilla-file-router/runtime.js';
 import { Icon } from '@vaadin/react-components';
 import { useAuth } from 'Frontend/util/auth.js';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import { GlassBox } from 'Frontend/components/GlassBox';
-
-const defaultTitle = document.title;
-const documentTitleSignal = signal('');
-effect(() => {
-  document.title = documentTitleSignal.value;
-});
-
-// Publish for Vaadin to use
-(window as any).Vaadin.documentTitleSignal = documentTitleSignal;
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 const renderIcon = (iconName?: string) => {
   switch (iconName) {
@@ -38,12 +29,12 @@ const renderIcon = (iconName?: string) => {
     case 'DescriptionIcon':
       return <DescriptionIcon />;
     default:
-      return null;
+      return <HelpOutlineIcon />;
   }
 };
 
 export default function MainLayout() {
-  const currentTitle = useViewConfig()?.title ?? defaultTitle;
+  const currentTitle = useViewConfig()?.title ?? '';
   const navigate = useNavigate();
   const location = useLocation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -51,7 +42,7 @@ export default function MainLayout() {
   const open = Boolean(anchorEl);
 
   useEffect(() => {
-    documentTitleSignal.value = currentTitle;
+    document.title = currentTitle;
   }, [currentTitle]);
 
   const toggleNav = () => {
@@ -73,10 +64,6 @@ export default function MainLayout() {
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100dvh',
-        gap: '3px',
         '&::before': {
           content: '""',
           position: 'fixed',
@@ -84,7 +71,7 @@ export default function MainLayout() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundImage: `linear-gradient(135deg,rgb(249, 249, 249),rgb(249, 249, 249))`,
+          backgroundImage: `linear-gradient(135deg,rgba(224, 224, 224, 0.80),rgba(224, 224, 224, 0.80))`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           zIndex: -1,
@@ -94,15 +81,15 @@ export default function MainLayout() {
       <GlassBox
         component="header"
         sx={{
+          position: 'sticky',
+          top: 0,
+          width: '100%',
           height: '50px',
           flexShrink: 0,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          borderRadius: '10px',
           zIndex: 1300,
-          p: 1,
-          m: '0 1 0 1',
         }}>
         {/* leat LOGO + menu */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -189,12 +176,7 @@ export default function MainLayout() {
       </GlassBox>
 
       {/* content */}
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          overflowY: 'auto',
-        }}>
+      <Box component="main" sx={{}}>
         <Suspense fallback={<div>Loading...</div>}>
           <Outlet />
         </Suspense>

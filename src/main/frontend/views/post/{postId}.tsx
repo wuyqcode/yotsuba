@@ -1,35 +1,35 @@
 import { Box, Button, Stack, TextField, Typography } from '@mui/material';
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
 import { ChangeEvent, useEffect, useState, KeyboardEvent, useCallback } from 'react';
-import Editor from 'Frontend/components/Editor';
+import Editor from 'Frontend/components/EditorWrapper';
 import { PostService } from 'Frontend/generated/endpoints';
-import { useQueryClient } from '@tanstack/react-query';
 import PostDto from 'Frontend/generated/io/github/dutianze/yotsuba/cms/application/dto/PostDto';
-import { useNavigate, useParams } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 import { GlassBox } from 'Frontend/components/GlassBox';
-import FileExplorer from 'Frontend/components/FileExplorer';
 
 export const config: ViewConfig = {
   menu: { exclude: true },
 };
 
-export default function MilkdownEditorWrapper() {
+export default function PostDetail() {
   const { postId } = useParams();
   if (!postId) {
     throw new Error('postId is required but not found');
   }
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [post, setPost] = useState<PostDto>();
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState<string>('');
   const [paperHeight, setPaperHeight] = useState<number>(0);
+  const fromSearch = (location.state as { fromSearch?: string })?.fromSearch || '';
 
   const measuredRef = useCallback((node: any) => {
     if (node !== null) {
       setPaperHeight(node.getBoundingClientRect().height);
     }
   }, []);
-  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (postId) {
@@ -51,10 +51,7 @@ export default function MilkdownEditorWrapper() {
 
   const handleSave = async (closeAfterSave = false) => {
     try {
-      await PostService.updatePost(postId, post?.title, post?.cover, post?.content);
-
-      // 使 'posts' 查询失效，触发重新获取
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      await PostService.updatePost(postId, post?.title ?? '', post?.cover ?? '', post?.content ?? '');
 
       if (closeAfterSave) {
         closePostEditor();
@@ -66,7 +63,10 @@ export default function MilkdownEditorWrapper() {
   };
 
   const closePostEditor = () => {
-    navigate('/post');
+    navigate({
+      pathname: '/post',
+      search: fromSearch,
+    });
   };
 
   const handleAddTag = () => {
@@ -131,7 +131,7 @@ export default function MilkdownEditorWrapper() {
   return (
     <Box sx={{ display: 'flex', height: '100%', p: 1, gap: 1 }}>
       {/* 左侧 Tree */}
-      <GlassBox
+      {/* <GlassBox
         sx={{
           width: 260,
           flexShrink: 0,
@@ -141,7 +141,7 @@ export default function MilkdownEditorWrapper() {
           p: 2,
         }}>
         <FileExplorer />
-      </GlassBox>
+      </GlassBox> */}
 
       {/* 右侧 编辑区 */}
       <GlassBox

@@ -20,6 +20,9 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBrid
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
 import java.time.LocalDateTime;
@@ -123,9 +126,16 @@ public class Post extends AbstractAggregateRoot<Post> implements Comparable<Post
 
         registerEvent(new PostUpdatedEvent(id));
 
+
         this.title = title;
-        this.cover = cover;
+//        this.cover = cover;
         this.content = content;
+        Document doc = Jsoup.parse(content.content());
+        Element firstImg = doc.selectFirst("img");
+        if (firstImg != null) {
+            this.cover = FileResourceId.extractIdFromUrl(firstImg.attr("src"));
+        }
+
     }
 
     @Override

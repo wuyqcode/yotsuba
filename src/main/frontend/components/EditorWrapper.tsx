@@ -1,9 +1,5 @@
-import { useState } from 'react';
-
-import RichTextEditor, { BaseKit } from 'reactjs-tiptap-editor';
-
-import { locale } from 'reactjs-tiptap-editor/locale-bundle';
-
+import { useRef, useState } from 'react';
+import RichTextEditor, { BaseKit, type Editor } from 'reactjs-tiptap-editor';
 import { Attachment } from 'reactjs-tiptap-editor/attachment';
 import { Blockquote } from 'reactjs-tiptap-editor/blockquote';
 import { Bold } from 'reactjs-tiptap-editor/bold';
@@ -37,7 +33,7 @@ import { SearchAndReplace } from 'reactjs-tiptap-editor/searchandreplace';
 import { SlashCommand } from 'reactjs-tiptap-editor/slashcommand';
 import { Strike } from 'reactjs-tiptap-editor/strike';
 import { Table } from 'reactjs-tiptap-editor/table';
-import { TableOfContents } from 'reactjs-tiptap-editor/tableofcontent';
+// import { TableOfContents } from 'reactjs-tiptap-editor/tableofcontent';
 import { TaskList } from 'reactjs-tiptap-editor/tasklist';
 import { TextAlign } from 'reactjs-tiptap-editor/textalign';
 import { TextUnderline } from 'reactjs-tiptap-editor/textunderline';
@@ -45,7 +41,6 @@ import { Video } from 'reactjs-tiptap-editor/video';
 import { TextDirection } from 'reactjs-tiptap-editor/textdirection';
 import { Drawer } from 'reactjs-tiptap-editor/drawer';
 import { Twitter } from 'reactjs-tiptap-editor/twitter';
-
 import 'reactjs-tiptap-editor/style.css';
 import 'prism-code-editor-lightweight/layout.css';
 import 'prism-code-editor-lightweight/themes/github-dark.css';
@@ -55,17 +50,18 @@ import 'easydrawer/styles.css';
 import { useUpload } from 'Frontend/hooks/useUpload';
 import { Box } from '@mui/material';
 import { GlassBox } from './GlassBox';
+import { TableOfContents } from './TableOfContents';
 
 interface EditorProps {
   content: string;
   onChange: (content: string) => void;
 }
 
-const Editor: React.FC<EditorProps> = ({ content, onChange }) => {
+const EditorWrapper: React.FC<EditorProps> = ({ content, onChange }) => {
   const [disable, setDisable] = useState(false);
 
   const { upload, loading } = useUpload();
-  locale.setLang('zh_CN');
+  // locale.setLang('zh_CN');
 
   const extensions = [
     BaseKit.configure({
@@ -78,7 +74,7 @@ const Editor: React.FC<EditorProps> = ({ content, onChange }) => {
     }),
     History,
     SearchAndReplace,
-    TableOfContents,
+    // TableOfContents,
     FormatPainter.configure({ spacer: true }),
     Clear,
     FontFamily,
@@ -150,18 +146,25 @@ const Editor: React.FC<EditorProps> = ({ content, onChange }) => {
     Twitter,
   ];
 
+  const editorRef = useRef<{ editor: Editor | null }>(null);
+
   return (
-    <RichTextEditor
-      output="html"
-      content={content as any}
-      onChangeContent={onChange}
-      extensions={extensions}
-      disabled={disable}
-      dark={false}
-      removeDefaultWrapper={true}
-      contentClass={'editor'}
-    />
+    <>
+      {editorRef.current && <TableOfContents editor={editorRef.current?.editor} />}
+      <RichTextEditor
+        output="html"
+        content={content as any}
+        onChangeContent={onChange}
+        extensions={extensions}
+        disabled={disable}
+        dark={false}
+        removeDefaultWrapper={true}
+        contentClass={'editor'}
+        useEditorOptions={{ autofocus: true }}
+        ref={editorRef}
+      />
+    </>
   );
 };
 
-export default Editor;
+export default EditorWrapper;
