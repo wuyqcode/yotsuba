@@ -3,7 +3,6 @@ package io.github.dutianze.yotsuba.cms.application.dto;
 import io.github.dutianze.yotsuba.cms.domain.Post;
 import io.github.dutianze.yotsuba.cms.domain.valueobject.PostStatus;
 import lombok.Data;
-import org.springframework.lang.NonNull;
 
 import java.time.LocalDateTime;
 import java.util.List;

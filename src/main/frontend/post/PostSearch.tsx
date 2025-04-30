@@ -1,23 +1,10 @@
-import {
-  Box,
-  Typography,
-  TextField,
-  IconButton,
-  Stack,
-  CardMedia,
-  Grid,
-  Card,
-  CardContent,
-  Pagination,
-} from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
-import { useState, ChangeEvent, KeyboardEvent, useEffect } from 'react';
+import { Box, Typography, CardMedia, Grid, Card, CardContent, Pagination, Divider } from '@mui/material';
+import { useState, useEffect } from 'react';
 import { PostService } from 'Frontend/generated/endpoints';
 import { useNavigate, useSearchParams } from 'react-router';
 import PostDto from 'Frontend/generated/io/github/dutianze/yotsuba/cms/application/dto/PostDto';
 import { Link } from 'react-router';
+import FilterPanel from './FilterPanel';
 
 export default function PostSearch() {
   const navigate = useNavigate();
@@ -31,12 +18,12 @@ export default function PostSearch() {
   const [totalPages, setTotalPages] = useState<number>(0);
 
   useEffect(() => {
-    fetchPosts(page - 1);
-  }, [page, searchText]);
+    fetchPosts();
+  }, [page]);
 
-  const fetchPosts = async (pageNum: number) => {
+  const fetchPosts = async () => {
     try {
-      const res = await PostService.searchMessages(searchText, pageNum, pageSize);
+      const res = await PostService.searchMessages(searchText, page - 1, pageSize);
       setPosts(res?.content);
       setTotalPages(res?.totalPages);
     } catch (err) {
@@ -63,7 +50,7 @@ export default function PostSearch() {
   };
 
   function handleSearch(): void {
-    throw new Error('Function not implemented.');
+    fetchPosts();
   }
 
   function handleClear(): void {
@@ -76,50 +63,14 @@ export default function PostSearch() {
 
   return (
     <Box>
-      {/* 输入框 + 操作按钮区 */}
-      <Box sx={{ display: 'flex', gap: 1, width: '100%', maxWidth: 600, mt: 2 }}>
-        <TextField
-          variant="outlined"
-          placeholder="+ を使用して複数のキーワードを組み合わせる"
-          value={searchText}
-          onChange={handleInputChange}
-          fullWidth
-          sx={{
-            '& .MuiOutlinedInput-root': { borderRadius: '50px' },
-            '& .MuiOutlinedInput-input': { py: 1, px: 2 },
-          }}
-        />
-        <IconButton color="primary" onClick={handleSearch}>
-          <SearchIcon />
-        </IconButton>
-        <IconButton color="error" onClick={handleClear} disabled={!searchText}>
-          <DeleteIcon />
-        </IconButton>
-        <IconButton color="success" onClick={handleCreatePost}>
-          <AddIcon />
-        </IconButton>
-      </Box>
+      <FilterPanel
+        searchText={searchText}
+        handleInputChange={handleInputChange}
+        handleSearch={handleSearch}
+        handleCreatePost={handleCreatePost}
+      />
 
-      {/* 推荐Tag区 */}
-      <Stack direction="row" spacing={1} flexWrap="wrap" justifyContent="center" mt={2}>
-        {['java', 'aws', 'python'].map((tag) => (
-          <Box
-            key={tag}
-            sx={{
-              px: 1.5,
-              py: 0.5,
-              borderRadius: 10,
-              fontSize: '12px',
-              cursor: 'pointer',
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
-              color: 'warning.main',
-              transition: 'all 0.2s',
-              '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.15)' },
-            }}>
-            {tag}
-          </Box>
-        ))}
-      </Stack>
+      <Divider sx={{ m: 1 }} />
 
       {/* 列表区 */}
       <Grid container spacing={2}>

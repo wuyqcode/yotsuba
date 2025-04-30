@@ -106,7 +106,7 @@ export default function MainLayout() {
             component="img"
             src="images/icon.png"
             sx={{ width: 40, height: 40, cursor: 'pointer' }}
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/post')}
           />
         </Box>
 
