@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
-import { Box, Typography, Button, IconButton, TextField, InputAdornment, Divider, Chip } from '@mui/material';
-import DescriptionIcon from '@mui/icons-material/Description';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import CreateIcon from '@mui/icons-material/Create';
-import DeleteIcon from '@mui/icons-material/Delete';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { Box, Typography, IconButton, TextField, Chip } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface NoteFolder {
   id: string;
@@ -157,10 +153,10 @@ const NotesFilterPanel: React.FC<NotesFilterPanelProps> = ({
     setTags((prev) => prev.filter((t) => t !== tag));
   };
 
-  const remainingTag = tags.length === 1 ? tags[0] : null;
+  const [hoveredTag, setHoveredTag] = useState<string | null>(null);
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
       {/* 收藏夹展示 */}
       <Box
         sx={{
@@ -170,27 +166,12 @@ const NotesFilterPanel: React.FC<NotesFilterPanelProps> = ({
           boxShadow: 3,
           overflow: 'hidden',
         }}>
-        {folder.cover ? (
-          <Box
-            component="img"
-            src={folder.cover}
-            alt={folder.name}
-            sx={{ width: 200, height: 140, objectFit: 'cover', flexShrink: 0 }}
-          />
-        ) : (
-          <Box
-            sx={{
-              width: 200,
-              height: 140,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              bgcolor: 'background.paper',
-              flexShrink: 0,
-            }}>
-            <DescriptionIcon sx={{ fontSize: 60, color: 'text.secondary' }} />
-          </Box>
-        )}
+        <Box
+          component="img"
+          src={folder.cover}
+          alt={folder.name}
+          sx={{ width: 150, height: 100, objectFit: 'cover', flexShrink: 0 }}
+        />
 
         <Box sx={{ flex: 1, px: 2 }}>
           <Typography variant="h5" noWrap>
@@ -203,7 +184,7 @@ const NotesFilterPanel: React.FC<NotesFilterPanelProps> = ({
       </Box>
 
       {/* 搜索栏 */}
-      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
         <TextField
           variant="outlined"
           placeholder="+ を使用して複数のキーワードを組み合わせる"
@@ -234,17 +215,31 @@ const NotesFilterPanel: React.FC<NotesFilterPanelProps> = ({
         sx={{
           display: 'flex',
           flexWrap: 'wrap',
-          gap: 1,
+          gap: 0.5,
           justifyContent: 'flex-start',
         }}>
         {tags.map((tag) => (
           <Chip
             key={tag}
             label={tag}
-            onDelete={() => handleDelete(tag)}
+            size="small"
+            onDelete={hoveredTag === tag ? () => handleDelete(tag) : undefined}
+            deleteIcon={
+              hoveredTag === tag ? (
+                <CloseIcon
+                  sx={{
+                    fontSize: 18,
+                  }}
+                />
+              ) : undefined
+            }
+            onMouseEnter={() => setHoveredTag(tag)}
+            onMouseLeave={() => setHoveredTag(null)}
             sx={{
               fontWeight: 'bold',
-              height: 28,
+              pl: 1,
+              pr: 1,
+              transition: 'background-color 0.2s ease',
               '& .MuiChip-label': { px: 1 },
             }}
           />
