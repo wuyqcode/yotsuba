@@ -1,6 +1,7 @@
 import { Grid } from '@mui/material';
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
 import { GlassBox } from 'Frontend/components/GlassBox';
+import FolderSidebar from 'Frontend/post/FolderSidebar';
 import PostSearch from 'Frontend/post/PostSearch';
 
 export const config: ViewConfig = {
@@ -13,13 +14,11 @@ export const config: ViewConfig = {
 
 export default function AdminView() {
   return (
-    <Grid container spacing={1} columns={16}>
-      <Grid size={2}>
-        <GlassBox sx={{ position: 'sticky', top: '50px', minHeight: 'calc(100dvh - 50px)', borderRadius: '0px' }}>
-          menu
-        </GlassBox>
+    <Grid container spacing={1} columns={24}>
+      <Grid size={4}>
+        <FolderSidebar />
       </Grid>
-      <Grid size={12}>
+      <Grid size={17}>
         <GlassBox
           sx={{
             display: 'flex',
@@ -29,7 +28,7 @@ export default function AdminView() {
           <PostSearch />
         </GlassBox>
       </Grid>
-      <Grid size={2}>
+      <Grid size={3}>
         <GlassBox sx={{ position: 'sticky', top: '50px', minHeight: '100%' }}>tag</GlassBox>
       </Grid>
     </Grid>

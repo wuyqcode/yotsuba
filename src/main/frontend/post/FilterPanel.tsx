@@ -132,19 +132,19 @@ const tagDetails: Record<string, { title: string; image: string; content: string
 
 const keys: string[] = Object.keys(tagDetails);
 
-interface NotesFilterPanelProps {
+interface FilterPanelProps {
   searchText: string;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSearch: () => void;
   handleCreatePost: () => void;
 }
 
-const NotesFilterPanel: React.FC<NotesFilterPanelProps> = ({
+export default function FilterPanel({
   searchText,
   handleInputChange,
   handleSearch,
   handleCreatePost,
-}) => {
+}: FilterPanelProps) {
   const [folder] = useState<NoteFolder>(noteFolder);
   const [searchQuery, setSearchQuery] = useState('');
   const [tags, setTags] = useState(keys);
@@ -278,6 +278,4 @@ const NotesFilterPanel: React.FC<NotesFilterPanelProps> = ({
         })()}
     </Box>
   );
-};
-
-export default NotesFilterPanel;
+}
