@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import RichTextEditor, { BaseKit, type Editor } from 'reactjs-tiptap-editor';
 import { Attachment } from 'reactjs-tiptap-editor/attachment';
 import { Blockquote } from 'reactjs-tiptap-editor/blockquote';
@@ -48,9 +48,10 @@ import 'prism-code-editor-lightweight/themes/github-dark.css';
 import 'katex/dist/katex.min.css';
 import 'easydrawer/styles.css';
 import { useUpload } from 'Frontend/hooks/useUpload';
-import { Box } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { GlassBox } from './GlassBox';
 import { TableOfContents } from './TableOfContents';
+import { Item } from '@vaadin/react-components';
 
 interface EditorProps {
   content: string;
@@ -145,25 +146,59 @@ const EditorWrapper: React.FC<EditorProps> = ({ content, onChange }) => {
     }),
     Twitter,
   ];
+  const boxRef = useRef<HTMLDivElement | null>(null);
 
   const editorRef = useRef<{ editor: Editor | null }>(null);
-
+  const [offsetTop, setOffsetTop] = useState(0);
+  useEffect(() => {
+    if (boxRef.current) {
+      const top = boxRef.current.getBoundingClientRect().top;
+      setOffsetTop(top);
+    }
+  }, []);
   return (
-    <>
-      {editorRef.current && <TableOfContents editor={editorRef.current?.editor} />}
-      <RichTextEditor
-        output="html"
-        content={content as any}
-        onChangeContent={onChange}
-        extensions={extensions}
-        disabled={disable}
-        dark={false}
-        removeDefaultWrapper={true}
-        contentClass={'editor'}
-        useEditorOptions={{ autofocus: true }}
-        ref={editorRef}
-      />
-    </>
+    <Stack direction="row" spacing={1}>
+      <TableOfContents editor={editorRef.current?.editor} />
+      <Box
+        ref={boxRef}
+        sx={{
+          overflowY: 'hidden',
+          width: 'calc(100%-250px)',
+          height: `calc(100vh - ${offsetTop}px)`,
+          '.reactjs-tiptap-editor': {
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+            '& > *': {
+              display: 'contents',
+              '& > *': {
+                display: 'contents',
+              },
+            },
+          },
+          '.editor': {
+            flex: '1 1 auto',
+            overflowY: 'auto',
+            minHeight: 0,
+            '.ProseMirror': {
+              padding: '4px !important',
+            },
+          },
+        }}>
+        <RichTextEditor
+          output="html"
+          content={content as any}
+          onChangeContent={onChange}
+          extensions={extensions}
+          disabled={disable}
+          dark={false}
+          removeDefaultWrapper={true}
+          contentClass={'editor'}
+          useEditorOptions={{ autofocus: true }}
+          ref={editorRef}
+        />
+      </Box>
+    </Stack>
   );
 };
 

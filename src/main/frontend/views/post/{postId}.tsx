@@ -58,7 +58,6 @@ export default function PostDetail() {
       }
     } catch (error) {
       console.error('Failed to update post:', error);
-      // 这里可以添加错误处理，比如显示一个错误消息
     }
   };
 
@@ -129,94 +128,36 @@ export default function PostDetail() {
   };
 
   return (
-    <Box sx={{ display: 'flex', height: '100%', p: 1, gap: 1 }}>
-      {/* 左侧 Tree */}
-      {/* <GlassBox
-        sx={{
-          width: 260,
-          flexShrink: 0,
-          borderRight: '1px solid rgba(0,0,0,0.08)',
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          p: 2,
-        }}>
-        <FileExplorer />
-      </GlassBox> */}
+    <GlassBox
+      sx={{
+        height: 'calc(100dvh - 50px)',
+        backgroundColor: 'white',
+        overflow: 'hidden',
+      }}>
+      {postId && post && (
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <TextField
+              label="Title"
+              value={post.title}
+              onChange={handleTitleChange}
+              size="small"
+              sx={{ maxWidth: 300 }}
+            />
 
-      {/* 右侧 编辑区 */}
-      <GlassBox
-        sx={{
-          flexGrow: 1,
-          display: 'flex',
-          p: 2,
-          flexDirection: 'column',
-          overflow: 'hidden',
-          backgroundColor: 'white ',
-        }}>
-        {postId && post && (
-          <>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography
-                  variant="body1"
-                  color="primary"
-                  fontWeight="bold"
-                  sx={{ cursor: 'pointer' }}
-                  onClick={closePostEditor}>
-                  post /
-                </Typography>
-                <TextField
-                  label="Title"
-                  value={post.title}
-                  onChange={handleTitleChange}
-                  size="small"
-                  sx={{ maxWidth: 300 }}
-                />
-              </Box>
+            <Stack direction="row" spacing={1}>
+              <Button variant="outlined" color="secondary" onClick={closePostEditor}>
+                close
+              </Button>
+              <Button variant="contained" color="primary" onClick={() => handleSave(false)}>
+                Save
+              </Button>
+            </Stack>
+          </Box>
 
-              <Stack direction="row" spacing={1}>
-                <Button variant="outlined" color="secondary" onClick={closePostEditor}>
-                  Cancel
-                </Button>
-                <Button variant="contained" color="primary" onClick={() => handleSave(true)}>
-                  Save
-                </Button>
-              </Stack>
-            </Box>
-
-            <Box
-              sx={{
-                flexGrow: 1,
-                overflow: 'auto',
-                display: 'flex',
-                flexDirection: 'column',
-                '.reactjs-tiptap-editor': {
-                  display: 'flex',
-                  flexDirection: 'column',
-                  height: '100%',
-                  width: '100%',
-                  '& > *': {
-                    display: 'contents',
-                    '& > *': {
-                      display: 'contents',
-                    },
-                  },
-                },
-                '.editor': {
-                  flex: '1 1 auto',
-                  overflow: 'auto',
-                  minHeight: 0,
-                  '.ProseMirror': {
-                    padding: '4px !important',
-                  },
-                },
-              }}>
-              {/* 富文本编辑器区域 */}
-              <Editor content={post?.content ?? ''} onChange={onChange} />
-            </Box>
-          </>
-        )}
-      </GlassBox>
-    </Box>
+          <Editor content={post?.content ?? ''} onChange={onChange} />
+        </Box>
+      )}
+    </GlassBox>
   );
 }

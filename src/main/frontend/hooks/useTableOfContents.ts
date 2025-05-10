@@ -7,7 +7,7 @@ export interface TableOfContentsItem {
   id: string;
 }
 
-export function useTableOfContents(editor: Editor | null) {
+export function useTableOfContents(editor?: Editor | null) {
   const [items, setItems] = useState<TableOfContentsItem[]>([]);
 
   const getItems = useCallback(() => {

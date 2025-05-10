@@ -176,7 +176,7 @@ export default function MainLayout() {
       </GlassBox>
 
       {/* content */}
-      <Box component="main" sx={{}}>
+      <Box component="main">
         <Suspense fallback={<div>Loading...</div>}>
           <Outlet />
         </Suspense>

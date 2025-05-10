@@ -25,71 +25,9 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import { GlassBox } from 'Frontend/components/GlassBox';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import { Collection, trashCollection, useSelectedCollectionStore } from './hook/useSelectedCollectionStore';
 
-// Type for a collection
-interface Collection {
-  id: number;
-  name: string;
-}
-
-// Fake API simulation with typed interface
-interface FakeApi {
-  collections: Collection[];
-  deletedCollections: Collection[];
-  getCollections: () => Promise<Collection[]>;
-  addCollection: (name: string) => Promise<Collection>;
-  updateCollection: (id: number, name: string) => Promise<Collection>;
-  deleteCollection: (id: number) => Promise<Collection>;
-  restoreCollection: (id: number) => Promise<Collection>;
-  permanentlyDeleteCollection: (id: number) => Promise<void>;
-}
-
-const fakeApi: FakeApi = {
-  collections: Array.from({ length: 6 }, (_, i) => [
-    { id: i * 2 + 1, name: 'Favorite Posts' },
-    { id: i * 2 + 2, name: 'Inspiration' },
-  ]).flat(),
-  deletedCollections: [],
-  getCollections: async () => {
-    return fakeApi.collections;
-  },
-  addCollection: async (name: string) => {
-    const newCollection: Collection = { id: Date.now(), name };
-    fakeApi.collections.push(newCollection);
-    return newCollection;
-  },
-  updateCollection: async (id: number, name: string) => {
-    const index = fakeApi.collections.findIndex((col) => col.id === id);
-    if (index !== -1) {
-      fakeApi.collections[index].name = name;
-      return fakeApi.collections[index];
-    }
-    throw new Error('Collection not found');
-  },
-  deleteCollection: async (id: number) => {
-    const index = fakeApi.collections.findIndex((col) => col.id === id);
-    if (index !== -1) {
-      const [deleted] = fakeApi.collections.splice(index, 1);
-      fakeApi.deletedCollections.push(deleted);
-      return deleted;
-    }
-    throw new Error('Collection not found');
-  },
-  restoreCollection: async (id: number) => {
-    const index = fakeApi.deletedCollections.findIndex((col) => col.id === id);
-    if (index !== -1) {
-      const [restored] = fakeApi.deletedCollections.splice(index, 1);
-      fakeApi.collections.push(restored);
-      return restored;
-    }
-    throw new Error('Collection not found');
-  },
-  permanentlyDeleteCollection: async (id: number) => {
-    fakeApi.deletedCollections = fakeApi.deletedCollections.filter((col) => col.id !== id);
-  },
-};
-
-const PostCollectionSidebar: React.FC = () => {
+const CollectionSidebar = () => {
   const [openCollections, setOpenCollections] = useState<boolean>(true);
   const [openRecycleBin, setOpenRecycleBin] = useState<boolean>(false);
   const [collections, setCollections] = useState<Collection[]>([]);
@@ -98,19 +36,38 @@ const PostCollectionSidebar: React.FC = () => {
   const [openEditDialog, setOpenEditDialog] = useState<boolean>(false);
   const [newCollectionName, setNewCollectionName] = useState<string>('');
   const [editCollection, setEditCollection] = useState<Collection | null>(null);
-  // 新增状态：跟踪选中的集合 ID
-  const [selectedId, setSelectedId] = useState<number | string | null>(null);
+  const { selectedCollection, setCollection, clearCollection } = useSelectedCollectionStore();
 
-  // Fetch collections on mount
   useEffect(() => {
-    fakeApi.getCollections().then((data: Collection[]) => setCollections(data));
+    const fetchCollections = async () => {
+      const mockCollections = [
+        {
+          id: 101,
+          name: '我的收藏夹',
+          count: 12,
+          cover: 'https://picsum.photos/seed/collection1/300/200',
+          lastUpdated: '2025-05-10',
+        },
+        {
+          id: 102,
+          name: '学习资源',
+          count: 8,
+          cover: 'https://picsum.photos/seed/collection2/300/200',
+          lastUpdated: '2025-05-08',
+        },
+      ];
+
+      setCollections(mockCollections);
+    };
+
+    fetchCollections();
   }, []);
 
   // Handlers for CRUD operations
   const handleAddCollection = async () => {
     if (newCollectionName.trim()) {
-      const newCollection: Collection = await fakeApi.addCollection(newCollectionName.trim());
-      setCollections([...collections, newCollection]);
+      // const newCollection: Collection = await fakeApi.addCollection(newCollectionName.trim());
+      // setCollections([...collections, newCollection]);
       setNewCollectionName('');
       setOpenAddDialog(false);
     }
@@ -118,7 +75,7 @@ const PostCollectionSidebar: React.FC = () => {
 
   const handleEditCollection = async () => {
     if (editCollection && newCollectionName.trim()) {
-      await fakeApi.updateCollection(editCollection.id, newCollectionName.trim());
+      // await fakeApi.updateCollection(editCollection.id, newCollectionName.trim());
       setCollections(
         collections.map((col) => (col.id === editCollection.id ? { ...col, name: newCollectionName.trim() } : col))
       );
@@ -129,24 +86,24 @@ const PostCollectionSidebar: React.FC = () => {
   };
 
   const handleDeleteCollection = async (id: number) => {
-    await fakeApi.deleteCollection(id);
+    // await fakeApi.deleteCollection(id);
     setCollections(collections.filter((col) => col.id !== id));
-    setDeletedCollections([...fakeApi.deletedCollections]);
+    // setDeletedCollections([...fakeApi.deletedCollections]);
     // 如果删除的是选中项，重置选中状态
-    if (selectedId === id) {
-      setSelectedId(null);
-    }
+    // if (selectedId === id) {
+    //   setSelectedId(null);
+    // }
   };
 
   const handleRestoreCollection = async (id: number) => {
-    await fakeApi.restoreCollection(id);
-    setDeletedCollections(fakeApi.deletedCollections);
-    setCollections([...fakeApi.collections]);
+    // await fakeApi.restoreCollection(id);
+    // setDeletedCollections(fakeApi.deletedCollections);
+    // setCollections([...fakeApi.collections]);
   };
 
   const handlePermanentlyDeleteCollection = async (id: number) => {
-    await fakeApi.permanentlyDeleteCollection(id);
-    setDeletedCollections(fakeApi.deletedCollections);
+    // await fakeApi.permanentlyDeleteCollection(id);
+    // setDeletedCollections(fakeApi.deletedCollections);
   };
 
   const selectedListItemStyles: SxProps<Theme> = {
@@ -177,9 +134,8 @@ const PostCollectionSidebar: React.FC = () => {
       <List component="nav" dense>
         <ListItemButton
           sx={selectedListItemStyles}
-          selected={selectedId === null} // 将 "ALL" 视为 null
-          onClick={() => setSelectedId(null)} // 点击 "ALL" 时选中
-        >
+          selected={selectedCollection === null}
+          onClick={() => clearCollection()}>
           <ListItemIcon>
             <AllInclusiveIcon sx={{ color: 'black', fontSize: 20 }} />
           </ListItemIcon>
@@ -193,6 +149,8 @@ const PostCollectionSidebar: React.FC = () => {
             <FavoriteIcon sx={{ color: 'black', fontSize: 20 }} />
           </ListItemIcon>
           <ListItemText primary="Saved" />
+          <AddIcon sx={{ color: 'black', fontSize: 18 }} onClick={() => setOpenAddDialog(true)} />
+
           {openCollections ? (
             <ExpandLess sx={{ fontSize: 18, color: 'black' }} />
           ) : (
@@ -206,9 +164,8 @@ const PostCollectionSidebar: React.FC = () => {
                 disableGutters
                 key={collection.id}
                 sx={{ pl: 4, ...selectedListItemStyles }}
-                selected={selectedId === collection.id} // 设置选中状态
-                onClick={() => setSelectedId(collection.id)} // 点击时更新选中 ID
-              >
+                selected={collection.id === selectedCollection?.id}
+                onClick={() => setCollection(collection)}>
                 <ListItemText
                   primary={collection.name}
                   slotProps={{
@@ -244,22 +201,14 @@ const PostCollectionSidebar: React.FC = () => {
             ))}
           </List>
         </Collapse>
-        <ListItemButton sx={{ pl: 4 }} onClick={() => setOpenAddDialog(true)}>
-          <ListItemIcon>
-            <AddIcon sx={{ color: 'black', fontSize: 18 }} />
-          </ListItemIcon>
-          <ListItemText primary="Create" />
-        </ListItemButton>
+
         <Divider />
 
         {/* Trash */}
         <ListItemButton
           sx={selectedListItemStyles}
-          selected={selectedId === 'trash'} // Check if "trash" is selected
-          onClick={() => {
-            setSelectedId('trash'); // Set selectedId to "trash"
-            setOpenRecycleBin(!openRecycleBin); // Toggle recycle bin
-          }}>
+          selected={trashCollection.id === selectedCollection?.id}
+          onClick={() => setCollection(trashCollection)}>
           <ListItemIcon>
             <RestoreFromTrashIcon sx={{ color: 'black', fontSize: 20 }} />
           </ListItemIcon>
@@ -275,7 +224,6 @@ const PostCollectionSidebar: React.FC = () => {
           sx: {
             width: '320px',
             borderRadius: '12px',
-            backdropFilter: 'blur(8px)',
             backgroundColor: 'rgba(255, 255, 255, 0.91)', // Glassmorphism effect
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
             overflow: 'hidden',
@@ -376,7 +324,6 @@ const PostCollectionSidebar: React.FC = () => {
           sx: {
             width: '320px',
             borderRadius: '12px',
-            backdropFilter: 'blur(8px)',
             backgroundColor: 'rgba(255, 255, 255, 0.91)', // Glassmorphism effect
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
             overflow: 'hidden',
@@ -472,4 +419,4 @@ const PostCollectionSidebar: React.FC = () => {
   );
 };
 
-export default PostCollectionSidebar;
+export default CollectionSidebar;

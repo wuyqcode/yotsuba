@@ -25,6 +25,7 @@
     "@vaadin/vaadin-development-mode-detector": "2.0.7",
     "@vaadin/vaadin-usage-statistics": "2.1.3",
     "construct-style-sheets-polyfill": "3.1.0",
+    "idb-keyval": "^6.2.2",
     "lit": "3.2.1",
     "mermaid": "^8.14.0",
     "react": "18.3.1",
@@ -32,7 +33,8 @@
     "react-dom": "18.3.1",
     "react-router": "7.2.0",
     "react-spring": "^9.7.5",
-    "reactjs-tiptap-editor": "^0.3.0"
+    "reactjs-tiptap-editor": "^0.3.0",
+    "zustand": "^5.0.4"
   },
   "devDependencies": {
     "@babel/preset-react": "7.26.3",
@@ -96,7 +98,9 @@
     "@mui/x-tree-view": "$@mui/x-tree-view",
     "react-arborist": "$react-arborist",
     "@atlaskit/pragmatic-drag-and-drop": "$@atlaskit/pragmatic-drag-and-drop",
-    "react-spring": "$react-spring"
+    "react-spring": "$react-spring",
+    "idb-keyval": "$idb-keyval",
+    "zustand": "$zustand"
   },
   "vaadin": {
     "dependencies": {
@@ -153,6 +157,6 @@
       "workbox-core": "7.3.0",
       "workbox-precaching": "7.3.0"
     },
-    "hash": "5d4bcca25ee4b0d07b9ed26bb87ac0736f0eab6d53002b7c897cc54c251010ba"
+    "hash": "e38b41a5df96ac18adfe77007626f46748a83d84c649a8fbd8ba472e1fe01bbd"
   }
 }

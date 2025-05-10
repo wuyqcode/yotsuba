@@ -6,11 +6,10 @@ import { TableOfContentsItem, useTableOfContents } from 'Frontend/hooks/useTable
 
 interface TableOfContentsProps {
   className?: string;
-  editor: Editor | null;
+  editor?: Editor | null;
 }
 
-export function TableOfContents({ className, editor }: TableOfContentsProps) {
-  const [expanded, setExpanded] = useState(true);
+export function TableOfContents({ editor }: TableOfContentsProps) {
   const items = useTableOfContents(editor);
 
   const handleItemClick = (id: string) => {
@@ -47,10 +46,17 @@ export function TableOfContents({ className, editor }: TableOfContentsProps) {
         }}>
         <ListItemText
           primary={item.text}
-          primaryTypographyProps={{
-            variant: item.level === 1 ? 'subtitle1' : 'body2',
-            fontWeight: item.level === 1 ? 'bold' : 'normal',
-            color: 'text.secondary',
+          slotProps={{
+            primary: {
+              sx: {
+                variant: item.level === 1 ? 'subtitle1' : 'body2',
+                fontWeight: item.level === 1 ? 'bold' : 'normal',
+                color: 'text.secondary',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              },
+            },
           }}
         />
       </ListItemButton>
@@ -58,51 +64,20 @@ export function TableOfContents({ className, editor }: TableOfContentsProps) {
   };
 
   return (
-    <>
-      {expanded ? (
-        <Paper
-          elevation={3}
-          sx={{
-            width: 280,
-            maxHeight: '90vh',
-            overflowY: 'auto',
-            position: 'fixed',
-            top: 80,
-            right: 20,
-            p: 2,
-            borderRadius: 2,
-          }}
-          className={className} // 正确传递 className
-        >
-          <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
-            <Box display="flex" alignItems="center" gap={1}>
-              <Bookmarks fontSize="small" />
-              <Typography variant="subtitle2">目次</Typography>
-            </Box>
-            <IconButton size="small" onClick={() => setExpanded(false)}>
-              <MenuOpen />
-            </IconButton>
-          </Box>
-          <Divider />
-          <List>{items.map((item, index) => renderHeadingItem(item, index))}</List>
-        </Paper>
-      ) : (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setExpanded(true)}
-          sx={{
-            position: 'fixed',
-            bottom: 32,
-            right: 32,
-            borderRadius: '50%',
-            minWidth: 56,
-            minHeight: 56,
-            boxShadow: 4,
-          }}>
-          <Bookmarks />
-        </Button>
-      )}
-    </>
+    <Paper
+      elevation={3}
+      sx={{
+        width: '250px',
+        p: 2,
+      }}>
+      <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
+        <Box display="flex" alignItems="center" gap={1}>
+          <Bookmarks fontSize="small" />
+          <Typography variant="subtitle2">目次</Typography>
+        </Box>
+      </Box>
+      <Divider />
+      <List>{items.map((item, index) => renderHeadingItem(item, index))}</List>
+    </Paper>
   );
 }

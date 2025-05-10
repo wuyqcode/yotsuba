@@ -1,136 +1,10 @@
 import React, { useState } from 'react';
-import { Box, Typography, IconButton, TextField, Chip } from '@mui/material';
+import { Box, Typography, IconButton, TextField } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from '@mui/icons-material/Close';
-
-interface NoteFolder {
-  id: string;
-  name: string;
-  cover?: string;
-  count: number;
-  lastUpdated: string;
-}
-
-const noteFolder: NoteFolder = {
-  id: 'nf1',
-  name: '我的笔记收藏夹',
-  cover: 'https://picsum.photos/seed/notes/300/200',
-  count: 12,
-  lastUpdated: '2025-04-30',
-};
-
-// 模拟每个 tag 的详细信息
-interface TagDetail {
-  title: string;
-  image: string;
-  content: string;
-}
-
-const tagDetails: Record<string, { title: string; image: string; content: string }> = {
-  tag1: {
-    title: 'Tag1 语言',
-    image: 'https://picsum.photos/seed/tag1/100/100',
-    content: 'Tag1 是一种流行的开发工具。',
-  },
-  tag2: {
-    title: 'Tag2 编译器',
-    image: 'https://picsum.photos/seed/tag2/100/100',
-    content: 'Tag2 支持高性能计算与并发。',
-  },
-  tag3: {
-    title: 'Tag3 指令集',
-    image: 'https://picsum.photos/seed/tag3/100/100',
-    content: 'Tag3 用于编译多个语言的程序。',
-  },
-  tag4: {
-    title: 'Tag4 虚拟机',
-    image: 'https://picsum.photos/seed/tag4/100/100',
-    content: 'Tag4 具备良好的跨平台能力。',
-  },
-  tag5: {
-    title: 'Tag5 调试工具',
-    image: 'https://picsum.photos/seed/tag5/100/100',
-    content: 'Tag5 广泛应用于后端系统。',
-  },
-  tag6: {
-    title: 'Tag6 数据库',
-    image: 'https://picsum.photos/seed/tag6/100/100',
-    content: 'Tag6 是一种流行的开发工具。',
-  },
-  tag7: {
-    title: 'Tag7 操作系统',
-    image: 'https://picsum.photos/seed/tag7/100/100',
-    content: 'Tag7 支持高性能计算与并发。',
-  },
-  tag8: {
-    title: 'Tag8 框架',
-    image: 'https://picsum.photos/seed/tag8/100/100',
-    content: 'Tag8 用于编译多个语言的程序。',
-  },
-  tag9: {
-    title: 'Tag9 容器',
-    image: 'https://picsum.photos/seed/tag9/100/100',
-    content: 'Tag9 具备良好的跨平台能力。',
-  },
-  tag10: {
-    title: 'Tag10 协议',
-    image: 'https://picsum.photos/seed/tag10/100/100',
-    content: 'Tag10 广泛应用于后端系统。',
-  },
-  tag11: {
-    title: 'Tag11 语言',
-    image: 'https://picsum.photos/seed/tag11/100/100',
-    content: 'Tag11 是一种流行的开发工具。',
-  },
-  tag12: {
-    title: 'Tag12 编译器',
-    image: 'https://picsum.photos/seed/tag12/100/100',
-    content: 'Tag12 支持高性能计算与并发。',
-  },
-  tag13: {
-    title: 'Tag13 指令集',
-    image: 'https://picsum.photos/seed/tag13/100/100',
-    content: 'Tag13 用于编译多个语言的程序。',
-  },
-  tag14: {
-    title: 'Tag14 虚拟机',
-    image: 'https://picsum.photos/seed/tag14/100/100',
-    content: 'Tag14 具备良好的跨平台能力。',
-  },
-  tag15: {
-    title: 'Tag15 调试工具',
-    image: 'https://picsum.photos/seed/tag15/100/100',
-    content: 'Tag15 广泛应用于后端系统。',
-  },
-  tag16: {
-    title: 'Tag16 数据库',
-    image: 'https://picsum.photos/seed/tag16/100/100',
-    content: 'Tag16 是一种流行的开发工具。',
-  },
-  tag17: {
-    title: 'Tag17 操作系统',
-    image: 'https://picsum.photos/seed/tag17/100/100',
-    content: 'Tag17 支持高性能计算与并发。',
-  },
-  tag18: {
-    title: 'Tag18 框架',
-    image: 'https://picsum.photos/seed/tag18/100/100',
-    content: 'Tag18 用于编译多个语言的程序。',
-  },
-  tag19: {
-    title: 'Tag19 容器',
-    image: 'https://picsum.photos/seed/tag19/100/100',
-    content: 'Tag19 具备良好的跨平台能力。',
-  },
-  tag20: {
-    title: 'Tag20 协议',
-    image: 'https://picsum.photos/seed/tag20/100/100',
-    content: 'Tag20 广泛应用于后端系统。',
-  },
-};
-
-const keys: string[] = Object.keys(tagDetails);
+import TagChip from './TagChip';
+import { Tag, useSelectedTagsStore } from './hook/useSelectedTagsStore';
+import { useSelectedCollectionStore } from './hook/useSelectedCollectionStore';
 
 interface FilterPanelProps {
   searchText: string;
@@ -145,42 +19,83 @@ export default function FilterPanel({
   handleSearch,
   handleCreatePost,
 }: FilterPanelProps) {
-  const [folder] = useState<NoteFolder>(noteFolder);
   const [searchQuery, setSearchQuery] = useState('');
-  const [tags, setTags] = useState(keys);
-
-  const handleDelete = (tag: string) => {
-    setTags((prev) => prev.filter((t) => t !== tag));
-  };
-
+  const { selectedTags, removeTag } = useSelectedTagsStore();
   const [hoveredTag, setHoveredTag] = useState<string | null>(null);
+  const { selectedCollection, clearCollection } = useSelectedCollectionStore();
+
+  const renderTagDetail = (tag: Tag) => {
+    return (
+      <Box
+        sx={{
+          borderRadius: 2,
+          boxShadow: 2,
+          p: 1,
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          alignItems: 'center',
+        }}>
+        <Box
+          component="img"
+          src={tag.image}
+          alt={tag.title}
+          sx={{ width: 100, height: 100, objectFit: 'contain', borderRadius: 1 }}
+        />
+        <Box>
+          <Typography variant="h6">{tag.title}</Typography>
+          <Typography variant="body2" color="text.secondary">
+            {tag.content}
+          </Typography>
+        </Box>
+      </Box>
+    );
+  };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
       {/* 收藏夹展示 */}
+      {selectedCollection && (
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            borderRadius: 2,
+            boxShadow: 3,
+            overflow: 'hidden',
+          }}>
+          <Box
+            component="img"
+            src={selectedCollection.cover}
+            alt={selectedCollection.name}
+            sx={{ width: 150, height: 100, objectFit: 'cover', flexShrink: 0 }}
+          />
+
+          <Box sx={{ flex: 1, px: 2 }}>
+            <Typography variant="h5" noWrap>
+              {selectedCollection.name}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              共 {selectedCollection.count} 条笔记 · 最近更新 {selectedCollection.lastUpdated}
+            </Typography>
+          </Box>
+        </Box>
+      )}
+
+      {/* 仅剩一个 tag 时显示详情 */}
+      {selectedTags.length === 1 && renderTagDetail(selectedTags[0])}
+
+      {/* 标签展示 */}
       <Box
         sx={{
           display: 'flex',
-          alignItems: 'center',
-          borderRadius: 2,
-          boxShadow: 3,
-          overflow: 'hidden',
+          flexWrap: 'wrap',
+          gap: 0.5,
+          justifyContent: 'flex-start',
         }}>
-        <Box
-          component="img"
-          src={folder.cover}
-          alt={folder.name}
-          sx={{ width: 150, height: 100, objectFit: 'cover', flexShrink: 0 }}
-        />
-
-        <Box sx={{ flex: 1, px: 2 }}>
-          <Typography variant="h5" noWrap>
-            {folder.name}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            共 {folder.count} 条笔记 · 最近更新 {folder.lastUpdated}
-          </Typography>
-        </Box>
+        {selectedTags.map((tag) => (
+          <TagChip tag={tag} onDelete={() => removeTag(tag)} />
+        ))}
       </Box>
 
       {/* 搜索栏 */}
@@ -209,73 +124,6 @@ export default function FilterPanel({
           <AddIcon />
         </IconButton>
       </Box>
-
-      {/* 标签展示 */}
-      <Box
-        sx={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: 0.5,
-          justifyContent: 'flex-start',
-        }}>
-        {tags.map((tag) => (
-          <Chip
-            key={tag}
-            label={tag}
-            size="small"
-            onDelete={hoveredTag === tag ? () => handleDelete(tag) : undefined}
-            deleteIcon={
-              hoveredTag === tag ? (
-                <CloseIcon
-                  sx={{
-                    fontSize: 18,
-                  }}
-                />
-              ) : undefined
-            }
-            onMouseEnter={() => setHoveredTag(tag)}
-            onMouseLeave={() => setHoveredTag(null)}
-            sx={{
-              fontWeight: 'bold',
-              pl: 1,
-              pr: 1,
-              transition: 'background-color 0.2s ease',
-              '& .MuiChip-label': { px: 1 },
-            }}
-          />
-        ))}
-      </Box>
-
-      {/* 仅剩一个 tag 时显示详情 */}
-      {tags.length === 1 &&
-        (() => {
-          const detail = tagDetails[tags[0]];
-          return detail ? (
-            <Box
-              sx={{
-                borderRadius: 2,
-                boxShadow: 2,
-                p: 1,
-                bgcolor: 'background.paper',
-                display: 'flex',
-                gap: 2,
-                alignItems: 'center',
-              }}>
-              <Box
-                component="img"
-                src={detail.image}
-                alt={detail.title}
-                sx={{ width: 100, height: 100, objectFit: 'contain', borderRadius: 1 }}
-              />
-              <Box>
-                <Typography variant="h6">{detail.title}</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {detail.content}
-                </Typography>
-              </Box>
-            </Box>
-          ) : null;
-        })()}
     </Box>
   );
 }
