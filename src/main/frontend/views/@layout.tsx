@@ -62,21 +62,7 @@ export default function MainLayout() {
     )}`;
 
   return (
-    <Box
-      sx={{
-        '&::before': {
-          content: '""',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `linear-gradient(135deg,rgba(224, 224, 224, 0.80),rgba(224, 224, 224, 0.80))`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          zIndex: -1,
-        },
-      }}>
+    <Box>
       {/* header */}
       <GlassBox
         component="header"

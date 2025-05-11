@@ -33,7 +33,6 @@ import { SearchAndReplace } from 'reactjs-tiptap-editor/searchandreplace';
 import { SlashCommand } from 'reactjs-tiptap-editor/slashcommand';
 import { Strike } from 'reactjs-tiptap-editor/strike';
 import { Table } from 'reactjs-tiptap-editor/table';
-// import { TableOfContents } from 'reactjs-tiptap-editor/tableofcontent';
 import { TaskList } from 'reactjs-tiptap-editor/tasklist';
 import { TextAlign } from 'reactjs-tiptap-editor/textalign';
 import { TextUnderline } from 'reactjs-tiptap-editor/textunderline';
@@ -50,7 +49,7 @@ import 'easydrawer/styles.css';
 import { useUpload } from 'Frontend/hooks/useUpload';
 import { Box, Stack } from '@mui/material';
 import { GlassBox } from './GlassBox';
-import { TableOfContents } from './TableOfContents';
+import { Toc } from './Toc';
 import { Item } from '@vaadin/react-components';
 
 interface EditorProps {
@@ -75,7 +74,6 @@ const EditorWrapper: React.FC<EditorProps> = ({ content, onChange }) => {
     }),
     History,
     SearchAndReplace,
-    // TableOfContents,
     FormatPainter.configure({ spacer: true }),
     Clear,
     FontFamily,
@@ -158,7 +156,7 @@ const EditorWrapper: React.FC<EditorProps> = ({ content, onChange }) => {
   }, []);
   return (
     <Stack direction="row" spacing={1}>
-      <TableOfContents editor={editorRef.current?.editor} />
+      <Toc editor={editorRef.current?.editor} />
       <Box
         ref={boxRef}
         sx={{
@@ -180,9 +178,7 @@ const EditorWrapper: React.FC<EditorProps> = ({ content, onChange }) => {
             flex: '1 1 auto',
             overflowY: 'auto',
             minHeight: 0,
-            '.ProseMirror': {
-              padding: '4px !important',
-            },
+            paddingBottom: '40vh',
           },
         }}>
         <RichTextEditor

@@ -11,6 +11,11 @@ export const config: ViewConfig = {
   menu: { exclude: true },
 };
 
+interface LocationState {
+  fromSearch?: string;
+  scrollPosition?: number;
+}
+
 export default function PostDetail() {
   const { postId } = useParams();
   if (!postId) {
@@ -23,7 +28,9 @@ export default function PostDetail() {
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState<string>('');
   const [paperHeight, setPaperHeight] = useState<number>(0);
-  const fromSearch = (location.state as { fromSearch?: string })?.fromSearch || '';
+  const fromSearch = (location.state as LocationState)?.fromSearch || '';
+  const scrollPosition = (location.state as LocationState)?.scrollPosition;
+  console.log('####', location.state);
 
   const measuredRef = useCallback((node: any) => {
     if (node !== null) {
@@ -62,10 +69,15 @@ export default function PostDetail() {
   };
 
   const closePostEditor = () => {
-    navigate({
-      pathname: '/post',
-      search: fromSearch,
-    });
+    navigate(
+      {
+        pathname: '/post',
+        search: fromSearch,
+      },
+      {
+        state: { fromSearch, scrollPosition } as LocationState,
+      }
+    );
   };
 
   const handleAddTag = () => {

@@ -1,20 +1,25 @@
 import { Box, Typography, CardMedia, Grid, Card, CardContent, Pagination, Divider } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { PostService } from 'Frontend/generated/endpoints';
-import { useNavigate, useSearchParams } from 'react-router';
+import { useLocation, useNavigate, useSearchParams } from 'react-router';
 import PostDto from 'Frontend/generated/io/github/dutianze/yotsuba/cms/application/dto/PostDto';
-import { Link } from 'react-router';
 import FilterPanel from './FilterPanel';
+import PostCard from './PostCard';
+
+interface LocationState {
+  fromSearch?: string;
+  scrollPosition?: number;
+}
 
 export default function PostSearch() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [searchText, setSearchText] = useState(() => searchParams.get('search') || '');
   const [page, setPage] = useState(() => Number(searchParams.get('page') || 1));
-
   const [posts, setPosts] = useState<PostDto[]>([]);
-  const [pageSize] = useState(12);
+  const [pageSize] = useState(28);
   const [totalPages, setTotalPages] = useState<number>(0);
 
   useEffect(() => {
@@ -24,25 +29,38 @@ export default function PostSearch() {
   const fetchPosts = async () => {
     try {
       const res = await PostService.searchMessages(searchText, page - 1, pageSize);
-      setPosts(res?.content);
-      setTotalPages(res?.totalPages);
+      setPosts(res?.content || []);
+      setTotalPages(res?.totalPages || 0);
     } catch (err) {
-      console.error(err);
+      console.error('Error fetching posts:', err);
+      setPosts([]);
+      setTotalPages(0);
+    } finally {
+      const scrollPosition = Number((location.state as LocationState)?.scrollPosition);
+      if (!isNaN(scrollPosition)) {
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: scrollPosition, behavior: 'auto' });
+        });
+      }
     }
   };
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    const scrollPosition = 0;
     setPage(value);
-    setSearchParams({ search: searchText, page: String(value) });
+    setSearchParams({ search: searchText, page: String(value) }, { state: { scrollPosition } });
   };
 
   const handleCreatePost = async () => {
-    const newPostId = await PostService.createPost();
-    console.log(newPostId);
-
-    navigate(`/post/${newPostId}`, {
-      state: { fromSearch: location.search },
-    });
+    try {
+      const newPostId = await PostService.createPost();
+      const scrollPosition = window.scrollY;
+      navigate(`/post/${newPostId}`, {
+        state: { fromSearch: location.search, scrollPosition } as LocationState,
+      });
+    } catch (err) {
+      console.error('Error creating post:', err);
+    }
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,16 +68,31 @@ export default function PostSearch() {
   };
 
   function handleSearch(): void {
+    setPage(1);
     fetchPosts();
   }
 
-  function handleClear(): void {
-    throw new Error('Function not implemented.');
-  }
+  const handleClear = () => {
+    setSearchText('');
+    setPage(1);
+    fetchPosts();
+  };
 
-  function handleTagClick(tag: string): void {
-    throw new Error('Function not implemented.');
-  }
+  const handleTagClick = (tag: string) => {
+    setSearchText(tag);
+    setPage(1);
+    fetchPosts();
+  };
+
+  const handleCardClick = (event: React.MouseEvent, post: PostDto) => {
+    event.preventDefault();
+    const scrollPosition = window.scrollY;
+    console.log('Clicked, scrollY:', scrollPosition); // 调试：确认点击时的 scrollY
+
+    navigate(`/post/${post.id}`, {
+      state: { fromSearch: location.search, scrollPosition } as LocationState,
+    });
+  };
 
   return (
     <Box>
@@ -76,43 +109,7 @@ export default function PostSearch() {
       <Grid container spacing={2}>
         {posts?.map((post, index) => (
           <Grid key={post?.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-            <Card
-              component={Link}
-              to={`/post/${post?.id}`}
-              state={{ fromSearch: location.search }}
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%',
-                textDecoration: 'none',
-                color: 'inherit',
-                transition: 'transform 0.2s ease',
-                '&:hover': {
-                  transform: 'scale(1.02)',
-                  boxShadow: 6,
-                },
-              }}>
-              <CardMedia
-                component="img"
-                height="160"
-                image={post.cover}
-                alt={post?.title}
-                sx={{ objectFit: 'cover' }}
-              />
-              <CardContent sx={{ flexGrow: 1, py: 1 }}>
-                <Typography variant="h6" component="div" noWrap sx={{ fontWeight: 700, lineHeight: 1.2, mb: 0.5 }}>
-                  {post?.title}
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                  <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1 }}>
-                    {post?.createdAt}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1 }}>
-                    • {100} views
-                  </Typography>
-                </Box>
-              </CardContent>
-            </Card>
+            <PostCard post={post} />
           </Grid>
         ))}
       </Grid>

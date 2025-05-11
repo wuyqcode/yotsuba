@@ -36,6 +36,8 @@ export default function AdminView() {
             display: 'flex',
             flexDirection: 'column',
             minHeight: '100%',
+            border: 'none',
+            boxShadow: 'none',
           }}>
           <PostSearch />
         </GlassBox>
