@@ -3,14 +3,27 @@ import AddIcon from '@mui/icons-material/Add';
 import ThumbUpAltOutlinedIcon from '@mui/icons-material/ThumbUpAltOutlined';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PostDto from 'Frontend/generated/io/github/dutianze/yotsuba/cms/application/dto/PostDto';
+import { useNavigate } from 'react-router';
+import { LocationState } from './PostSearch';
 
 interface PostCardProps {
   post: PostDto;
 }
 
 export default function PostCard({ post }: PostCardProps) {
+  const navigate = useNavigate();
+
+  const handleCardClick = (event: React.MouseEvent, post: PostDto) => {
+    event.preventDefault();
+    const scrollPosition = window.scrollY;
+
+    navigate(`/post/${post.id}`, {
+      state: { fromSearch: location.search, scrollPosition } as LocationState,
+    });
+  };
   return (
     <Card
+      onClick={(e) => handleCardClick(e, post)}
       sx={{
         position: 'relative',
         borderRadius: 2,

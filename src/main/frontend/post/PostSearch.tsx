@@ -6,7 +6,7 @@ import PostDto from 'Frontend/generated/io/github/dutianze/yotsuba/cms/applicati
 import FilterPanel from './FilterPanel';
 import PostCard from './PostCard';
 
-interface LocationState {
+export interface LocationState {
   fromSearch?: string;
   scrollPosition?: number;
 }
@@ -82,16 +82,6 @@ export default function PostSearch() {
     setSearchText(tag);
     setPage(1);
     fetchPosts();
-  };
-
-  const handleCardClick = (event: React.MouseEvent, post: PostDto) => {
-    event.preventDefault();
-    const scrollPosition = window.scrollY;
-    console.log('Clicked, scrollY:', scrollPosition); // 调试：确认点击时的 scrollY
-
-    navigate(`/post/${post.id}`, {
-      state: { fromSearch: location.search, scrollPosition } as LocationState,
-    });
   };
 
   return (
