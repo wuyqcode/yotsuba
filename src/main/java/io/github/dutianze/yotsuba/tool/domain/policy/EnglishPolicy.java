@@ -1,7 +1,7 @@
 package io.github.dutianze.yotsuba.tool.domain.policy;
 
-import com.atilika.kuromoji.jumandic.Token;
-import io.github.dutianze.yotsuba.tool.domain.share.StringHelper;
+import com.atilika.kuromoji.ipadic.neologd.Token;
+import io.github.dutianze.yotsuba.tool.domain.common.StringHelper;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -19,8 +19,8 @@ public class EnglishPolicy extends BasePolicy {
     }
 
     @Override
-    public boolean canApply(Token token) {
-        return StringHelper.containsKatakana(token.getSurface());
+    public boolean canApply(TokenRecord tokenRecord) {
+        return StringHelper.containsKatakana(tokenRecord.getSurface());
     }
 
     @Override

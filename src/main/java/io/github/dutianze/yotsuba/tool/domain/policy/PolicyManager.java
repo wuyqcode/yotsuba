@@ -1,7 +1,7 @@
 package io.github.dutianze.yotsuba.tool.domain.policy;
 
-import com.atilika.kuromoji.jumandic.Token;
-import io.github.dutianze.yotsuba.tool.domain.share.Constant;
+import com.atilika.kuromoji.ipadic.neologd.Token;
+import io.github.dutianze.yotsuba.tool.domain.common.Constant;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -28,12 +28,13 @@ public class PolicyManager {
         }
         StringBuilder result = new StringBuilder();
         for (Token token : tokenize) {
+            TokenRecord tokenRecord = new TokenRecord(token);
             String convertedText = policies.stream()
                                            .sorted(Comparator.comparing(Policy::priority))
-                                           .filter(policy -> policy.canApply(token))
+                                           .filter(policy -> policy.canApply(tokenRecord))
                                            .findFirst()
-                                           .map(policy -> policy.apply(new PolicyContext(token, englishContext)))
-                                           .orElseGet(token::getSurface);
+                                           .map(policy -> policy.apply(new PolicyContext(tokenRecord, englishContext)))
+                                           .orElseGet(tokenRecord::getSurface);
             result.append(convertedText);
         }
         return result.toString();

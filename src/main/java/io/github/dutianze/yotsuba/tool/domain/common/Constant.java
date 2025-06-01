@@ -1,6 +1,6 @@
-package io.github.dutianze.yotsuba.tool.domain.share;
+package io.github.dutianze.yotsuba.tool.domain.common;
 
-import com.atilika.kuromoji.jumandic.Tokenizer;
+import com.atilika.kuromoji.ipadic.neologd.Tokenizer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**

@@ -1,10 +1,10 @@
 package io.github.dutianze.yotsuba.tool.domain.pipeline;
 
-import com.atilika.kuromoji.jumandic.Token;
+import com.atilika.kuromoji.ipadic.neologd.Token;
 import com.fasterxml.jackson.databind.JsonNode;
-import io.github.dutianze.yotsuba.tool.domain.share.Constant;
-import io.github.dutianze.yotsuba.tool.domain.share.ListHelper;
-import io.github.dutianze.yotsuba.tool.domain.share.StringHelper;
+import io.github.dutianze.yotsuba.tool.domain.common.Constant;
+import io.github.dutianze.yotsuba.tool.domain.common.ListHelper;
+import io.github.dutianze.yotsuba.tool.domain.common.StringHelper;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.domain.SpineReference;

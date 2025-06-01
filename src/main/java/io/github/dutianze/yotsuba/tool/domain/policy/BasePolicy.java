@@ -7,6 +7,10 @@ package io.github.dutianze.yotsuba.tool.domain.policy;
 public abstract class BasePolicy implements Policy {
 
 
+    protected String rubyWrap(String kanji, String hira) {
+        return "<ruby>" + kanji + "<rt>" + hira + "</rt></ruby>";
+    }
+
     protected String applyRuby(String kanji, String kana) {
         String commonPrefix = findCommonPrefix(kanji, kana);
         String commonSuffix = findCommonSuffix(kanji, kana);
@@ -20,34 +24,25 @@ public abstract class BasePolicy implements Policy {
         String kanjiMiddle = kanji.substring(prefixLength, kanji.length() - suffixLength);
         String kanaMiddle = kana.substring(prefixLength, kana.length() - suffixLength);
 
-        return commonPrefix + "<ruby>" + kanjiMiddle + "<rt>" + kanaMiddle + "</rt></ruby>" + commonSuffix;
+        return commonPrefix + rubyWrap(kanjiMiddle, kanaMiddle) + commonSuffix;
     }
 
-    private String findCommonPrefix(String a, String b) {
-        int minLength = Math.min(a.length(), b.length());
-        StringBuilder commonPrefix = new StringBuilder();
-        for (int i = 0; i < minLength; i++) {
-            if (a.charAt(i) == b.charAt(i)) {
-                commonPrefix.append(a.charAt(i));
-            } else {
-                break;
-            }
+    public String findCommonPrefix(String str1, String str2) {
+        int len = Math.min(str1.length(), str2.length());
+        int i = 0;
+        while (i < len && str1.charAt(i) == str2.charAt(i)) {
+            i++;
         }
-        return commonPrefix.toString();
+        return str1.substring(0, i);
     }
 
-    private String findCommonSuffix(String a, String b) {
-        int minLength = Math.min(a.length(), b.length());
-        StringBuilder commonSuffix = new StringBuilder();
-        for (int i = 0; i < minLength; i++) {
-            char c = a.charAt(a.length() - 1 - i);
-            if (c == b.charAt(b.length() - 1 - i)) {
-                commonSuffix.insert(0, c);
-            } else {
-                break;
-            }
+    public String findCommonSuffix(String str1, String str2) {
+        int len1 = str1.length(), len2 = str2.length();
+        int i = 0;
+        while (i < len1 && i < len2 && str1.charAt(len1 - 1 - i) == str2.charAt(len2 - 1 - i)) {
+            i++;
         }
-        return commonSuffix.toString();
+        return str1.substring(len1 - i);
     }
 
 }

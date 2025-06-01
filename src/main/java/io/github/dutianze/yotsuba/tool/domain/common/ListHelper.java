@@ -1,4 +1,4 @@
-package io.github.dutianze.yotsuba.tool.domain.share;
+package io.github.dutianze.yotsuba.tool.domain.common;
 
 import java.util.List;
 import java.util.stream.Collectors;

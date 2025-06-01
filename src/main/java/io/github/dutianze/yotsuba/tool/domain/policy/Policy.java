@@ -1,6 +1,5 @@
 package io.github.dutianze.yotsuba.tool.domain.policy;
 
-import com.atilika.kuromoji.jumandic.Token;
 
 /**
  * @author dutianze
@@ -10,7 +9,7 @@ public interface Policy {
 
     int priority();
 
-    boolean canApply(Token token);
+    boolean canApply(TokenRecord tokenRecord);
 
     String apply(PolicyContext policyContext);
 }

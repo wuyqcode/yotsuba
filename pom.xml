@@ -63,6 +63,10 @@
 			<id>psiegman-repo</id>
 			<url>https://github.com/psiegman/mvn-repo/raw/master/releases</url>
 		</repository>
+		<repository>
+			<id>github</id>
+			<url>https://maven.pkg.github.com/wuyqcode/kuromoji</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
@@ -191,8 +195,8 @@
 		</dependency>
 		<dependency>
 			<groupId>com.atilika.kuromoji</groupId>
-			<artifactId>kuromoji-jumandic</artifactId>
-			<version>0.9.0</version>
+			<artifactId>kuromoji-ipadic-neologd</artifactId>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>nl.siegmann.epublib</groupId>
