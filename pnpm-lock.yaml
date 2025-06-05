@@ -31,7 +31,7 @@ importers:
         version: 3.5.2
       '@vaadin/bundles':
         specifier: 24.7.1
-        version: 24.7.1(keeb32fyemtz7jk3x4foy46ebe)
+        version: 24.7.1(b93aff30594d2712b7c73da33e302afb)
       '@vaadin/common-frontend':
         specifier: 0.0.19
         version: 0.0.19(lit@3.2.1)
@@ -68,12 +68,24 @@ importers:
       '@vaadin/vaadin-development-mode-detector':
         specifier: 2.0.7
         version: 2.0.7
+      '@vaadin/vaadin-lumo-styles':
+        specifier: 24.7.1
+        version: 24.7.1
+      '@vaadin/vaadin-material-styles':
+        specifier: 24.7.1
+        version: 24.7.1
+      '@vaadin/vaadin-themable-mixin':
+        specifier: 24.7.1
+        version: 24.7.1
       '@vaadin/vaadin-usage-statistics':
         specifier: 2.1.3
         version: 2.1.3
       construct-style-sheets-polyfill:
         specifier: 3.1.0
         version: 3.1.0
+      date-fns:
+        specifier: 2.29.3
+        version: 2.29.3
       idb-keyval:
         specifier: ^6.2.2
         version: 6.2.2
@@ -3026,9 +3038,6 @@ packages:
   '@vaadin/vaadin-themable-mixin@24.7.1':
     resolution: {integrity: sha512-V52WbXMB2+7fiG2HBlYxMIn+LwzSPAKnxcU/G1WAbv9jsKeTzutGUgzWo0R8RCC7L4fNAyyB8ogM5Hpak2vLUw==}
 
-  '@vaadin/vaadin-themable-mixin@24.7.2':
-    resolution: {integrity: sha512-HrsIr4DHSbrHUky16YXsK4NbQfUsEKamLnGJQToInj61eLKroUi3ERJPRFkXV4jbNdIuKDomjtB1p6bSBZ5y/A==}
-
   '@vaadin/vaadin-usage-statistics@2.1.3':
     resolution: {integrity: sha512-8r4TNknD7OJQADe3VygeofFR7UNAXZ2/jjBFP5dgI8+2uMfnuGYgbuHivasKr9WSQ64sPej6m8rDoM1uSllXjQ==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
@@ -3713,6 +3722,10 @@ packages:
   data-view-byte-offset@1.0.1:
     resolution: {integrity: sha512-BS8PfmtDGnrgYdOonGZQdLZslWIeCGFP9tpan0hi1Co2Zr2NKADsvGYA8XxuG/4UWgJ6Cjtv+YJnB6MM69QGlQ==}
     engines: {node: '>= 0.4'}
+
+  date-fns@2.29.3:
+    resolution: {integrity: sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==}
+    engines: {node: '>=0.11'}
 
   dateformat@4.6.3:
     resolution: {integrity: sha512-2P0p0pFGzHS5EMnhdxQi7aJN+iMheud0UhG4dlE1DLAlvL8JHjJJTX/CSm4JXwV0Ka5nGk3zC5mcb5bUQUxxMA==}
@@ -8753,7 +8766,7 @@ snapshots:
       '@vaadin/vaadin-themable-mixin': 24.7.1
       lit: 3.2.1
 
-  '@vaadin/bundles@24.7.1(keeb32fyemtz7jk3x4foy46ebe)':
+  '@vaadin/bundles@24.7.1(b93aff30594d2712b7c73da33e302afb)':
     optionalDependencies:
       '@open-wc/dedupe-mixin': 1.4.0
       '@polymer/polymer': 3.5.2
@@ -9430,7 +9443,7 @@ snapshots:
   '@vaadin/polymer-legacy-adapter@24.7.1':
     dependencies:
       '@polymer/polymer': 3.5.2
-      '@vaadin/vaadin-themable-mixin': 24.7.2
+      '@vaadin/vaadin-themable-mixin': 24.7.1
       lit: 3.2.1
 
   '@vaadin/popover@24.7.1':
@@ -9691,11 +9704,6 @@ snapshots:
       '@vaadin/vaadin-themable-mixin': 24.7.1
 
   '@vaadin/vaadin-themable-mixin@24.7.1':
-    dependencies:
-      '@open-wc/dedupe-mixin': 1.4.0
-      lit: 3.2.1
-
-  '@vaadin/vaadin-themable-mixin@24.7.2':
     dependencies:
       '@open-wc/dedupe-mixin': 1.4.0
       lit: 3.2.1
@@ -10541,6 +10549,8 @@ snapshots:
       call-bound: 1.0.4
       es-errors: 1.3.0
       is-data-view: 1.0.2
+
+  date-fns@2.29.3: {}
 
   dateformat@4.6.3: {}
 

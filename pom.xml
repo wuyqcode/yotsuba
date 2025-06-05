@@ -274,6 +274,21 @@
 				<artifactId>maven-wrapper-plugin</artifactId>
 				<version>3.3.2</version>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.3.0</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>com.example.MainApp</mainClass>
+						</manifest>
+						<manifestEntries>
+							<App-Icon>META-INF/resources/images/icon.png</App-Icon>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
