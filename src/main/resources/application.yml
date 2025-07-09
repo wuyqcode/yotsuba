@@ -36,6 +36,8 @@ vaadin:
   pnpm:
     enable: true
   exclude-urls: /swagger-ui/**
+  npm:
+    excludeWebComponents: true
 modules:
   primary:
     datasource:
