@@ -280,9 +280,6 @@
 				<version>3.3.0</version>
 				<configuration>
 					<archive>
-						<manifest>
-							<mainClass>com.example.MainApp</mainClass>
-						</manifest>
 						<manifestEntries>
 							<App-Icon>META-INF/resources/images/icon.png</App-Icon>
 						</manifestEntries>
