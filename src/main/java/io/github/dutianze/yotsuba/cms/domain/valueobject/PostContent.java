@@ -2,7 +2,6 @@ package io.github.dutianze.yotsuba.cms.domain.valueobject;
 
 import jakarta.persistence.Embeddable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
-import org.jmolecules.ddd.types.ValueObject;
 
 /**
  * @author dutianze
@@ -13,5 +12,5 @@ public record PostContent(
         @FullTextField(analyzer = "english", name = "content_en")
         @FullTextField(analyzer = "japanese", name = "content_ja")
         @FullTextField(analyzer = "chinese", name = "content_cn")
-        String content) implements ValueObject {
+        String content)  {
 }
