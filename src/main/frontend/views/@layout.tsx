@@ -69,6 +69,7 @@ export default function MainLayout() {
         sx={{
           position: 'sticky',
           top: 0,
+          padding: '0 16px',
           width: '100%',
           height: '50px',
           flexShrink: 0,
@@ -127,6 +128,7 @@ export default function MainLayout() {
           sx={{
             position: 'fixed',
             inset: '0',
+            bgcolor: 'rgba(0, 0, 0, 0.5)', // 半透明黑色
             zIndex: 1100,
           }}
           onClick={() => setNavOpen(false)}
@@ -139,9 +141,8 @@ export default function MainLayout() {
           position: 'fixed',
           top: '50px',
           left: 0,
-          width: 200,
+          width: 250,
           height: 'calc(100% - 50px)',
-          marginTop: '5px',
           transition: 'transform 0.3s ease-in-out',
           transform: navOpen ? 'translateX(0)' : 'translateX(-100%)',
           zIndex: 1201,
