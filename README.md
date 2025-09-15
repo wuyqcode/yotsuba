@@ -4,7 +4,7 @@ This project can be used as a starting point to create your own Hilla applicatio
 It contains all the necessary configuration and some placeholder files to get you started.
 
 ## Running the application
-
+s
 The project is a standard Maven project. To run it from the command line,
 type `mvnw` (Windows), or `./mvnw` (Mac & Linux), then open
 http://localhost:8080 in your browser.
