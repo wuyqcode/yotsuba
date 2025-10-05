@@ -3,10 +3,10 @@ import { Box, Typography, IconButton, InputBase, Paper, Stack } from '@mui/mater
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import FolderIcon from '@mui/icons-material/Folder';
-import { useSelectedTagsStore } from './hook/useSelectedTagsStore';
-import { useSelectedCollectionStore } from './hook/useSelectedCollectionStore';
-import { Tag } from './hook/useTagStore';
+import { useSelectedTagsStore } from 'Frontend/features/post/hooks/useSelectedTagsStore';
+import { useSelectedCollectionStore } from 'Frontend/features/post/hooks/useSelectedCollectionStore';
 import CloseIcon from '@mui/icons-material/Close';
+import { Tag } from 'Frontend/features/post/hooks/useTagStore';
 
 interface FilterPanelProps {
   searchText: string;

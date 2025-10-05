@@ -46,11 +46,9 @@ import 'prism-code-editor-lightweight/themes/github-dark.css';
 
 import 'katex/dist/katex.min.css';
 import 'easydrawer/styles.css';
-import { useUpload } from 'Frontend/hooks/useUpload';
+import { useUpload } from 'Frontend/features/post/hooks/useUpload';
 import { Box, Stack } from '@mui/material';
-import { GlassBox } from './GlassBox';
-import { Toc } from './Toc';
-import { Item } from '@vaadin/react-components';
+import { Toc } from 'Frontend/components/Toc';
 
 interface EditorProps {
   content: string;

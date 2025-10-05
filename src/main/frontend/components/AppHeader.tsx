@@ -6,8 +6,8 @@ import MenuItem from '@mui/material/MenuItem';
 import CardMedia from '@mui/material/CardMedia';
 import { Icon } from '@vaadin/react-components';
 import { useNavigate } from 'react-router';
-import { useAuth } from 'Frontend/util/auth.js';
-import HeaderNavBar from './HeaderNavBar';
+import { useAuth } from 'Frontend/utils/auth';
+import HeaderNavBar from 'Frontend/components/HeaderNavBar';
 
 const HEIGHT = 50;
 

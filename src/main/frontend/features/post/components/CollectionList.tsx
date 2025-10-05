@@ -1,8 +1,7 @@
 import React from 'react';
 import { Stack } from '@mui/material';
-import { useCollectionStore } from './hook/useCollectionStore';
-import { Collection } from './hook/useCollectionStore';
-import CollectionItem from './CollectionItem';
+import { useCollectionStore, Collection } from 'Frontend/features/post/hooks/useCollectionStore';
+import CollectionItem from 'Frontend/features/post/components/CollectionItem';
 
 interface Props {
   onEdit: (col: Collection) => void;

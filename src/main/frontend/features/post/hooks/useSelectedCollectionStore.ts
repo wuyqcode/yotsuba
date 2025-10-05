@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { useIndexedDBStorage } from './useIndexedDBStorage';
-import { Collection } from './useCollectionStore';
+import { useIndexedDBStorage } from 'Frontend/features/post/hooks/useIndexedDBStorage';
+import { Collection } from 'Frontend/features/post/hooks/useCollectionStore';
 
 interface SelectedCollectionState {
   selectedCollection: Collection | null;

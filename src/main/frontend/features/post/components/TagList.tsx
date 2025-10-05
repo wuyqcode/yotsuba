@@ -1,8 +1,8 @@
 import React from 'react';
 import { Stack } from '@mui/material';
-import TagChip from './TagChip';
-import { useSelectedTagsStore } from './hook/useSelectedTagsStore';
-import { Tag, useTagStore } from './hook/useTagStore';
+import TagChip from 'Frontend/features/post/components/TagChip';
+import { useSelectedTagsStore } from 'Frontend/features/post/hooks/useSelectedTagsStore';
+import { Tag, useTagStore } from 'Frontend/features/post/hooks/useTagStore';
 
 const TagList = () => {
   const { tags } = useTagStore();

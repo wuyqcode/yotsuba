@@ -1,5 +1,5 @@
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
-import { useAuth } from 'Frontend/util/auth.js';
+import { useAuth } from 'Frontend/utils/auth';
 import { useState } from 'react';
 import { Box, Button, TextField, Typography, Card, CardContent, Alert } from '@mui/material';
 

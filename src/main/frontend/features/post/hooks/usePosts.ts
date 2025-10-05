@@ -1,4 +1,4 @@
-import { usePostStore } from '../stores/postStore';
+import { usePostStore } from 'Frontend/features/post/stores/postStore';
 
 export function usePosts() {
   const posts = usePostStore((s) => s.posts);

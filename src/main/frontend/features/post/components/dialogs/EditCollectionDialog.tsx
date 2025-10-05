@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from '@mui/material';
-import { Collection, useCollectionStore } from 'Frontend/post/hook/useCollectionStore';
+import { Collection, useCollectionStore } from 'Frontend/features/post/hooks/useCollectionStore';
 
 interface Props {
   open: boolean;

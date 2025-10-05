@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer'; // 标签图标
 import CloseIcon from '@mui/icons-material/Close';
-import { Tag } from './hook/useTagStore';
+import { Tag } from 'Frontend/features/post/hooks/useTagStore';
 
 interface TagChipProps {
   tag: Tag;

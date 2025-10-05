@@ -1,10 +1,10 @@
 import { Box, Typography, Grid, Divider, CircularProgress, TablePagination, Pagination } from '@mui/material';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import FilterPanel from './FilterPanel';
-import PostCard from './PostCard';
-import { usePosts } from './hook/usePosts';
-import PaginationBar from './PaginationBar';
+import FilterPanel from 'Frontend/features/post/components/FilterPanel';
+import PostCard from 'Frontend/features/post/components/PostCard';
+import { usePosts } from 'Frontend/features/post/hooks/usePosts';
+import PaginationBar from 'Frontend/features/post/components/PaginationBar';
 
 export default function PostListPage() {
   const navigate = useNavigate();

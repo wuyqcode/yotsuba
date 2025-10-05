@@ -2,8 +2,8 @@ import React from 'react';
 import { Box, Card, CardContent, Typography, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useSelectedCollectionStore } from './hook/useSelectedCollectionStore';
-import { Collection } from './hook/useCollectionStore';
+import { useSelectedCollectionStore } from 'Frontend/features/post/hooks/useSelectedCollectionStore';
+import { Collection } from 'Frontend/features/post/hooks/useCollectionStore';
 
 interface Props {
   col: Collection;

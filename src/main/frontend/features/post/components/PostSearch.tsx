@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import { PostService } from 'Frontend/generated/endpoints';
 import { useLocation, useNavigate, useSearchParams } from 'react-router';
 import PostDto from 'Frontend/generated/io/github/dutianze/yotsuba/cms/application/dto/PostDto';
-import FilterPanel from './FilterPanel';
-import PostCard from './PostCard';
+import FilterPanel from 'Frontend/features/post/components/FilterPanel';
+import PostCard from 'Frontend/features/post/components/PostCard';
 
 export interface LocationState {
   fromSearch?: string;

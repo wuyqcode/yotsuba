@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Tag } from './useTagStore';
+import { Tag } from 'Frontend/features/post/hooks/useTagStore';
 
 interface SelectedTagsState {
   selectedTags: Tag[];

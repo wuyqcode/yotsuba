@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Box, Divider, Typography } from '@mui/material';
 
-import CollectionList from './CollectionList';
-import TagList from './TagList';
-import AddCollectionDialog from './components/dialogs/AddCollectionDialog';
-import EditCollectionDialog from './components/dialogs/EditCollectionDialog';
-import { Collection } from './hook/useCollectionStore';
+import CollectionList from 'Frontend/features/post/components/CollectionList';
+import TagList from 'Frontend/features/post/components/TagList';
+import AddCollectionDialog from 'Frontend/features/post/components/dialogs/AddCollectionDialog';
+import EditCollectionDialog from 'Frontend/features/post/components/dialogs/EditCollectionDialog';
+import { Collection } from 'Frontend/features/post/hooks/useCollectionStore';
 
 const Sidebar = () => {
   const [openAddDialog, setOpenAddDialog] = useState(false);
