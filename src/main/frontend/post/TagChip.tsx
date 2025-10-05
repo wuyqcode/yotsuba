@@ -1,53 +1,74 @@
 import React from 'react';
-import { Chip } from '@mui/material';
+import { Box, Typography } from '@mui/material';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer'; // 标签图标
 import CloseIcon from '@mui/icons-material/Close';
-import { Tag, useSelectedTagsStore } from './hook/useSelectedTagsStore';
+import { Tag } from './hook/useTagStore';
 
 interface TagChipProps {
   tag: Tag;
+  selected?: boolean;
   onClick?: (tag: Tag) => void;
   onDelete?: (tag: Tag) => void;
 }
 
-const TagChip = ({ tag, onClick, onDelete }: TagChipProps) => {
+const getTagColor = (selected?: boolean) => {
+  if (selected) {
+    return {
+      bg: '#5E81AC', // 主题蓝（Nord 深蓝 / GitHub 蓝）
+      color: '#ffffff',
+    };
+  }
+  return {
+    bg: '#f6f8fa', // 浅灰背景
+    color: '#24292f',
+  };
+};
+
+const TagChip = ({ tag, selected = false, onClick, onDelete }: TagChipProps) => {
+  const { bg, color } = getTagColor(selected);
+
   return (
-    <Chip
-      label={tag.title}
-      size="small"
+    <Box
+      component="span"
       onClick={() => onClick?.(tag)}
-      onDelete={() => onDelete?.(tag)}
-      deleteIcon={<CloseIcon sx={{ fontSize: 18 }} />}
       sx={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 0.5,
+        px: 1,
+        py: 0.2,
+        borderRadius: '2em',
+        fontSize: '0.75rem',
         fontWeight: 500,
-        p: '4px 8px',
-        background: '#f4f4f5', // Light neutral gray
-        color: '#374151', // Dark gray for text
-        border: '1px solid #e5e7eb', // Subtle border
-        borderRadius: '12px',
-        transition: 'all 0.2s ease',
+        lineHeight: 1.5,
+        backgroundColor: bg,
+        color,
+        cursor: 'pointer',
+        userSelect: 'none',
+        transition: 'background-color 0.2s ease',
         '&:hover': {
-          animation: 'scale 0.2s ease',
-          background: '#e5e7eb', // Slightly darker gray on hover
-          borderColor: '#d1d5db',
+          opacity: 0.9,
         },
-        '& .MuiChip-label': {
-          p: '0 8px',
-        },
-        '& .MuiChip-deleteIcon': {
-          color: '#6b7280', // Medium gray for icon
-          transition: 'color 0.2s ease',
-          '&:hover': {
-            color: '#374151', // Darker gray on hover
-          },
-        },
-        // Keyframes for scale animation
-        '@keyframes scale': {
-          '0%': { transform: 'scale(1)' },
-          '50%': { transform: 'scale(1.05)' },
-          '100%': { transform: 'scale(1)' },
-        },
-      }}
-    />
+      }}>
+      <LocalOfferIcon sx={{ fontSize: 14 }} />
+      <Typography component="span" sx={{ fontSize: '0.75rem', fontWeight: 500 }}>
+        {tag.title}
+      </Typography>
+      {onDelete && (
+        <CloseIcon
+          sx={{
+            fontSize: 14,
+            cursor: 'pointer',
+            ml: 0.3,
+            '&:hover': { opacity: 0.7 },
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(tag);
+          }}
+        />
+      )}
+    </Box>
   );
 };
 

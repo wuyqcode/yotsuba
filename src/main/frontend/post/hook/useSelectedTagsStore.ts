@@ -1,42 +1,28 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import { useIndexedDBStorage } from './useIndexedDBStorage';
-
-export interface Tag {
-  id: number;
-  title: string;
-  image: string;
-  content: string;
-}
+import { Tag } from './useTagStore';
 
 interface SelectedTagsState {
   selectedTags: Tag[];
   addTag: (tag: Tag) => void;
-  removeTag: (tag: Tag) => void;
-  clearTags: () => void;
+  removeTag: (id: number) => void;
+  toggleTag: (tag: Tag) => void;
 }
 
-export const useSelectedTagsStore = create<SelectedTagsState>()(
-  persist(
-    (set, get) => ({
-      selectedTags: [],
-      addTag: (addTag: Tag) => {
-        const tags = get().selectedTags;
-        if (tags.find((t) => t.id === addTag.id)) {
-          return;
-        }
-        set({ selectedTags: [...tags, addTag] });
-      },
-      removeTag: (deleteTag: Tag) => {
-        set({
-          selectedTags: get().selectedTags.filter((tag) => tag.id !== deleteTag.id),
-        });
-      },
-      clearTags: () => set({ selectedTags: [] }),
+export const useSelectedTagsStore = create<SelectedTagsState>((set) => ({
+  selectedTags: [],
+  addTag: (tag) =>
+    set((state) =>
+      state.selectedTags.some((t) => t.id === tag.id) ? state : { selectedTags: [...state.selectedTags, tag] }
+    ),
+  removeTag: (id) =>
+    set((state) => ({
+      selectedTags: state.selectedTags.filter((t) => t.id !== id),
+    })),
+  toggleTag: (tag) =>
+    set((state) => {
+      const exists = state.selectedTags.some((t) => t.id === tag.id);
+      return exists
+        ? { selectedTags: state.selectedTags.filter((t) => t.id !== tag.id) }
+        : { selectedTags: [...state.selectedTags, tag] };
     }),
-    {
-      name: 'selected-tags',
-      storage: createJSONStorage(useIndexedDBStorage),
-    }
-  )
-);
+}));

@@ -1,20 +1,14 @@
-import { Box, Button, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Stack, TextField } from '@mui/material';
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
-import { ChangeEvent, useEffect, useState, KeyboardEvent, useCallback } from 'react';
+import { ChangeEvent, useEffect, useState, KeyboardEvent } from 'react';
 import Editor from 'Frontend/components/EditorWrapper';
 import { PostService } from 'Frontend/generated/endpoints';
 import PostDto from 'Frontend/generated/io/github/dutianze/yotsuba/cms/application/dto/PostDto';
-import { useLocation, useNavigate, useParams } from 'react-router';
-import { GlassBox } from 'Frontend/components/GlassBox';
+import { useNavigate, useParams } from 'react-router';
 
 export const config: ViewConfig = {
   menu: { exclude: true },
 };
-
-interface LocationState {
-  fromSearch?: string;
-  scrollPosition?: number;
-}
 
 export default function PostDetail() {
   const { postId } = useParams();
@@ -22,21 +16,9 @@ export default function PostDetail() {
     throw new Error('postId is required but not found');
   }
   const navigate = useNavigate();
-  const location = useLocation();
-
   const [post, setPost] = useState<PostDto>();
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState<string>('');
-  const [paperHeight, setPaperHeight] = useState<number>(0);
-  const fromSearch = (location.state as LocationState)?.fromSearch || '';
-  const scrollPosition = (location.state as LocationState)?.scrollPosition;
-  console.log('####', location.state);
-
-  const measuredRef = useCallback((node: any) => {
-    if (node !== null) {
-      setPaperHeight(node.getBoundingClientRect().height);
-    }
-  }, []);
 
   useEffect(() => {
     if (postId) {
@@ -69,15 +51,7 @@ export default function PostDetail() {
   };
 
   const closePostEditor = () => {
-    navigate(
-      {
-        pathname: '/post',
-        search: fromSearch,
-      },
-      {
-        state: { fromSearch, scrollPosition } as LocationState,
-      }
-    );
+    navigate(-1);
   };
 
   const handleAddTag = () => {
@@ -140,12 +114,7 @@ export default function PostDetail() {
   };
 
   return (
-    <GlassBox
-      sx={{
-        height: 'calc(100dvh - 50px)',
-        backgroundColor: 'white',
-        overflow: 'hidden',
-      }}>
+    <Box sx={{ mx: 2, mt: 2 }}>
       {postId && post && (
         <Box>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -170,6 +139,7 @@ export default function PostDetail() {
           <Editor content={post?.content ?? ''} onChange={onChange} />
         </Box>
       )}
-    </GlassBox>
+    </Box>
   );
 }
+

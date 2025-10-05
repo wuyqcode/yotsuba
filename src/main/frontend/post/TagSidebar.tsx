@@ -1,58 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { Stack, Typography } from '@mui/material';
+import React from 'react';
+import { Box, Stack, Typography } from '@mui/material';
 import TagChip from './TagChip';
-import { GlassBox } from 'Frontend/components/GlassBox';
-import { Tag, useSelectedTagsStore } from './hook/useSelectedTagsStore';
+import { useSelectedTagsStore } from './hook/useSelectedTagsStore';
+import { Tag, useTagStore } from './hook/useTagStore';
 
 const TagSidebar = () => {
-  const [tags, setTags] = useState<Tag[]>([]);
-  const addTag = useSelectedTagsStore((s) => s.addTag);
+  const { tags } = useTagStore();
+  const { selectedTags, addTag, removeTag } = useSelectedTagsStore();
 
-  useEffect(() => {
-    const fetchTags = async () => {
-      const mockTags: Tag[] = [
-        {
-          id: 1,
-          title: 'Tag1 语言',
-          image: 'https://picsum.photos/seed/tag1/100/100',
-          content: 'Tag1 是一种流行的开发工具。',
-        },
-        {
-          id: 2,
-          title: 'Tag2 设计',
-          image: 'https://picsum.photos/seed/tag2/100/100',
-          content: 'Tag2 用于 UI 设计流程。',
-        },
-        {
-          id: 3,
-          title: 'Tag3 AI',
-          image: 'https://picsum.photos/seed/tag3/100/100',
-          content: 'Tag3 是 AI 热门标签。',
-        },
-      ];
-      setTags(mockTags);
-    };
-
-    fetchTags();
-  }, []);
+  const handleToggle = (tag: Tag) => {
+    const exists = selectedTags.some((t) => t.id === tag.id);
+    exists ? removeTag(tag.id) : addTag(tag);
+  };
 
   return (
-    <GlassBox
-      sx={{
-        position: 'sticky',
-        top: '50px',
-        height: 'calc(100dvh - 50px)',
-        overflow: 'auto',
-      }}>
-      <Typography variant="subtitle1" gutterBottom>
-        タグ一覧
+    <Box p={2}>
+      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+        Tags
       </Typography>
-      <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-        {tags.map((tag) => (
-          <TagChip key={tag.id} tag={tag} onClick={() => addTag(tag)} />
-        ))}
+      <Stack direction="row" spacing={1} flexWrap="wrap">
+        {tags.map((tag) => {
+          const selected = selectedTags.some((t) => t.id === tag.id);
+          return <TagChip key={tag.id} tag={tag} selected={selected} onClick={() => handleToggle(tag)} />;
+        })}
       </Stack>
-    </GlassBox>
+    </Box>
   );
 };
 

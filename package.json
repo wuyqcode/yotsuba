@@ -7,7 +7,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^7.0.2",
-    "@mui/material": "^7.0.2",
+    "@mui/material": "^7.3.4",
     "@mui/x-tree-view": "8.0.0-beta.3",
     "@polymer/polymer": "3.5.2",
     "@vaadin/bundles": "24.8.3",
@@ -125,7 +125,7 @@
       "workbox-core": "7.3.0",
       "workbox-precaching": "7.3.0"
     },
-    "hash": "b7bca3aaecb7210d92327f036fd35b02417a27c5fea9e11d74cd632bc9c51eaf"
+    "hash": "0348b5ec9315773c2242799fb1f31c50870fe9dff1f64dd6cc1f80cff4dc8c1e"
   },
   "pnpm": {
     "overrides": {
@@ -221,7 +221,10 @@
       "@vaadin/vaadin-material-styles": "24.8.3",
       "@vaadin/router": "2.0.0",
       "@vaadin/vertical-layout": "24.8.3",
-      "@vaadin/virtual-list": "24.8.3"
+      "@vaadin/virtual-list": "24.8.3",
+      "react-is": "18.3.1",
+      "prop-types": "15.8.1",
+      "hoist-non-react-statics": "3.3.2"
     }
   }
 }

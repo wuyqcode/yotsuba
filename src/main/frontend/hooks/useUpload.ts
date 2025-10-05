@@ -9,7 +9,7 @@ export const useUpload = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8080/api/file-resource', {
+      const response = await fetch('/api/file-resource', {
         method: 'POST',
         body: formData,
       });
