@@ -18,7 +18,7 @@
 
 	<properties>
 		<java.version>21</java.version>
-		<vaadin.version>24.8.3</vaadin.version>
+		<vaadin.version>24.9.2</vaadin.version>
 		<spring-modulith.version>1.4.1</spring-modulith.version>
 		<org.hibernate.search.version>7.2.3.Final</org.hibernate.search.version>
 		<lucene.version>9.11.1</lucene.version>
@@ -206,6 +206,11 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.coobird</groupId>
+			<artifactId>thumbnailator</artifactId>
+			<version>0.4.20</version>
 		</dependency>
 	</dependencies>
 

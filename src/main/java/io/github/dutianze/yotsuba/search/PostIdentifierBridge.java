@@ -1,9 +1,10 @@
 package io.github.dutianze.yotsuba.search;
 
-import io.github.dutianze.yotsuba.cms.domain.PostId;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
+
+import io.github.dutianze.yotsuba.note.domain.PostId;
 
 /**
  * @author dutianze

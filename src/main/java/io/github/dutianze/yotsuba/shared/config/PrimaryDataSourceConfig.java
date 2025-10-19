@@ -40,7 +40,7 @@ import static io.github.dutianze.yotsuba.shared.config.PrimaryDataSourceConfig.P
         entityManagerFactoryRef = ENTITY_MANAGER_FACTORY,
         transactionManagerRef = PLATFORM_TX_MANAGER,
         basePackages = {
-                "io.github.dutianze.yotsuba.cms",
+                "io.github.dutianze.yotsuba.note",
                 "io.github.dutianze.yotsuba.shared",
                 "io.github.dutianze.yotsuba.search",
                 "org.springframework"
@@ -51,7 +51,7 @@ public class PrimaryDataSourceConfig {
     public static final String JPA_PROPS = "modules.primary.jpa";
     public static final String DATASOURCE = "modules.primary.datasource";
     public static final String[] BASE_PACKAGES = {
-            "io.github.dutianze.yotsuba.cms",
+            "io.github.dutianze.yotsuba.note",
             "io.github.dutianze.yotsuba.shared",
             "io.github.dutianze.yotsuba.search",
             "org.springframework"

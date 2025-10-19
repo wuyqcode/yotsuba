@@ -1,8 +1,9 @@
 package io.github.dutianze.yotsuba.search;
 
-import io.github.dutianze.yotsuba.cms.domain.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import io.github.dutianze.yotsuba.note.domain.Post;
 
 import java.util.List;
 import java.util.Map;

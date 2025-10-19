@@ -1,0 +1,159 @@
+import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
+import { Box, Fab, SwipeableDrawer, Typography, Grid, Divider, CircularProgress } from '@mui/material';
+import { useState, useEffect } from 'react';
+import MenuIcon from '@mui/icons-material/Menu';
+import Sidebar from 'Frontend/features/note/components/Sidebar';
+import { useNavigate } from 'react-router';
+import FilterPanel from 'Frontend/features/note/components/FilterPanel';
+import NoteCard from 'Frontend/features/note/components/NoteCard';
+import { useNotes } from 'Frontend/features/note/hooks/useNotes';
+import PaginationBar from 'Frontend/features/note/components/PaginationBar';
+
+export const config: ViewConfig = {
+  menu: {
+    order: 2,
+    icon: 'DescriptionIcon',
+  },
+  title: '笔记',
+};
+
+export default function NoteListView() {
+  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+  const {
+    notes: posts,
+    page,
+    totalPages,
+    totalElements,
+    pageSize,
+    searchText,
+    fetchNotes: fetchPosts,
+    setPage,
+    setPageSize,
+    setSearchText,
+    createNote: createPost,
+    isEmpty,
+    isLoading,
+    isError,
+  } = useNotes();
+
+  useEffect(() => {
+    fetchPosts();
+  }, [page, searchText, pageSize, fetchPosts]);
+
+  const onPageChange = (_: unknown, newPage: number) => {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const onPageSizeChange = (pageSize: number) => {
+    setPageSize(pageSize);
+    setPage(1);
+  };
+
+  const onCreatePost = async () => {
+    const newPostId = await createPost();
+    if (newPostId) {
+      navigate(`/note/${newPostId}`);
+    }
+  };
+
+  return (
+    <Box sx={{ display: { xs: 'block', lg: 'flex' } }}>
+      {/* 大屏 Sidebar */}
+      <Box
+        sx={{
+          position: 'fixed',
+          top: '50px',
+          left: 0,
+          bottom: 0,
+          display: { xs: 'none', lg: 'flex' },
+          flexDirection: 'column',
+          width: '260px',
+          height: 'calc(100vh - 50px)',
+          overflow: 'auto',
+          borderRight: '1px solid #eee',
+          bgcolor: '#fff',
+        }}>
+        <Sidebar />
+      </Box>
+
+      {/* 主内容区 */}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '80vh',
+          px: 1,
+          width: { lg: 'calc(100% - 260px)' },
+          ml: { lg: '260px' },
+        }}>
+        <Box>
+          <FilterPanel
+            searchText={searchText}
+            handleInputChange={(e) => setSearchText(e.target.value)}
+            handleSearch={() => setSearchText(searchText)}
+            handleCreatePost={onCreatePost}
+          />
+
+          <Divider sx={{ my: 2 }} />
+
+          {isLoading && (
+            <Box textAlign="center" mt={4}>
+              <CircularProgress />
+            </Box>
+          )}
+          {isError && (
+            <Typography color="error" textAlign="center" mt={4}>
+              Failed to load notes
+            </Typography>
+          )}
+          {isEmpty && (
+            <Typography textAlign="center" mt={4}>
+              No notes found
+            </Typography>
+          )}
+
+          <Grid container spacing={2}>
+            {posts?.map((post) => (
+              <Grid key={post.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+                <NoteCard note={post} />
+              </Grid>
+            ))}
+          </Grid>
+
+          <PaginationBar
+            page={page}
+            totalPages={totalPages}
+            totalItems={totalElements}
+            pageSize={pageSize}
+            onPageChange={onPageChange}
+            onPageSizeChange={onPageSizeChange}
+          />
+        </Box>
+      </Box>
+
+      {/* 小屏悬浮按钮 */}
+      <Fab
+        color="primary"
+        aria-label="open sidebar"
+        onClick={() => setOpen(!open)}
+        sx={{
+          display: { xs: 'flex', lg: 'none' },
+          position: 'fixed',
+          bottom: 16,
+          right: 16,
+          zIndex: 1300,
+        }}>
+        <MenuIcon />
+      </Fab>
+
+      {/* 小屏 Drawer */}
+      <SwipeableDrawer anchor="bottom" open={open} onOpen={() => setOpen(true)} onClose={() => setOpen(false)}>
+        <Box sx={{ height: '100%', overflow: 'auto', p: 2 }}>
+          <Sidebar />
+        </Box>
+      </SwipeableDrawer>
+    </Box>
+  );
+}

@@ -9,7 +9,7 @@ export const config: ViewConfig = {
 const Home = () => {
   const navigate = useNavigate();
   useEffect(() => {
-    navigate('/post');
+    navigate('/note');
   }, [navigate]);
   return <div>Redirecting...</div>;
 };

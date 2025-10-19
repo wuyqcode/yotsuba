@@ -1,6 +1,5 @@
 package io.github.dutianze.yotsuba.search;
 
-import io.github.dutianze.yotsuba.cms.domain.Post;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchResult;
@@ -11,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+
+import io.github.dutianze.yotsuba.note.domain.Post;
 
 import java.util.List;
 import java.util.Map;

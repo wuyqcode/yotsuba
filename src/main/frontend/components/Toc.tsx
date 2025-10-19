@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Editor } from '@tiptap/react';
 import { Bookmarks } from '@mui/icons-material';
 import { Box, Paper, Typography, Divider, List, ListItemButton, ListItemText } from '@mui/material';
-import { HeadingItem, useTableOfContents } from 'Frontend/features/post/hooks/useToc';
+import { HeadingItem, useTableOfContents } from 'Frontend/features/note/hooks/useToc';
 
 interface TableOfContentsProps {
   className?: string;

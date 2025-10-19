@@ -79,6 +79,8 @@ export default function HeaderNavBar() {
   };
   const handleClose = () => setOpen(false);
 
+  console.log(createMenuItems());
+
   return (
     <Navigation>
       <ul>

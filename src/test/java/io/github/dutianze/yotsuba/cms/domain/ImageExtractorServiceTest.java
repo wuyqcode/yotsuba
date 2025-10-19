@@ -1,7 +1,9 @@
 package io.github.dutianze.yotsuba.cms.domain;
 
-import io.github.dutianze.yotsuba.cms.infrastructure.MarkdownExtractServiceImpl;
 import io.github.dutianze.yotsuba.file.FileResourceId;
+import io.github.dutianze.yotsuba.note.domain.MarkdownExtractService;
+import io.github.dutianze.yotsuba.note.infrastructure.MarkdownExtractServiceImpl;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

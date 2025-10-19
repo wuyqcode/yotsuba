@@ -46,7 +46,7 @@ import 'prism-code-editor-lightweight/themes/github-dark.css';
 
 import 'katex/dist/katex.min.css';
 import 'easydrawer/styles.css';
-import { useUpload } from 'Frontend/features/post/hooks/useUpload';
+import { useUpload } from 'Frontend/features/note/hooks/useUpload';
 import { Box, Stack } from '@mui/material';
 import { Toc } from 'Frontend/components/Toc';
 

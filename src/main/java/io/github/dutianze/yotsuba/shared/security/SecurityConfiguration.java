@@ -1,42 +1,44 @@
 package io.github.dutianze.yotsuba.shared.security;
 
-import com.vaadin.flow.spring.security.VaadinWebSecurity;
+import static com.vaadin.flow.spring.security.VaadinSecurityConfigurer.vaadin;
+
+import com.vaadin.flow.spring.security.VaadinAwareSecurityContextHolderStrategyConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.SecurityFilterChain;
 
 @EnableWebSecurity
 @Configuration
-public class SecurityConfiguration extends VaadinWebSecurity {
+@Import(VaadinAwareSecurityContextHolderStrategyConfiguration.class)
+public class SecurityConfiguration {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf
-                .ignoringRequestMatchers(new AntPathRequestMatcher("/api/**"))
-        );
-        http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(new AntPathRequestMatcher("/")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/**")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/api/**")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/public")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/images/*.png")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/line-awesome/**/*.svg")).permitAll()
-        );
-        http.cors(AbstractHttpConfigurer::disable);
-        http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
-        super.configure(http);
-        setLoginView(http, "/login");
+    @Bean
+    public SecurityFilterChain vaadinSecurityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"));
+
+        // Public access
+        http.authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll());
+
+        http.authorizeHttpRequests(authorize -> authorize.requestMatchers("/images/*.png").permitAll());
+
+        // Icons from the line-awesome addon
+        http.authorizeHttpRequests(authorize -> authorize.requestMatchers("/line-awesome/**").permitAll());
+
+        http.with(vaadin(), vaadin -> {
+            vaadin.loginView("/login");
+        });
+
+        return http.build();
     }
 
 }
