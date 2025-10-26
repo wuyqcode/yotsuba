@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import MenuIcon from '@mui/icons-material/Menu';
 import Sidebar from 'Frontend/features/note/components/Sidebar';
 import { useNavigate } from 'react-router';
-import FilterPanel from 'Frontend/features/note/components/FilterPanel';
+import ContextHeader from 'Frontend/features/note/components/ContextHeader';
 import NoteCard from 'Frontend/features/note/components/NoteCard';
 import { useNotes } from 'Frontend/features/note/hooks/useNotes';
 import PaginationBar from 'Frontend/features/note/components/PaginationBar';
@@ -20,42 +20,41 @@ export const config: ViewConfig = {
 export default function NoteListView() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+
   const {
-    notes: posts,
+    notes,
     page,
     totalPages,
     totalElements,
     pageSize,
     searchText,
-    fetchNotes: fetchPosts,
+    fetchNotes,
     setPage,
     setPageSize,
     setSearchText,
-    createNote: createPost,
+    createNote,
     isEmpty,
     isLoading,
     isError,
   } = useNotes();
 
   useEffect(() => {
-    fetchPosts();
-  }, [page, searchText, pageSize, fetchPosts]);
+    fetchNotes();
+  }, [page, searchText, pageSize, fetchNotes]);
 
   const onPageChange = (_: unknown, newPage: number) => {
     setPage(newPage);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const onPageSizeChange = (pageSize: number) => {
-    setPageSize(pageSize);
+  const onPageSizeChange = (newSize: number) => {
     setPage(1);
+    setPageSize(newSize);
   };
 
-  const onCreatePost = async () => {
-    const newPostId = await createPost();
-    if (newPostId) {
-      navigate(`/note/${newPostId}`);
-    }
+  const onCreateNote = async () => {
+    const newNoteId = await createNote();
+    if (newNoteId) navigate(`/note/${newNoteId}`);
   };
 
   return (
@@ -74,7 +73,8 @@ export default function NoteListView() {
           overflow: 'auto',
           borderRight: '1px solid #eee',
           bgcolor: '#fff',
-        }}>
+        }}
+      >
         <Sidebar />
       </Box>
 
@@ -83,45 +83,52 @@ export default function NoteListView() {
         sx={{
           display: 'flex',
           flexDirection: 'column',
-          minHeight: '80vh',
+          minHeight: 'calc(100vh - 50px)',
           px: 1,
           width: { lg: 'calc(100% - 260px)' },
           ml: { lg: '260px' },
-        }}>
-        <Box>
-          <FilterPanel
-            searchText={searchText}
-            handleInputChange={(e) => setSearchText(e.target.value)}
-            handleSearch={() => setSearchText(searchText)}
-            handleCreatePost={onCreatePost}
-          />
+        }}
+      >
+        <ContextHeader
+          searchText={searchText}
+          handleInputChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value)}
+          handleSearch={() => setSearchText(searchText)}
+          handleCreatePost={onCreateNote}
+        />
 
-          <Divider sx={{ my: 2 }} />
+        <Divider sx={{ my: 2 }} />
 
+        {/* 主体内容区 */}
+        <Box sx={{ flexGrow: 1 }}>
           {isLoading && (
             <Box textAlign="center" mt={4}>
               <CircularProgress />
             </Box>
           )}
+
           {isError && (
             <Typography color="error" textAlign="center" mt={4}>
               Failed to load notes
             </Typography>
           )}
-          {isEmpty && (
+
+          {isEmpty && !isLoading && (
             <Typography textAlign="center" mt={4}>
               No notes found
             </Typography>
           )}
 
-          <Grid container spacing={2}>
-            {posts?.map((post) => (
-              <Grid key={post.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-                <NoteCard note={post} />
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            {notes?.map((note) => (
+              <Grid key={note.id} size={{ xs: 6, sm: 3, md: 2.4, lg: 2 }}>
+                <NoteCard note={note} />
               </Grid>
             ))}
           </Grid>
+        </Box>
 
+        {/* 底部的分页条 */}
+        <Box sx={{ mt: 'auto', pb: 2 }}>
           <PaginationBar
             page={page}
             totalPages={totalPages}
@@ -144,13 +151,14 @@ export default function NoteListView() {
           bottom: 16,
           right: 16,
           zIndex: 1300,
-        }}>
+        }}
+      >
         <MenuIcon />
       </Fab>
 
       {/* 小屏 Drawer */}
-      <SwipeableDrawer anchor="bottom" open={open} onOpen={() => setOpen(true)} onClose={() => setOpen(false)}>
-        <Box sx={{ height: '100%', overflow: 'auto', p: 2 }}>
+      <SwipeableDrawer anchor="left" open={open} onOpen={() => setOpen(true)} onClose={() => setOpen(false)}>
+        <Box sx={{ width: 260, height: '100%', overflow: 'auto', p: 2 }}>
           <Sidebar />
         </Box>
       </SwipeableDrawer>

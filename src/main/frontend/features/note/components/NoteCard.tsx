@@ -1,9 +1,7 @@
-import { Box, Card, CardMedia, Typography, Stack, IconButton } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import ThumbUpAltOutlinedIcon from '@mui/icons-material/ThumbUpAltOutlined';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import NoteDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/NoteDto';
+import { Box, Typography, IconButton } from '@mui/material';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useNavigate } from 'react-router';
+import NoteDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/NoteDto';
 
 interface NoteCardProps {
   note: NoteDto;
@@ -12,101 +10,100 @@ interface NoteCardProps {
 export default function NoteCard({ note }: NoteCardProps) {
   const navigate = useNavigate();
 
-  const handleCardClick = (event: React.MouseEvent, note: NoteDto) => {
-    event.preventDefault();
-    event.stopPropagation();
-    navigate(`/note/${note.id}`, { replace: false });
-  };
+  const handleNavigate = () => navigate(`/note/${note.id}/detail`);
+
   return (
-    <Card
-      onClick={(e) => handleCardClick(e, note)}
+    <Box
+      onClick={handleNavigate}
       sx={{
         position: 'relative',
         borderRadius: 2,
         overflow: 'hidden',
         cursor: 'pointer',
-        transition: 'transform 0.2s ease',
+        aspectRatio: '2 / 3',
+        boxShadow: '0 3px 10px rgba(0,0,0,0.2)',
+        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
         '&:hover': {
-          transform: 'scale(1.02)',
+          transform: 'translateY(-4px)',
+          boxShadow: '0 8px 18px rgba(0,0,0,0.35)',
+        },
+        '&:hover .overlay': { opacity: 1 },
+        '&:hover img': {
+          transform: 'scale(1.05)',
+          filter: 'brightness(60%)',
         },
       }}>
-      {/* 封面图 */}
-      <Box sx={{ position: 'relative' }}>
-        <CardMedia
-          component="img"
-          image={note.cover}
-          alt={note.title}
-          height="200"
-          sx={{ objectFit: 'cover', width: '100%' }}
-        />
-        {/* 时长角标 */}
-        <Typography
-          variant="caption"
-          sx={{
-            position: 'absolute',
-            bottom: 8,
-            right: 8,
-            bgcolor: 'rgba(0,0,0,0.6)',
-            color: 'white',
-            px: 0.6,
-            borderRadius: 1,
-            fontSize: '0.75rem',
-          }}>
-          {'duration'}
-        </Typography>
+      {/* 封面 */}
+      <Box
+        component="img"
+        src={'https://image.tmdb.org/t/p/w500/vDkct38sSFSWJIATlfJw0l3QOIR.jpg'}
+        alt={note.title}
+        sx={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          transition: 'all 0.4s ease',
+        }}
+      />
 
-        {/* 收藏按钮 */}
-        <IconButton
-          size="small"
-          sx={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            color: 'white',
-            bgcolor: 'rgba(0,0,0,0.5)',
-            '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' },
-          }}>
-          <AddIcon fontSize="small" />
-        </IconButton>
+      {/* 标题 */}
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          width: '100%',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)',
+          color: 'white',
+          p: 1.2,
+        }}>
+        <Typography variant="subtitle1" fontWeight="bold" noWrap sx={{ lineHeight: 1.2 }}>
+          {note.title || '未命名笔记'}
+        </Typography>
+        <Typography variant="caption" sx={{ opacity: 0.8 }}>
+          {note?.author || '未知作者'}
+        </Typography>
       </Box>
 
-      {/* 内容部分 */}
-      <Box sx={{ p: 1.5 }}>
-        {/* 视频标题 */}
+      {/* 悬浮层 */}
+      <Box
+        className="overlay"
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          background: 'rgba(0,0,0,0.65)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+          opacity: 0,
+          transition: 'opacity 0.4s ease',
+          p: 2,
+        }}>
         <Typography
-          variant="body1"
+          variant="body2"
+          color="white"
           sx={{
-            fontWeight: 600,
-            fontSize: '0.95rem',
+            mb: 2,
+            lineHeight: 1.4,
             display: '-webkit-box',
+            WebkitLineClamp: 4,
             WebkitBoxOrient: 'vertical',
-            WebkitLineClamp: 2,
             overflow: 'hidden',
           }}>
-          {note.title}
+          {note.summary || '暂无简介'}
         </Typography>
 
-        {/* 作者行 */}
-        <Stack direction="row" alignItems="center" spacing={0.5} mt={0.5}>
-          <Typography variant="body2" fontSize="0.8rem">
-            {'author'}
-          </Typography>
-          <CheckCircleIcon sx={{ fontSize: 14, color: '#4ea1ff' }} />
-        </Stack>
-
-        {/* 播放量 + 点赞 */}
-        <Stack direction="row" spacing={2} mt={0.5}>
-          <Typography variant="caption" color="gray">
-            {'views'} 次观看
-          </Typography>
-          <Stack direction="row" spacing={0.5} alignItems="center">
-            <ThumbUpAltOutlinedIcon sx={{ fontSize: 14, color: 'gray' }} />
-            <Typography variant="caption" color="gray">
-              {'likes'}%
-            </Typography>
-          </Stack>
-        </Stack>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <IconButton
+            sx={{
+              color: 'white',
+              backgroundColor: 'rgba(255,255,255,0.2)',
+              '&:hover': { backgroundColor: 'rgba(255,255,255,0.4)' },
+            }}>
+            <FavoriteBorderIcon />
+          </IconButton>
+        </Box>
       </Box>
-    </Card>
+    </Box>
   );
 }

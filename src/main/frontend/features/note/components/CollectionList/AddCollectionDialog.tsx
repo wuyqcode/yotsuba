@@ -1,4 +1,3 @@
-// dialogs/AddCollectionDialog.tsx
 import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from '@mui/material';
 import React, { useState } from 'react';
 

@@ -212,6 +212,11 @@
 			<artifactId>thumbnailator</artifactId>
 			<version>0.4.20</version>
 		</dependency>
+		<dependency>
+			<groupId>net.arnx</groupId>
+			<artifactId>jef4j</artifactId>
+			<version>0.11.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

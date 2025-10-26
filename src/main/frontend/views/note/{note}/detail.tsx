@@ -21,6 +21,7 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import WatchLaterIcon from "@mui/icons-material/WatchLater";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
+import EditIcon from "@mui/icons-material/Edit";
 
 export default function TvShowPage() {
   const [season, setSeason] = useState(1);
@@ -253,6 +254,27 @@ export default function TvShowPage() {
           ))}
         </Box>
       </Box>
+      {/* === Floating Edit Button === */}
+      <IconButton
+        color="primary"
+        onClick={() => alert("进入编辑模式")}
+        sx={{
+          position: "fixed",
+          bottom: 32,
+          right: 32,
+          bgcolor: "#1976d2",
+          color: "#fff",
+          width: 60,
+          height: 60,
+          boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+          "&:hover": {
+            bgcolor: "#1565c0",
+            transform: "translateY(-2px)",
+          },
+        }}
+      >
+        <EditIcon fontSize="large" />
+      </IconButton>
     </Container>
   );
 }
