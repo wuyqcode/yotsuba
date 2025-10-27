@@ -3,6 +3,7 @@ package io.github.dutianze.yotsuba.note.domain;
 import io.github.dutianze.yotsuba.file.FileResourceId;
 import io.github.dutianze.yotsuba.file.FileResourceReferenceAddedEvent;
 import io.github.dutianze.yotsuba.file.FileResourceReferenceRemovedEvent;
+import io.github.dutianze.yotsuba.note.domain.valueobject.NoteType;
 import io.github.dutianze.yotsuba.note.domain.valueobject.PostContent;
 import io.github.dutianze.yotsuba.note.domain.valueobject.PostStatus;
 import io.github.dutianze.yotsuba.note.domain.valueobject.PostTitle;
@@ -61,8 +62,12 @@ public class Post extends AbstractAggregateRoot<Post> implements Comparable<Post
     private PostContent content;
 
     @Column(name = "post_status")
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private PostStatus postStatus = PostStatus.DRAFT;
+
+    @Column(name = "note_type")
+    @Enumerated(EnumType.STRING)
+    private NoteType noteType = NoteType.MEDIA;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();

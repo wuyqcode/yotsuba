@@ -30,13 +30,14 @@ create table event_publication (
 
 
 create table post (
-    post_status tinyint check (post_status between 0 and 3),
     created_at timestamp,
     updated_at timestamp,
     content varchar(255),
     cover_resource_id varchar(255),
     id varchar(255) not null,
     title varchar(255),
+    post_status VARCHAR(20) NOT NULL DEFAULT 'DRAFT',
+    note_type VARCHAR(50) NOT NULL DEFAULT 'MEDIA',
     primary key (id)
 );
 

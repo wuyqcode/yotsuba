@@ -18,7 +18,7 @@
 }
 
 body {
-  /* 4. Add accessible line-height */
+/* 4. Add accessible line-height */
   line-height: 1.5;
   /* 5. Improve text rendering */
   -webkit-font-smoothing: antialiased;
@@ -76,4 +76,11 @@ h6 {
 
 #outlet {
   display: contents !important;
+}
+
+.richtext-outline,
+.richtext-outline-1 {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
 }

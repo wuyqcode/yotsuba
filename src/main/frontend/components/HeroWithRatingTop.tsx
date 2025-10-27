@@ -8,36 +8,53 @@ import {
   IconButton,
   CardMedia,
 } from "@mui/material";
+import EditIcon from '@mui/icons-material/Edit';
+import { useNavigate } from "react-router";
 
-/**
- * 只包含“上半部分”的布局与背景效果：
- * - 背景图：绝对定位、混合模式、滤镜、mask 渐隐（与你给的 CSS 一致）
- * - Vignette 遮罩：四周压暗，强化可读性
- * - 主体内容：左侧海报 + 右侧标题/简介/按钮
- * - 评分区：位于上半部分底部，居中
- */
-export default function HeroWithRatingTop() {
+interface HeroWithRatingTopProps {
+  id?: string;
+}
+
+export default function HeroWithRatingTop({ id }: HeroWithRatingTopProps) {
+  const navigate = useNavigate();
+
   return (
     <Box
       sx={{
         position: "relative",
         borderRadius: 3,
-        width: "100vw", // ✅ 全宽
-        marginLeft: "calc(50% - 50vw)", // ✅ 防止被 Container 限制
+        width: "100vw",
+        marginLeft: "calc(50% - 50vw)",
         overflow: "hidden",
-        // 提供可调的 CSS 变量（与原 CSS 对齐）
         "--backdrop-filter": "blur(4px) grayscale(80%)",
         "--backdrop-mix-blend-mode": "multiply",
-        px: { xs: 2, md: 6 },                    // ✅ 左右稍宽
-        pt: { xs: 3, md: 3 },                   // ✅ 顶部内边距更大
-        pb: { xs: 4, md: 6 },                   // ✅ 底部平衡视觉
+        px: { xs: 2, md: 6 },
+        pt: { xs: 3, md: 3 },
+        pb: { xs: 4, md: 6 },
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",                // ✅ 垂直居中内容
+        justifyContent: "center",
       } as React.CSSProperties}
     >
+      <IconButton
+        onClick={() => navigate(`/note/media/${id}/edit`)}
+        sx={{
+          position: "absolute",
+          top: 16,
+          right: 24,
+          zIndex: 2,
+          bgcolor: "rgba(255,255,255,0.15)",
+          color: "#fff",
+          backdropFilter: "blur(4px)",
+          "&:hover": {
+            bgcolor: "rgba(255,255,255,0.3)",
+            transform: "translateY(-2px)",
+          },
+        }}
+      >
+        <EditIcon />
+      </IconButton>
 
-      {/* 背景图层（完全按照你给的写法） */}
       <Box
         component="img"
         alt="backdrop"
@@ -57,7 +74,6 @@ export default function HeroWithRatingTop() {
         }}
       />
 
-       {/* 文字区暗幕层（增强对比） */}
        <Box
          sx={{
            position: "absolute",
@@ -70,7 +86,6 @@ export default function HeroWithRatingTop() {
          }}
        />
 
-      {/* 主体内容（左海报 + 右信息），仅用 flex 实现 */}
       <Box
         sx={{
           position: "relative",
@@ -78,17 +93,16 @@ export default function HeroWithRatingTop() {
             display: "flex",
             flexWrap: "wrap",
             alignItems: "center",
-            justifyContent: { xs: "center", sm: "flex-start" }, // ✅ 小屏居中
-            flexDirection: { xs: "column", sm: "row" },          // ✅ 小屏上下排列
-            textAlign: { xs: "center", sm: "left" },             // ✅ 文字也居中
+            justifyContent: { xs: "center", sm: "flex-start" },
+            flexDirection: { xs: "column", sm: "row" },
+            textAlign: { xs: "center", sm: "left" },
             gap: { xs: 3, md: 4 },
             color: "white",
              maxWidth: "1100px",
-             padding: { xs: "0 40px", md: "0 80px" },   // ✅ 小屏40，大屏80
+             padding: { xs: "0 40px", md: "0 80px" },
         }}
       >
 
-        {/* 海报 */}
         <Box sx={{ flex: "0 0 260px" }}>
           <CardMedia
             component="img"
@@ -98,33 +112,28 @@ export default function HeroWithRatingTop() {
           />
         </Box>
 
-        {/* 右侧信息 */}
         <Box sx={{ flex: "1 1 420px", minWidth: 280 }}>
-
           <Typography variant="h3" fontWeight="bold" sx={{ lineHeight: 1.1 }}>
             Naruto <Typography component="span">2002</Typography>
           </Typography>
-
           <Typography variant="body1" sx={{ mt: 1, opacity: 0.9 }}>
             24 min ・ Animation, Action & Adventure, Sci-Fi & Fantasy
           </Typography>
-
           <Typography sx={{ mt: 2, maxWidth: 680, opacity: 0.95 }}>
             Naruto Uzumaki, a mischievous adolescent ninja, struggles as he
             searches for recognition and dreams of becoming the Hokage, the
             village’s leader and strongest ninja.
           </Typography>
-
           <Stack direction="row" spacing={2} sx={{ mt: 3, flexWrap: "wrap" }}>
             <Button
               variant="contained"
               sx={{
                   backgroundColor: "#fff",
                   color: "#000",
-                  border: "1px solid #000",  // 黑色边框
+                  border: "1px solid #000",
                   "&:hover": {
                     backgroundColor: "#f5f5f5",
-                    border: "1px solid #000", // hover 时保持黑框
+                    border: "1px solid #000",
                   },
               }}
             >

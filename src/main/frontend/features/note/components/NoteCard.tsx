@@ -10,7 +10,9 @@ interface NoteCardProps {
 export default function NoteCard({ note }: NoteCardProps) {
   const navigate = useNavigate();
 
-  const handleNavigate = () => navigate(`/note/${note.id}/detail`);
+  const handleNavigate = () => {
+    navigate(`/note/${note.noteType}/${note.id}`);
+  }
 
   return (
     <Box

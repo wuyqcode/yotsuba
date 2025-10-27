@@ -54,7 +54,7 @@ export default function NoteListView() {
 
   const onCreateNote = async () => {
     const newNoteId = await createNote();
-    if (newNoteId) navigate(`/note/${newNoteId}`);
+    if (newNoteId) navigate(`/note/media/${newNoteId}/edit`);
   };
 
   return (
@@ -73,8 +73,7 @@ export default function NoteListView() {
           overflow: 'auto',
           borderRight: '1px solid #eee',
           bgcolor: '#fff',
-        }}
-      >
+        }}>
         <Sidebar />
       </Box>
 
@@ -87,8 +86,7 @@ export default function NoteListView() {
           px: 1,
           width: { lg: 'calc(100% - 260px)' },
           ml: { lg: '260px' },
-        }}
-      >
+        }}>
         <ContextHeader
           searchText={searchText}
           handleInputChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value)}
@@ -151,8 +149,7 @@ export default function NoteListView() {
           bottom: 16,
           right: 16,
           zIndex: 1300,
-        }}
-      >
+        }}>
         <MenuIcon />
       </Fab>
 
