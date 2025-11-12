@@ -1,33 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from '@mui/material';
-import { Collection, useCollectionStore } from 'Frontend/features/note/hooks/useCollectionStore';
+import type CollectionDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/CollectionDto';
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  collection: Collection | null;
+  collection: CollectionDto | null;
+  onSave: (id: string, name: string) => Promise<void> | void;
 }
 
-const EditCollectionDialog: React.FC<Props> = ({ open, onClose, collection }) => {
+const EditCollectionDialog: React.FC<Props> = ({ open, onClose, collection, onSave }) => {
   const [name, setName] = useState('');
-  const updateCollection = useCollectionStore((state) => state.updateCollection);
 
   useEffect(() => {
-    if (collection) {
-      setName(collection.name);
-    }
-  }, [collection]);
+    setName(collection?.name ?? '');
+  }, [collection, open]);
+
+  const handleClose = () => {
+    onClose();
+  };
 
   const handleSave = () => {
-    if (collection && name.trim()) {
-      updateCollection(collection.id, name.trim()); // ✅ 更新 Zustand store
-      setName('');
-      onClose();
-    }
+    if (!collection || !collection.id || !name.trim()) return;
+    Promise.resolve(onSave(collection.id, name.trim()))
+      .then(() => {
+        onClose();
+      })
+      .catch((err) => {
+        console.error('[EditCollectionDialog] 更新集合失败:', err);
+      });
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
       <DialogTitle>コレクションを編集</DialogTitle>
       <DialogContent>
         <TextField
@@ -40,7 +45,7 @@ const EditCollectionDialog: React.FC<Props> = ({ open, onClose, collection }) =>
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>キャンセル</Button>
+        <Button onClick={handleClose}>キャンセル</Button>
         <Button onClick={handleSave} disabled={!name.trim()} variant="contained">
           保存
         </Button>

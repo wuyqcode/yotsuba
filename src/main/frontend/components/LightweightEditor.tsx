@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import RichTextEditor, { BaseKit, type Editor } from 'reactjs-tiptap-editor';
 import { Bold } from 'reactjs-tiptap-editor/bold';
 import { SlashCommand } from 'reactjs-tiptap-editor/slashcommand';
@@ -85,7 +85,6 @@ const LightweightEditor: React.FC<EditorProps> = ({ content, onChange, dark = fa
         dark={dark}
         removeDefaultWrapper={true}
         contentClass="editor"
-        useEditorOptions={{ autofocus: true }}
       />
     </Box>
   );

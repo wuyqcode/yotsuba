@@ -73,13 +73,10 @@ export default function HeaderNavBar() {
   const handleToggle = () => {
     setOpen((prev) => {
       const next = !prev;
-      console.log('[MenuToggle] open ->', next);
       return next;
     });
   };
   const handleClose = () => setOpen(false);
-
-  console.log(createMenuItems());
 
   return (
     <Navigation>

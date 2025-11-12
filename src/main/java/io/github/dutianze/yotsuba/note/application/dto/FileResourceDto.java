@@ -14,6 +14,6 @@ public record FileResourceDto(
 
     public static FileResourceDto fromEntity(FileResource fileResource) {
         return new FileResourceDto(fileResource.getId().id(), fileResource.getFilename(),
-                                   fileResource.getId().getURL());
+                                   fileResource.getId().getUrl());
     }
 }

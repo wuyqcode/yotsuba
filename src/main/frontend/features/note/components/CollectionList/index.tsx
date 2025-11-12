@@ -1,15 +1,47 @@
 import { useState } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
-import { useCollectionStore, Collection } from 'Frontend/features/note/hooks/useCollectionStore';
 import CollectionItem from './CollectionItem';
 import EditCollectionDialog from './EditCollectionDialog';
 import AddCollectionDialog from './AddCollectionDialog';
+import CollectionDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/CollectionDto';
+import { useCollection } from '../../hooks/useCollection';
 
 const CollectionList = () => {
-  const { collections, deleteCollection } = useCollectionStore();
+  const {
+    collections,
+    selectedCollection,
+    setSelectedCollection,
+    clearSelectedCollection,
+    addCollection,
+    updateCollection,
+    deleteCollection,
+  } = useCollection();
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [editCollection, setEditCollection] = useState<Collection | null>(null);
+  const [editCollection, setEditCollection] = useState<CollectionDto | null>(null);
+
+  const handleAddCollection = async (name: string) => {
+    await addCollection(name);
+  };
+
+  const handleEditOpen = (collection: CollectionDto) => {
+    setEditCollection(collection);
+    setOpenEditDialog(true);
+  };
+
+  const handleEditSave = async (id: string, name: string) => {
+    await updateCollection(id, name);
+  };
+
+  const handleDeleteCollection = async (collection: CollectionDto) => {
+    const confirmDelete = window.confirm(`确认删除笔记本「${collection.name}」吗？`);
+    if (!confirmDelete) return;
+    if (!collection.id) return;
+    await deleteCollection(collection.id);
+    if (selectedCollection?.id === collection.id) {
+      clearSelectedCollection();
+    }
+  };
 
   return (
     <Box p={2}>
@@ -29,11 +61,10 @@ const CollectionList = () => {
           <CollectionItem
             key={col.id}
             col={col}
-            onEdit={() => {
-              setEditCollection(col);
-              setOpenEditDialog(true);
-            }}
-            onDelete={deleteCollection}
+            isSelected={selectedCollection?.id === col.id}
+            onSelect={setSelectedCollection}
+            onEdit={handleEditOpen}
+            onDelete={handleDeleteCollection}
           />
         ))}
       </Stack>
@@ -62,11 +93,19 @@ const CollectionList = () => {
         </Box>
       </Box>
       {/* Dialogs */}
-      <AddCollectionDialog open={openAddDialog} onClose={() => setOpenAddDialog(false)} />
+      <AddCollectionDialog
+        open={openAddDialog}
+        onClose={() => setOpenAddDialog(false)}
+        onAdd={handleAddCollection}
+      />
       <EditCollectionDialog
         open={openEditDialog}
-        onClose={() => setOpenEditDialog(false)}
+        onClose={() => {
+          setOpenEditDialog(false);
+          setEditCollection(null);
+        }}
         collection={editCollection}
+        onSave={handleEditSave}
       />
     </Box>
   );

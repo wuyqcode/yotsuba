@@ -43,12 +43,10 @@ import { Twitter } from 'reactjs-tiptap-editor/twitter';
 import 'reactjs-tiptap-editor/style.css';
 import 'prism-code-editor-lightweight/layout.css';
 import 'prism-code-editor-lightweight/themes/github-dark.css';
-
 import 'katex/dist/katex.min.css';
 import 'easydrawer/styles.css';
 import { useUpload } from 'Frontend/features/note/hooks/useUpload';
 import { Box, Stack } from '@mui/material';
-import { Toc } from 'Frontend/components/Toc';
 
 interface EditorProps {
   content: string;
@@ -154,7 +152,6 @@ const EditorWrapper: React.FC<EditorProps> = ({ content, onChange }) => {
   }, []);
   return (
     <Stack direction="row" spacing={1}>
-      <Toc editor={editorRef.current?.editor} />
       <Box
         ref={boxRef}
         sx={{

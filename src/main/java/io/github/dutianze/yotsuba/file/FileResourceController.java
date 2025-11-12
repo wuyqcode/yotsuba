@@ -37,7 +37,7 @@ public class FileResourceController {
         FileResource fileResource = new FileResource(null, filename, contentType, file.getBytes());
 
         fileResourceRepository.save(fileResource);
-        return ResponseEntity.ok().body(fileResource.getId().getURL());
+        return ResponseEntity.ok().body(fileResource.getId().getUrl());
     }
 
     @GetMapping("/{id}")

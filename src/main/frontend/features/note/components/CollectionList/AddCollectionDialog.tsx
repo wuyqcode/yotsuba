@@ -1,24 +1,41 @@
 import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface Props {
   open: boolean;
   onClose: () => void;
+  onAdd: (name: string) => Promise<void> | void;
 }
 
-const AddCollectionDialog: React.FC<Props> = ({ open, onClose }) => {
+const AddCollectionDialog: React.FC<Props> = ({ open, onClose, onAdd }) => {
   const [name, setName] = useState('');
+
+  useEffect(() => {
+    if (!open) {
+      setName('');
+    }
+  }, [open]);
+
+  const handleClose = () => {
+    setName('');
+    onClose();
+  };
 
   const handleAdd = () => {
     if (name.trim()) {
-      // TODO: API call
-      setName('');
-      onClose();
+      Promise.resolve(onAdd(name.trim()))
+        .then(() => {
+          setName('');
+          onClose();
+        })
+        .catch((err) => {
+          console.error('[AddCollectionDialog] 创建集合失败:', err);
+        });
     }
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
       <DialogTitle>新規コレクション</DialogTitle>
       <DialogContent>
         <TextField
@@ -31,7 +48,7 @@ const AddCollectionDialog: React.FC<Props> = ({ open, onClose }) => {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>キャンセル</Button>
+        <Button onClick={handleClose}>キャンセル</Button>
         <Button onClick={handleAdd} disabled={!name.trim()} variant="contained">
           追加
         </Button>

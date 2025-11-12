@@ -2,24 +2,23 @@ import React from 'react';
 import { Box, Card, CardContent, Typography, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useSelectedCollectionStore } from 'Frontend/features/note/hooks/useSelectedCollectionStore';
-import { Collection } from 'Frontend/features/note/hooks/useCollectionStore';
+import CollectionDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/CollectionDto';
 
 interface Props {
-  col: Collection;
-  onEdit?: (col: Collection) => void;
-  onDelete?: (id: number) => void;
+  col: CollectionDto;
+  isSelected: boolean;
+  onSelect: (collection: CollectionDto) => void;
+  onEdit: (collection: CollectionDto) => void;
+  onDelete: (collection: CollectionDto) => void;
 }
 
-const CollectionItem: React.FC<Props> = ({ col, onEdit, onDelete }) => {
-  const { selectedCollection, setCollection } = useSelectedCollectionStore();
-  const isSelected = selectedCollection?.id === col.id;
+const CollectionItem: React.FC<Props> = ({ col, isSelected, onSelect, onEdit, onDelete }) => {
 
   return (
     <Card
       component="div"
       variant="outlined"
-      onClick={() => setCollection(col)}
+      onClick={() => onSelect(col)}
       sx={{
         cursor: 'pointer',
         borderRadius: 1.5,
@@ -53,42 +52,36 @@ const CollectionItem: React.FC<Props> = ({ col, onEdit, onDelete }) => {
           {col.name}
         </Typography>
 
-        {(onEdit || onDelete) && (
-          <Box sx={{ display: 'flex', gap: 0.5 }}>
-            {onEdit && (
-              <IconButton
-                size="small"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit(col);
-                }}
-                sx={{
-                  color: isSelected ? '#ECEFF4' : '#4C566A',
-                  '&:hover': {
-                    color: '#81A1C1', // 编辑按钮 hover 蓝
-                  },
-                }}>
-                <EditIcon fontSize="small" />
-              </IconButton>
-            )}
-            {onDelete && (
-              <IconButton
-                size="small"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete(col.id);
-                }}
-                sx={{
-                  color: isSelected ? '#ECEFF4' : '#4C566A',
-                  '&:hover': {
-                    color: '#BF616A', // 删除按钮 hover 红
-                  },
-                }}>
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            )}
-          </Box>
-        )}
+        <Box sx={{ display: 'flex', gap: 0.5 }}>
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(col);
+            }}
+            sx={{
+              color: isSelected ? '#ECEFF4' : '#4C566A',
+              '&:hover': {
+                color: '#81A1C1', // 编辑按钮 hover 蓝
+              },
+            }}>
+            <EditIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(col);
+            }}
+            sx={{
+              color: isSelected ? '#ECEFF4' : '#4C566A',
+              '&:hover': {
+                color: '#BF616A', // 删除按钮 hover 红
+              },
+            }}>
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </Box>
       </CardContent>
     </Card>
   );

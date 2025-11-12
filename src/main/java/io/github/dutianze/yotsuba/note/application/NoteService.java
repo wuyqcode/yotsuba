@@ -2,78 +2,110 @@ package io.github.dutianze.yotsuba.note.application;
 
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.hilla.Endpoint;
-
 import io.github.dutianze.yotsuba.file.FileResourceId;
+import io.github.dutianze.yotsuba.note.application.dto.MediaNoteDto;
+import io.github.dutianze.yotsuba.note.application.dto.NoteCardDto;
 import io.github.dutianze.yotsuba.note.application.dto.PageDto;
-import io.github.dutianze.yotsuba.note.application.dto.NoteDto;
-import io.github.dutianze.yotsuba.note.domain.MarkdownExtractService;
-import io.github.dutianze.yotsuba.note.domain.Post;
-import io.github.dutianze.yotsuba.note.domain.PostId;
-import io.github.dutianze.yotsuba.note.domain.PostRepository;
-import io.github.dutianze.yotsuba.note.domain.valueobject.PostContent;
-import io.github.dutianze.yotsuba.note.domain.valueobject.PostTitle;
-import io.github.dutianze.yotsuba.search.PostSearch;
+import io.github.dutianze.yotsuba.note.application.dto.WikiNoteDto;
+import io.github.dutianze.yotsuba.note.domain.*;
+import io.github.dutianze.yotsuba.note.domain.valueobject.*;
+import io.github.dutianze.yotsuba.search.NoteSearch;
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.C;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * @author dutianze
- * @date 2024/8/4
- */
+import java.util.LinkedHashSet;
+
 @Endpoint
 @AnonymousAllowed
-@Transactional(readOnly = true)
 public class NoteService {
 
-    private final PostRepository postRepository;
-    private final PostSearch postSearch;
-    private final MarkdownExtractService markdownExtractService;
+    private final NoteRepository noteRepository;
+    private final NoteSearch noteSearch;
+    private final ExtractService extractService;
+    private final NoteAssembler noteAssembler;
+    private final MediaNoteRepository mediaNoteRepository;
+    private final CollectionRepository collectionRepository;
 
-    public NoteService(PostRepository postRepository, PostSearch postSearch,
-                       MarkdownExtractService markdownExtractService) {
-        this.postRepository = postRepository;
-        this.postSearch = postSearch;
-        this.markdownExtractService = markdownExtractService;
+    public NoteService(NoteRepository noteRepository, NoteSearch noteSearch,
+                       @Qualifier("htmlExtractServiceImpl") ExtractService extractService,
+                       NoteAssembler noteAssembler, MediaNoteRepository mediaNoteRepository,
+                       CollectionRepository collectionRepository) {
+        this.noteRepository = noteRepository;
+        this.noteSearch = noteSearch;
+        this.extractService = extractService;
+        this.noteAssembler = noteAssembler;
+        this.mediaNoteRepository = mediaNoteRepository;
+        this.collectionRepository = collectionRepository;
     }
 
-    public NoteDto findById(String id) {
-        Post post = postRepository.findById(new PostId(id)).orElseThrow(
-                () -> new EntityNotFoundException("Post with ID " + id + " not found"));
-        return NoteDto.fromEntity(post);
+    /**
+     * -------- Query --------
+     **/
+    @Transactional(readOnly = true)
+    public WikiNoteDto findWikiNoteById(String id) {
+        Note note = noteRepository.findById(new NoteId(id))
+                                  .orElseThrow(() -> new EntityNotFoundException("Note with ID " + id + " not found"));
+        return noteAssembler.toWikiDto(note);
     }
 
-    public PageDto<NoteDto> searchMessages(String searchText, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        if (StringUtils.isEmpty(searchText)) {
-            Page<Post> posts = postRepository.findAll(pageable);
-            return PageDto.from(posts.map(NoteDto::fromEntity));
+    public MediaNoteDto findMediaNoteById(String id) {
+        MediaNote mediaNote = mediaNoteRepository.findById(new NoteId(id))
+                                                 .orElseThrow(() -> new EntityNotFoundException(
+                                                         "MediaNote with ID " + id + " not found"));
+        return noteAssembler.toMediaDto(mediaNote);
+    }
+
+    @Transactional(readOnly = true)
+    public PageDto<NoteCardDto> searchNotes(String collectionId, String searchText, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        if (StringUtils.isBlank(searchText)) {
+            Page<Note> notes = noteRepository.findAllByCollection_Id(new CollectionId(collectionId), pageable);
+            return PageDto.from(notes.map(noteAssembler::toCardDto));
+
         }
-        Page<Post> postPage = postSearch.search(searchText, pageable);
-        return PageDto.from(postPage.map(NoteDto::fromEntity));
+        return PageDto.from(noteSearch.search(searchText, pageable));
+    }
+
+    /**
+     * -------- Command --------
+     **/
+    @Transactional
+    public String createNote(String collectionId, NoteType noteType) {
+        Collection collection = collectionRepository.findById(new CollectionId(collectionId)).orElseThrow();
+        Note note = Note.create(collection, new NoteTitle("untitled"), noteType);
+        return noteRepository.save(note).getId().id();
     }
 
     @Transactional
-    public String createNote() {
-        Post post = new Post(new PostTitle("untitled"));
-        post.afterCreated();
-        Post savedPost = postRepository.save(post);
-        return savedPost.getId().id();
+    public void updateNote(@Nonnull String id, @Nonnull String title, @Nonnull String content) {
+        Note note = noteRepository.findById(new NoteId(id))
+                                  .orElseThrow(() -> new EntityNotFoundException("Note not found: " + id));
+
+        LinkedHashSet<FileResourceId> oldRefs =
+                extractService.extractFileReferenceIds(note.getContent().content());
+        LinkedHashSet<FileResourceId> newRefs =
+                extractService.extractFileReferenceIds(content);
+
+        note.rename(new NoteTitle(title));
+        note.refreshContent(new NoteContent(content), oldRefs, newRefs);
+        noteRepository.save(note);
     }
 
     @Transactional
-    public void updateNote(String id, String title, String cover, String content) {
-        Post existingPost = postRepository.findById(new PostId(id))
-                                          .orElseThrow(
-                                                  () -> new EntityNotFoundException("Post not found with id: " + id));
-
-        existingPost.updatePostDetails(new PostTitle(title),
-                                       FileResourceId.extractIdFromUrl(cover),
-                                       new PostContent(content),
-                                       markdownExtractService);
-        postRepository.save(existingPost);
+    public void deleteNote(String id) {
+        noteRepository.findById(new NoteId(id))
+                      .ifPresentOrElse(noteRepository::delete,
+                                       () -> {
+                                           throw new EntityNotFoundException("Note not found: " + id);
+                                       });
     }
 }

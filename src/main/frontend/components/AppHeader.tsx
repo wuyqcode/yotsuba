@@ -55,7 +55,7 @@ export default function AppHeader() {
           component="img"
           src="images/icon.png"
           sx={{ width: 40, height: 40, cursor: 'pointer' }}
-          onClick={() => navigate('/post')}
+          onClick={() => navigate('/note')}
         />
 
         <HeaderNavBar />

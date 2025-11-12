@@ -1,48 +1,147 @@
-import React from 'react';
-import { Paper, InputBase, IconButton } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import AddIcon from '@mui/icons-material/Add';
+import React, { useState } from 'react';
+import {
+  Paper,
+  InputBase,
+  IconButton,
+  Button,
+  Box,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+} from '@mui/material';
+import { Search, Add, LibraryBooks, Movie } from '@mui/icons-material';
+import { useNotes } from 'Frontend/features/note/hooks/useNotes';
+import { useNavigate } from 'react-router';
+import NoteType from 'Frontend/generated/io/github/dutianze/yotsuba/note/domain/valueobject/NoteType';
 
-interface SearchBarProps {
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onSearch: () => void;
-  onAdd: () => void;
-}
+export default function SearchBar(): JSX.Element {
+  const { searchText, setSearchText, fetchNotes, createNote } = useNotes();
+  const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
 
-export default function SearchBar({ value, onChange, onSearch, onAdd }: SearchBarProps) {
+  const handleSearch = (e?: React.FormEvent<HTMLFormElement>) => {
+    e?.preventDefault();
+    fetchNotes();
+  };
+
+  const handleCreate = async (type: NoteType) => {
+    try {
+      const newNoteId = await createNote(type);
+      if (!newNoteId) return;
+
+      let path = '';
+      if (type === NoteType.MEDIA) {
+        path = `/note/media/${newNoteId}/edit`;
+      } else if (type === NoteType.WIKI) {
+        path = `/note/wiki/${newNoteId}`;
+      }
+
+      navigate(path);
+      setAnchorEl(null);
+    } catch (err) {
+      console.error('创建笔记失败：', err);
+    }
+  };
+
   return (
     <Paper
       component="form"
-      onSubmit={(e) => {
-        e.preventDefault();
-        onSearch();
-      }}
+      onSubmit={handleSearch}
       sx={{
         display: 'flex',
         alignItems: 'center',
-        borderRadius: '30px',
-        px: 1,
+        borderRadius: 3,
+        px: 1.5,
         py: 0.5,
         border: '1px solid',
         borderColor: 'divider',
         bgcolor: 'background.paper',
-        boxShadow: 1,
-      }}
-    >
-      <SearchIcon sx={{ ml: 1, color: 'text.secondary' }} />
+        transition: 'box-shadow 0.2s ease',
+        '&:focus-within': {
+          boxShadow: (theme) => theme.shadows[3],
+        },
+      }}>
+      <Search sx={{ ml: 1, color: 'text.secondary' }} />
       <InputBase
-        placeholder="検索キーワードを入力..."
-        value={value}
-        onChange={onChange}
-        sx={{ ml: 1, flex: 1, fontSize: 14 }}
+        placeholder="搜索笔记..."
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        sx={{
+          ml: 1,
+          flex: 1,
+          fontSize: 14,
+        }}
       />
-      <IconButton type="submit" size="small" sx={{ ml: 1 }}>
-        <SearchIcon fontSize="small" />
+      <IconButton
+        type="submit"
+        size="small"
+        sx={{
+          mr: 0.5,
+          color: 'primary.main',
+          '&:hover': {
+            bgcolor: 'action.hover',
+          },
+        }}>
+        <Search fontSize="small" />
       </IconButton>
-      <IconButton size="small" color="primary" onClick={onAdd}>
-        <AddIcon fontSize="small" />
-      </IconButton>
+
+      <Button
+        variant="contained"
+        size="small"
+        startIcon={<Add />}
+        onClick={(e) => setAnchorEl(e.currentTarget)}
+        sx={{
+          ml: 1.5,
+          borderRadius: 2,
+          textTransform: 'none',
+          fontSize: 13,
+          px: 2.5,
+          bgcolor: 'primary.main',
+          boxShadow: 'none',
+          '&:hover': {
+            bgcolor: 'primary.dark',
+            boxShadow: (theme) => theme.shadows[2],
+          },
+        }}>
+        新建
+      </Button>
+
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={() => setAnchorEl(null)}
+        slotProps={{
+          transition: {
+            style: { transformOrigin: 'top right' },
+          },
+          paper: {
+            sx: {
+              mt: 1,
+              borderRadius: 2,
+              minWidth: 200,
+              boxShadow: (theme) => theme.shadows[6],
+            },
+          },
+        }}>
+        <MenuItem onClick={() => handleCreate(NoteType.MEDIA)}>
+          <ListItemIcon>
+            <Movie fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="媒体笔记" />
+        </MenuItem>
+
+        <Divider />
+
+        <MenuItem onClick={() => handleCreate(NoteType.WIKI)}>
+          <ListItemIcon>
+            <LibraryBooks fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Wiki 笔记" />
+        </MenuItem>
+      </Menu>
     </Paper>
   );
 }

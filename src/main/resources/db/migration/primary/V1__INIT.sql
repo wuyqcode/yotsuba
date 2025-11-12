@@ -1,61 +1,87 @@
-create table application_user (
-        profile_picture blob,
-        version integer not null,
-        hashed_password varchar(255),
-        id varchar(255) not null,
-        name varchar(255),
-        username varchar(255),
-        primary key (id)
+CREATE TABLE application_user (
+    id VARCHAR(255) NOT NULL PRIMARY KEY,
+    profile_picture BLOB,
+    version INTEGER not null,
+    hashed_password VARCHAR(255),
+    name VARCHAR(255),
+    username VARCHAR(255)
 );
 
-create table comment (
-    created_at timestamp,
-    updated_at timestamp,
-    comments_id varchar(255),
-    content varchar(255),
-    id varchar(255) not null,
-    post_id varchar(255),
-    primary key (id)
+CREATE TABLE user_roles (
+    user_id VARCHAR(255) NOT NULL,
+    roles VARCHAR(255) CHECK (roles IN ('USER','ADMIN'))
 );
 
-create table event_publication (
-    completion_date timestamp,
-    publication_date timestamp,
-    event_type varchar(255),
-    id blob not null,
-    listener_id varchar(255),
+CREATE TABLE event_publication (
+    id BLOB NOT NULL PRIMARY KEY,
+    event_type VARCHAR(255),
+    listener_id VARCHAR(255),
     serialized_event varchar(255),
-    primary key (id)
+    completion_date TIMESTAMP,
+    publication_date TIMESTAMP
+);
+
+CREATE TABLE collection (
+    id VARCHAR(255) NOT NULL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+);
+
+INSERT INTO collection (id, name, created_at, updated_at)
+VALUES ('ALL', '全部笔记', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO collection (id, name, created_at, updated_at)
+VALUES ('DELETED', '回收站', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+CREATE TABLE note (
+    id VARCHAR(255) NOT NULL PRIMARY KEY,
+    title VARCHAR(255),
+    content VARCHAR(255),
+    cover_resource_id VARCHAR(255),
+    collection_id VARCHAR(255) NOT NULL default 'ALL',
+    note_type VARCHAR(50) NOT NULL DEFAULT 'WIKI',
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+);
+
+CREATE TABLE media_note (
+    id VARCHAR(255) NOT NULL PRIMARY KEY,
+    release_year INTEGER,
+    rating REAL,
+    overview TEXT,
+    seasons_json TEXT
+);
+
+CREATE TABLE tag (
+    id varchar(255) NOT NULL PRIMARY KEY,
+    name varchar(255) NOT NULL UNIQUE,
+    collection_id VARCHAR(255) NOT NULL default 'ALL',
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+);
+
+CREATE TABLE note_tag (
+    note_id VARCHAR(255) NOT NULL,
+    tag_id VARCHAR(255) NOT NULL,
+    PRIMARY KEY (note_id, tag_id)
+);
+
+CREATE TABLE comment (
+    id VARCHAR(255) NOT NULL PRIMARY KEY,
+    note_id VARCHAR(255) NOT NULL,
+    content VARCHAR(255) NOT NULL DEFAULT '',
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
 );
 
 
-create table post (
-    created_at timestamp,
-    updated_at timestamp,
-    content varchar(255),
-    cover_resource_id varchar(255),
-    id varchar(255) not null,
-    title varchar(255),
-    post_status VARCHAR(20) NOT NULL DEFAULT 'DRAFT',
-    note_type VARCHAR(50) NOT NULL DEFAULT 'MEDIA',
-    primary key (id)
-);
-
-create table post_tag (
-    post_id varchar(255) not null,
-    tag_id varchar(255) not null,
-    primary key (post_id, tag_id)
-);
-
-create table tag (
-    created_at timestamp,
-    updated_at timestamp,
-    id varchar(255) not null,
-    name varchar(255),
-    primary key (id)
-);
-
-create table user_roles (
-    roles varchar(255) check (roles in ('USER','ADMIN')),
-    user_id varchar(255) not null
+CREATE TABLE tag_graph_edge (
+    source_tag_id   VARCHAR(255) NOT NULL,
+    target_tag_id   VARCHAR(255) NOT NULL,
+    collection_id   VARCHAR(255) NOT NULL default 'ALL',
+    weight          INTEGER NOT NULL DEFAULT 1,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    PRIMARY KEY (source_tag_id, target_tag_id, collection_id)
 );

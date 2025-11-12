@@ -1,29 +1,19 @@
 import { Box, Typography, Pagination, Select, MenuItem, FormControl, TextField, PaginationItem } from '@mui/material';
 import { ArrowBack, ArrowForward } from '@mui/icons-material';
 import { useState } from 'react';
+import { useNotes } from 'Frontend/features/note/hooks/useNotes';
 
-export default function SmartPagination({
-  page,
-  totalPages,
-  totalItems,
-  pageSize,
-  onPageChange,
-  onPageSizeChange,
-}: {
-  page: number;
-  totalPages: number;
-  totalItems: number;
-  pageSize: number;
-  onPageChange: (event: React.ChangeEvent<unknown>, value: number) => void;
-  onPageSizeChange: (value: number) => void;
-}) {
+export default function PaginationBar() {
+  const { page, totalPages, totalElements, pageSize, setPage, setPageSize } = useNotes();
+
   const [jumpPage, setJumpPage] = useState<string>('');
 
   const handleJump = (e: React.FormEvent) => {
     e.preventDefault();
     const target = Number(jumpPage);
     if (!isNaN(target) && target >= 1 && target <= totalPages) {
-      onPageChange(null as any, target);
+      setPage(target);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       setJumpPage('');
     }
   };
@@ -44,13 +34,16 @@ export default function SmartPagination({
         backgroundColor: 'background.paper',
       }}>
       <Typography variant="body2" color="text.secondary">
-        共 {totalItems} 条 · 第 {page} / {totalPages} 页
+        共 {totalElements} 条 · 第 {page} / {totalPages} 页
       </Typography>
 
       <Pagination
         count={totalPages}
         page={page}
-        onChange={onPageChange}
+        onChange={(_, newPage) => {
+          setPage(newPage);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
         color="primary"
         shape="rounded"
         siblingCount={1}
@@ -69,7 +62,12 @@ export default function SmartPagination({
       />
 
       <FormControl size="small" sx={{ minWidth: 100 }}>
-        <Select value={pageSize} onChange={(e) => onPageSizeChange(Number(e.target.value))}>
+        <Select
+          value={pageSize}
+          onChange={(e) => {
+            setPage(1);
+            setPageSize(Number(e.target.value));
+          }}>
           {[5, 10, 20, 50].map((size) => (
             <MenuItem key={size} value={size}>
               {size}/页

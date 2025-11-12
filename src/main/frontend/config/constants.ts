@@ -1,6 +1,6 @@
 export const APP_NAME = 'Yotsuba';
 
-export const API_BASE_URL = 'http://localhost:8080/api';
+export const API_BASE_URL = 'http://localhost:12191/api';
 
 export const STORAGE_KEYS = {
   AUTH_TOKEN: 'auth_token',

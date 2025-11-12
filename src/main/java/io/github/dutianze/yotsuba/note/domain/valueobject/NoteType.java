@@ -6,13 +6,13 @@ import lombok.Getter;
 @Getter
 public enum NoteType {
 
-    WIKI("wiki"),
-    MEDIA("media");
+  WIKI("wiki"),
+  MEDIA("media");
 
-    private final String value;
+  private final String value;
 
-    NoteType(String value) {
-        this.value = value;
-    }
+  NoteType(String value) {
+    this.value = value;
+  }
 
 }
