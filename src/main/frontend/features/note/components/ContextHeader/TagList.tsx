@@ -1,19 +1,14 @@
-import React from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { Tag } from 'Frontend/features/note/hooks/useTagStore';
+import { useTagStore } from '../../hooks/useTagStore';
 
-interface TagListProps {
-  tags: Tag[];
-  onRemove: (id: number) => void;
-}
-
-export default function TagList({ tags, onRemove }: TagListProps) {
-  if (!tags.length) return null;
+export default function TagList() {
+  const selectedTags = useTagStore((s) => s.selectedTags);
+  const toggleSelectedTag = useTagStore((s) => s.toggleSelectedTag);
 
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-      {tags.map((tag) => (
+      {selectedTags.map((tag) => (
         <Box
           key={tag.id}
           sx={{
@@ -32,8 +27,8 @@ export default function TagList({ tags, onRemove }: TagListProps) {
         >
           <Box
             component="img"
-            src={tag.image || '/default-tag.png'}
-            alt={tag.title}
+            src={'/default-tag.png'}
+            alt={tag.name}
             sx={{
               width: 28,
               height: 28,
@@ -43,11 +38,11 @@ export default function TagList({ tags, onRemove }: TagListProps) {
             }}
           />
           <Typography variant="body2" noWrap sx={{ fontSize: '0.8rem', maxWidth: 90 }}>
-            #{tag.title}
+            #{tag.name}
           </Typography>
           <IconButton
             size="small"
-            onClick={() => onRemove(tag.id)}
+            onClick={() => toggleSelectedTag(tag)}
             sx={{
               p: 0.2,
               color: 'text.secondary',

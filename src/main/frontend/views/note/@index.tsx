@@ -5,9 +5,10 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Sidebar from 'Frontend/features/note/components/Sidebar';
 import ContextHeader from 'Frontend/features/note/components/ContextHeader';
 import NoteCard from 'Frontend/features/note/components/NoteCard';
-import { useNotes } from 'Frontend/features/note/hooks/useNotes';
 import PaginationBar from 'Frontend/features/note/components/PaginationBar';
 import SearchResultCard from 'Frontend/features/note/components/SearchResultCard';
+import { useNoteStore } from 'Frontend/features/note/hooks/useNotes';
+import { useCollectionStore } from 'Frontend/features/note/hooks/useCollection';
 
 export const config: ViewConfig = {
   menu: { order: 2, icon: 'DescriptionIcon' },
@@ -17,11 +18,19 @@ export const config: ViewConfig = {
 export default function NoteListView() {
   const [open, setOpen] = useState(false);
 
-  const { notes, page, pageSize, fetchNotes, isEmpty, isLoading, isError, searchText } = useNotes();
+  const notes = useNoteStore((s) => s.notes);
+  const page = useNoteStore((s) => s.page);
+  const pageSize = useNoteStore((s) => s.pageSize);
+  const fetchNotes = useNoteStore((s) => s.fetchNotes);
+  const isEmpty = useNoteStore((s) => s.notes.length === 0 && !s.loading);
+  const isLoading = useNoteStore((s) => s.loading);
+  const isError = useNoteStore((s) => !!s.error);
+  const searchText = useNoteStore((s) => s.searchText);
+  const selectedCollection = useCollectionStore((s) => s.selectedCollection);
 
   useEffect(() => {
     fetchNotes();
-  }, [page, pageSize, fetchNotes]);
+  }, [page, pageSize, fetchNotes, selectedCollection]);
 
   return (
     <Box sx={{ display: { xs: 'block', lg: 'flex' } }}>

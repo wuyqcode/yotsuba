@@ -1,51 +1,26 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import CollectionItem from './CollectionItem';
-import EditCollectionDialog from './EditCollectionDialog';
 import AddCollectionDialog from './AddCollectionDialog';
-import CollectionDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/CollectionDto';
-import { useCollection } from '../../hooks/useCollection';
+import { useCollectionStore } from '../../hooks/useCollection';
 
 const CollectionList = () => {
-  const {
-    collections,
-    selectedCollection,
-    setSelectedCollection,
-    clearSelectedCollection,
-    addCollection,
-    updateCollection,
-    deleteCollection,
-  } = useCollection();
+  const collections = useCollectionStore((s) => s.collections);
+  const addCollection = useCollectionStore((s) => s.addCollection);
+  const fetchCollections = useCollectionStore((s) => s.fetchCollections);
+
+  useEffect(() => {
+    fetchCollections();
+  }, []);
+
   const [openAddDialog, setOpenAddDialog] = useState(false);
-  const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [editCollection, setEditCollection] = useState<CollectionDto | null>(null);
 
   const handleAddCollection = async (name: string) => {
     await addCollection(name);
   };
 
-  const handleEditOpen = (collection: CollectionDto) => {
-    setEditCollection(collection);
-    setOpenEditDialog(true);
-  };
-
-  const handleEditSave = async (id: string, name: string) => {
-    await updateCollection(id, name);
-  };
-
-  const handleDeleteCollection = async (collection: CollectionDto) => {
-    const confirmDelete = window.confirm(`确认删除笔记本「${collection.name}」吗？`);
-    if (!confirmDelete) return;
-    if (!collection.id) return;
-    await deleteCollection(collection.id);
-    if (selectedCollection?.id === collection.id) {
-      clearSelectedCollection();
-    }
-  };
-
   return (
     <Box p={2}>
-      {' '}
       <Typography
         variant="subtitle2"
         sx={{
@@ -58,14 +33,7 @@ const CollectionList = () => {
       </Typography>
       <Stack spacing={1} mt={1}>
         {collections.map((col) => (
-          <CollectionItem
-            key={col.id}
-            col={col}
-            isSelected={selectedCollection?.id === col.id}
-            onSelect={setSelectedCollection}
-            onEdit={handleEditOpen}
-            onDelete={handleDeleteCollection}
-          />
+          <CollectionItem key={col.id} col={col} />
         ))}
       </Stack>
       <Box mt={1}>
@@ -93,20 +61,7 @@ const CollectionList = () => {
         </Box>
       </Box>
       {/* Dialogs */}
-      <AddCollectionDialog
-        open={openAddDialog}
-        onClose={() => setOpenAddDialog(false)}
-        onAdd={handleAddCollection}
-      />
-      <EditCollectionDialog
-        open={openEditDialog}
-        onClose={() => {
-          setOpenEditDialog(false);
-          setEditCollection(null);
-        }}
-        collection={editCollection}
-        onSave={handleEditSave}
-      />
+      <AddCollectionDialog open={openAddDialog} onClose={() => setOpenAddDialog(false)} onAdd={handleAddCollection} />
     </Box>
   );
 };

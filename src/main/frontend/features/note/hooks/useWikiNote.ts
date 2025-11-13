@@ -31,7 +31,7 @@ function computeDirty(wiki: WikiNoteDto | null, original: WikiNoteDto | null): b
   return dirty;
 }
 
-export const useWikiStore = create<WikiState>((set, get) => ({
+export const useWikiNoteStore = create<WikiState>((set, get) => ({
   wiki: null,
   originalWiki: null,
   loading: false,
@@ -91,33 +91,3 @@ export const useWikiStore = create<WikiState>((set, get) => ({
     set({ isDirty: false, wiki: originalWiki ? { ...originalWiki } : null });
   },
 }));
-
-export function useWikiNote(id?: string) {
-  const { wiki, loading, error, loadWiki, saveWiki, updateWiki, isDirty, resetDirty, reset } = useWikiStore();
-  const { run, isLocked } = useLock(id ? `wiki:${id}` : 'wiki:unknown');
-
-  useEffect(() => {
-    if (!id) {
-      return;
-    }
-
-    run(async () => {
-      await loadWiki(id);
-    }).catch((err) => console.error('[WikiNote] loadWiki error:', err));
-
-    return () => {
-      reset();
-    };
-  }, [id]);
-
-  return {
-    wiki,
-    loading,
-    error,
-    setTitle: (title: string) => updateWiki({ title }),
-    setContent: (content: string) => updateWiki({ content }),
-    saveWiki,
-    isDirty,
-    resetDirty,
-  };
-}

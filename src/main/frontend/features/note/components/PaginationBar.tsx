@@ -1,10 +1,16 @@
 import { Box, Typography, Pagination, Select, MenuItem, FormControl, TextField, PaginationItem } from '@mui/material';
 import { ArrowBack, ArrowForward } from '@mui/icons-material';
 import { useState } from 'react';
-import { useNotes } from 'Frontend/features/note/hooks/useNotes';
+import { useNoteStore } from '../hooks/useNotes';
 
 export default function PaginationBar() {
-  const { page, totalPages, totalElements, pageSize, setPage, setPageSize } = useNotes();
+  const page = useNoteStore((s) => s.page);
+  const totalPages = useNoteStore((s) => s.totalPages);
+  const totalElements = useNoteStore((s) => s.totalElements);
+  const pageSize = useNoteStore((s) => s.pageSize);
+
+  const setPage = useNoteStore((s) => s.setPage);
+  const setPageSize = useNoteStore((s) => s.setPageSize);
 
   const [jumpPage, setJumpPage] = useState<string>('');
 

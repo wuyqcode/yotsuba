@@ -7,8 +7,8 @@ import 'prism-code-editor-lightweight/layout.css';
 import 'prism-code-editor-lightweight/themes/github-dark.css';
 import { WikiToc } from 'Frontend/features/note/components/wiki/WikiToc';
 import { useWikiEditor } from 'Frontend/features/note/hooks/useWikiEditor';
-import { useWikiNote } from 'Frontend/features/note/hooks/useWikiNote';
 import WikiHeader from 'Frontend/features/note/components/wiki/WikiHeader';
+import { useWikiNoteStore } from '../../hooks/useWikiNote';
 
 // ==========================
 // 子组件：加载/错误/空状态
@@ -57,7 +57,12 @@ function WikiCommentSection() {
 export default function WikiContent() {
   const { id } = useParams<{ id: string }>();
   const { editor, setEditor, mode, extensions, isReadOnly } = useWikiEditor();
-  const { wiki, loading, error, setContent } = useWikiNote(id);
+  const wiki = useWikiNoteStore((s) => s.wiki);
+  const loading = useWikiNoteStore((s) => s.loading);
+  const error = useWikiNoteStore((s) => s.error);
+
+  const updateWiki = useWikiNoteStore((s) => s.updateWiki);
+  const setContent = (content: string) => updateWiki({ content });
 
   // 状态分支
   if (loading || error || !wiki) {

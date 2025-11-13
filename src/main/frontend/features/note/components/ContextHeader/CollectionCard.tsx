@@ -1,10 +1,9 @@
-import React from 'react';
 import { Box, Typography } from '@mui/material';
 import FolderIcon from '@mui/icons-material/Folder';
-import { useCollection } from '../../hooks/useCollection';
+import { useCollectionStore } from '../../hooks/useCollection';
 
 export default function CollectionCard() {
-  const { selectedCollection } = useCollection();
+  const selectedCollection = useCollectionStore((s) => s.selectedCollection);
 
   return (
     <Box

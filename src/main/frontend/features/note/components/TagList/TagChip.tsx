@@ -2,19 +2,18 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer'; // 标签图标
 import CloseIcon from '@mui/icons-material/Close';
-import { Tag } from 'Frontend/features/note/hooks/useTagStore';
+import TagDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/TagDto';
+import { useTagStore } from '../../hooks/useTagStore';
 
 interface TagChipProps {
-  tag: Tag;
+  tag: TagDto;
   selected?: boolean;
-  onClick?: (tag: Tag) => void;
-  onDelete?: (tag: Tag) => void;
 }
 
 const getTagColor = (selected?: boolean) => {
   if (selected) {
     return {
-      bg: '#5E81AC', // 主题蓝（Nord 深蓝 / GitHub 蓝）
+      bg: '#5E81AC',
       color: '#ffffff',
     };
   }
@@ -24,13 +23,14 @@ const getTagColor = (selected?: boolean) => {
   };
 };
 
-const TagChip = ({ tag, selected = false, onClick, onDelete }: TagChipProps) => {
+const TagChip = ({ tag, selected = false }: TagChipProps) => {
   const { bg, color } = getTagColor(selected);
+  const toggleSelectedTag = useTagStore((s) => s.toggleSelectedTag);
 
   return (
     <Box
       component="span"
-      onClick={() => onClick?.(tag)}
+      onClick={() => toggleSelectedTag(tag)}
       sx={{
         display: 'inline-flex',
         alignItems: 'center',
@@ -52,22 +52,8 @@ const TagChip = ({ tag, selected = false, onClick, onDelete }: TagChipProps) => 
       }}>
       <LocalOfferIcon sx={{ fontSize: 14 }} />
       <Typography component="span" sx={{ fontSize: '0.75rem', fontWeight: 500 }}>
-        {tag.title}
+        {tag.name}
       </Typography>
-      {onDelete && (
-        <CloseIcon
-          sx={{
-            fontSize: 14,
-            cursor: 'pointer',
-            ml: 0.3,
-            '&:hover': { opacity: 0.7 },
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete(tag);
-          }}
-        />
-      )}
     </Box>
   );
 };

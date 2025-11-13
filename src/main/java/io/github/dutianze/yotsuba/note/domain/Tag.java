@@ -43,6 +43,13 @@ public class Tag implements Comparable<Tag> {
     this.name = name;
   }
 
+  public static Tag create(String name) {
+    Tag tag = new Tag();
+    tag.id = new TagId();
+    tag.name = name;
+    return tag;
+  }
+
   @Override
   public int compareTo(Tag o) {
     return this.name.compareTo(o.name);

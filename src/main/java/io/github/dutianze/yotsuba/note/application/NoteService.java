@@ -13,7 +13,6 @@ import io.github.dutianze.yotsuba.search.NoteSearch;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -68,10 +67,10 @@ public class NoteService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         if (StringUtils.isBlank(searchText)) {
-            Page<Note> notes = noteRepository.findAllByCollection_Id(new CollectionId(collectionId), pageable);
+            Page<Note> notes = noteRepository.findAllByCollectionId(collectionId, pageable);
             return PageDto.from(notes.map(noteAssembler::toCardDto));
-
         }
+
         return PageDto.from(noteSearch.search(searchText, pageable));
     }
 

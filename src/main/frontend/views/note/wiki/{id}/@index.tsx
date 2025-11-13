@@ -4,8 +4,9 @@ import 'reactjs-tiptap-editor/style.css';
 import 'prism-code-editor-lightweight/layout.css';
 import 'prism-code-editor-lightweight/themes/github-dark.css';
 import { WikiToc } from 'Frontend/features/note/components/wiki/WikiToc';
-import { useWikiNote } from 'Frontend/features/note/hooks/useWikiNote';
 import WikiContent from 'Frontend/features/note/components/wiki/WikiContent';
+import { useWikiNoteStore } from 'Frontend/features/note/hooks/useWikiNote';
+import { useEffect } from 'react';
 
 function WikiEditorPlaceholder({ loading, error }: { loading?: boolean; error?: string | null }) {
   return (
@@ -31,7 +32,14 @@ function WikiEditorPlaceholder({ loading, error }: { loading?: boolean; error?: 
 
 export default function WikiEditor() {
   const { id } = useParams<{ id: string }>();
-  const { wiki, loading, error } = useWikiNote(id);
+  const wiki = useWikiNoteStore((s) => s.wiki);
+  const loading = useWikiNoteStore((s) => s.loading);
+  const error = useWikiNoteStore((s) => s.error);
+  const loadWiki = useWikiNoteStore((s) => s.loadWiki);
+
+  useEffect(() => {
+    loadWiki(id);
+  }, [id]);
 
   if (loading || error || !wiki) {
     return <WikiEditorPlaceholder loading={loading} error={error} />;

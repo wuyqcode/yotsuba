@@ -24,15 +24,16 @@ CREATE TABLE event_publication (
 CREATE TABLE collection (
     id VARCHAR(255) NOT NULL PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
+    category INTEGER NOT NULL DEFAULT 1,
     created_at TIMESTAMP,
     updated_at TIMESTAMP
 );
 
-INSERT INTO collection (id, name, created_at, updated_at)
-VALUES ('ALL', '全部笔记', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO collection (id, name, category, created_at, updated_at)
+VALUES ('SYSTEM_DEFAULT', '默认笔记', 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-INSERT INTO collection (id, name, created_at, updated_at)
-VALUES ('DELETED', '回收站', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO collection (id, name, category, created_at, updated_at)
+VALUES ('SYSTEM_TRASH', '回收站', 9999, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 CREATE TABLE note (
     id VARCHAR(255) NOT NULL PRIMARY KEY,

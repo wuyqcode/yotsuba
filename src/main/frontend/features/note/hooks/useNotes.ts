@@ -1,11 +1,11 @@
-import { useState, useCallback } from 'react';
 import { create } from 'zustand';
+import { shallow } from 'zustand/shallow';
 import { NoteService } from 'Frontend/generated/endpoints';
-import NoteType from 'Frontend/generated/io/github/dutianze/yotsuba/note/domain/valueobject/NoteType';
 import NoteCardDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/NoteCardDto';
-import { useCollection } from 'Frontend/features/note/hooks/useCollection';
+import NoteType from 'Frontend/generated/io/github/dutianze/yotsuba/note/domain/valueobject/NoteType';
+import { useCollectionStore } from './useCollection';
 
-const useNotesStore = create<{
+type NoteState = {
   notes: NoteCardDto[];
   page: number;
   pageSize: number;
@@ -13,12 +13,20 @@ const useNotesStore = create<{
   totalElements: number;
   searchText: string;
 
+  loading: boolean;
+  error: string | null;
+
+  fetchNotes: () => Promise<void>;
+  createNote: (type: NoteType) => Promise<string>;
+  removeNote: (id: string) => Promise<void>;
+
   setPage: (page: number) => void;
   setPageSize: (size: number) => void;
   setSearchText: (text: string) => void;
   clearSearch: () => void;
-  setNotesData: (notes: NoteCardDto[], totalPages: number, totalElements: number) => void;
-}>((set) => ({
+};
+
+export const useNoteStore = create<NoteState>((set, get) => ({
   notes: [],
   page: 1,
   pageSize: 10,
@@ -26,116 +34,78 @@ const useNotesStore = create<{
   totalElements: 0,
   searchText: '',
 
+  loading: false,
+  error: null,
+
   setPage: (page) => set({ page }),
   setPageSize: (size) => set({ pageSize: size, page: 1 }),
   setSearchText: (text) => set({ searchText: text, page: 1 }),
   clearSearch: () => set({ searchText: '', page: 1 }),
-  setNotesData: (notes, totalPages, totalElements) => set({ notes, totalPages, totalElements }),
-}));
 
-export function useNotes() {
-  const { selectedCollection } = useCollection();
-  const notes = useNotesStore((s) => s.notes);
-  const page = useNotesStore((s) => s.page);
-  const pageSize = useNotesStore((s) => s.pageSize);
-  const totalPages = useNotesStore((s) => s.totalPages);
-  const totalElements = useNotesStore((s) => s.totalElements);
-  const searchText = useNotesStore((s) => s.searchText);
-  const setNotesData = useNotesStore((s) => s.setNotesData);
-  const setPage = useNotesStore((s) => s.setPage);
-  const setPageSize = useNotesStore((s) => s.setPageSize);
-  const setSearchText = useNotesStore((s) => s.setSearchText);
-  const clearSearch = useNotesStore((s) => s.clearSearch);
+  /** 拉取笔记列表 */
+  fetchNotes: async () => {
+    const selectedCollectionId = useCollectionStore.getState().selectedCollection?.id;
+    const { page, pageSize, searchText } = get();
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchNotes = useCallback(async () => {
-    const collectionId = selectedCollection?.id;
-    if (!collectionId) {
-      setNotesData([], 0, 0);
-      setError(null);
-      setLoading(false);
+    if (!selectedCollectionId) {
+      set({
+        notes: [],
+        totalPages: 0,
+        totalElements: 0,
+        error: null,
+        loading: false,
+      });
       return;
     }
 
-    setLoading(true);
-    setError(null);
+    set({ loading: true, error: null });
     try {
-      const res = await NoteService.searchNotes(collectionId, searchText, page - 1, pageSize);
-      setNotesData(res.content, res.totalPages, res.totalElements);
-    } catch (err: any) {
-      console.error('Failed to fetch notes:', err);
-      setError(err.message ?? 'Failed to fetch notes');
+      const res = await NoteService.searchNotes(selectedCollectionId, searchText, page - 1, pageSize);
+      set({
+        notes: res.content,
+        totalPages: res.totalPages,
+        totalElements: res.totalElements,
+      });
+    } catch (e: any) {
+      console.error('fetchNotes failed:', e);
+      set({ error: e.message ?? 'Failed to fetch notes' });
     } finally {
-      setLoading(false);
+      set({ loading: false });
     }
-  }, [page, pageSize, searchText, selectedCollection?.id, setNotesData]);
+  },
 
-  const createNote = useCallback(
-    async (type: NoteType) => {
-      setLoading(true);
-      try {
-        if (!selectedCollection) {
-          throw new Error('请选择一个集合后再创建笔记');
-        }
-        const collectionId = selectedCollection.id;
-        if (!collectionId) {
-          throw new Error('当前集合缺少ID，无法创建笔记');
-        }
-        const id = await NoteService.createNote(collectionId, type);
-        await fetchNotes();
-        return id;
-      } catch (err: any) {
-        console.error('Failed to create note:', err);
-        setError(err.message ?? 'Failed to create note');
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [fetchNotes, selectedCollection?.id]
-  );
+  /** 创建笔记 */
+  createNote: async (type: NoteType) => {
+    const selectedCollectionId = useCollectionStore.getState().selectedCollection?.id;
+    if (!selectedCollectionId) {
+      throw new Error('请先选择一个笔记本');
+    }
 
-  const removeNote = useCallback(
-    async (id: string) => {
-      setLoading(true);
-      try {
-        await NoteService.deleteNote(id);
-        await fetchNotes();
-      } catch (err: any) {
-        console.error('Failed to delete note:', err);
-        setError(err.message ?? 'Failed to delete note');
-      } finally {
-        setLoading(false);
-      }
-    },
-    [fetchNotes]
-  );
+    set({ loading: true, error: null });
+    try {
+      const id = await NoteService.createNote(selectedCollectionId, type);
+      await get().fetchNotes();
+      return id;
+    } catch (e: any) {
+      console.error('createNote failed:', e);
+      set({ error: e.message ?? 'Failed to create note' });
+      throw e;
+    } finally {
+      set({ loading: false });
+    }
+  },
 
-  const isEmpty = !loading && notes.length === 0;
-  const isLoading = loading;
-  const isError = Boolean(error);
-
-  return {
-    // 数据状态
-    notes,
-    page,
-    pageSize,
-    totalPages,
-    totalElements,
-    searchText,
-
-    fetchNotes,
-    createNote,
-    removeNote,
-    setPage,
-    setPageSize,
-    setSearchText,
-    clearSearch,
-
-    isEmpty,
-    isLoading,
-    isError,
-  };
-}
+  /** 删除笔记 */
+  removeNote: async (id: string) => {
+    set({ loading: true, error: null });
+    try {
+      await NoteService.deleteNote(id);
+      await get().fetchNotes();
+    } catch (e: any) {
+      console.error('removeNote failed:', e);
+      set({ error: e.message ?? 'Failed to delete note' });
+    } finally {
+      set({ loading: false });
+    }
+  },
+}));

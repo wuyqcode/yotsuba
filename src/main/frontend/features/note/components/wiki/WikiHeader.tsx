@@ -6,11 +6,19 @@ import ForumIcon from '@mui/icons-material/Forum';
 import SaveIcon from '@mui/icons-material/Save';
 import { useBlocker, type BlockerFunction } from 'react-router';
 import { useWikiEditor } from 'Frontend/features/note/hooks/useWikiEditor';
-import { useWikiNote } from 'Frontend/features/note/hooks/useWikiNote';
+import { useWikiNoteStore } from '../../hooks/useWikiNote';
 
 export default function WikiHeader(): JSX.Element {
   const { mode, setMode } = useWikiEditor();
-  const { wiki, setTitle, saveWiki, isDirty, resetDirty } = useWikiNote();
+  const wiki = useWikiNoteStore((s) => s.wiki);
+
+  const updateWiki = useWikiNoteStore((s) => s.updateWiki);
+  const setTitle = (title: string) => updateWiki({ title });
+
+  const saveWiki = useWikiNoteStore((s) => s.saveWiki);
+
+  const isDirty = useWikiNoteStore((s) => s.isDirty);
+  const resetDirty = useWikiNoteStore((s) => s.resetDirty);
 
   const [openDialog, setOpenDialog] = useState(false);
 

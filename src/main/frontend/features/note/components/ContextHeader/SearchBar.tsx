@@ -12,12 +12,17 @@ import {
   Divider,
 } from '@mui/material';
 import { Search, Add, LibraryBooks, Movie } from '@mui/icons-material';
-import { useNotes } from 'Frontend/features/note/hooks/useNotes';
 import { useNavigate } from 'react-router';
 import NoteType from 'Frontend/generated/io/github/dutianze/yotsuba/note/domain/valueobject/NoteType';
+import { useNoteStore } from '../../hooks/useNotes';
+import { useWikiEditorStore } from '../../hooks/useWikiEditor';
 
 export default function SearchBar(): JSX.Element {
-  const { searchText, setSearchText, fetchNotes, createNote } = useNotes();
+  const searchText = useNoteStore((s) => s.searchText);
+  const setSearchText = useNoteStore((s) => s.setSearchText);
+  const fetchNotes = useNoteStore((s) => s.fetchNotes);
+  const createNote = useNoteStore((s) => s.createNote);
+  const setMode = useWikiEditorStore((s) => s.setMode);
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -39,6 +44,7 @@ export default function SearchBar(): JSX.Element {
         path = `/note/wiki/${newNoteId}`;
       }
 
+      setMode('edit');
       navigate(path);
       setAnchorEl(null);
     } catch (err) {
