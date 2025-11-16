@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import TagDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/TagDto';
 import { TagService } from 'Frontend/generated/endpoints';
+import { useCollectionStore } from './useCollection';
 
 interface TagState {
   tags: TagDto[];
@@ -9,7 +10,7 @@ interface TagState {
   loading: boolean;
   error: string | null;
 
-  fetchTags: () => Promise<void>;
+  fetchTags: (collectionId?: string) => Promise<void>;
   addTag: (collectionId: string, name: string) => Promise<void>;
   updateTag: (id: string, name: string) => Promise<void>;
   deleteTag: (id: string) => Promise<void>;
@@ -17,9 +18,9 @@ interface TagState {
   setSelectedTag: (tag: TagDto) => void;
   clearSelectedTag: () => void;
 
-  addSelectedTag: (tag: TagDto) => void;
-  removeSelectedTag: (id: string) => void;
-  toggleSelectedTag: (tag: TagDto) => void;
+  addSelectedTag: (tag: TagDto) => Promise<void>;
+  removeSelectedTag: (id: string) => Promise<void>;
+  toggleSelectedTag: (tag: TagDto) => Promise<void>;
 
   reset: () => void;
 }
@@ -31,14 +32,32 @@ export const useTagStore = create<TagState>((set, get) => ({
   loading: false,
   error: null,
 
-  async fetchTags() {
+  async fetchTags(collectionId?: string) {
     set({ loading: true, error: null });
 
     try {
-      const res = await TagService.findAllTags();
+      const currentState = get();
+      // 使用 selectedTags 的 id 列表作为 tagIdList
+      const tagIdList = currentState.selectedTags.length > 0
+        ? currentState.selectedTags.map((tag) => tag.id)
+        : undefined;
+      
+      const res = await TagService.findAllTags(collectionId, tagIdList);
+
+      // 同步更新 selectedTags：根据 id 从新列表中匹配并更新
+      const updatedSelectedTags = currentState.selectedTags
+        .map((selectedTag) => res.find((tag) => tag.id === selectedTag.id))
+        .filter((tag): tag is TagDto => tag !== undefined);
+
+      // 同步更新 selectedTag
+      const updatedSelectedTag = currentState.selectedTag
+        ? res.find((tag) => tag.id === currentState.selectedTag?.id) || null
+        : null;
 
       set({
         tags: res,
+        selectedTags: updatedSelectedTags,
+        selectedTag: updatedSelectedTag,
         loading: false,
       });
     } catch (err: any) {
@@ -50,7 +69,7 @@ export const useTagStore = create<TagState>((set, get) => ({
     if (!collectionId || !name.trim()) return;
     try {
       await TagService.createTag(collectionId, name);
-      await get().fetchTags();
+      await get().fetchTags(collectionId);
     } catch (err: any) {
       set({ error: err.message || '创建失败' });
     }
@@ -59,7 +78,8 @@ export const useTagStore = create<TagState>((set, get) => ({
   async updateTag(id, name) {
     try {
       await TagService.updateTag(id, name);
-      await get().fetchTags();
+      const selectedCollectionId = useCollectionStore.getState().selectedCollection?.id;
+      await get().fetchTags(selectedCollectionId);
     } catch (err: any) {
       set({ error: err.message || '更新失败' });
     }
@@ -68,7 +88,8 @@ export const useTagStore = create<TagState>((set, get) => ({
   async deleteTag(id) {
     try {
       await TagService.deleteTag(id);
-      await get().fetchTags();
+      const selectedCollectionId = useCollectionStore.getState().selectedCollection?.id;
+      await get().fetchTags(selectedCollectionId);
 
       const cur = get().selectedTag;
       if (cur?.id === id) {
@@ -87,23 +108,37 @@ export const useTagStore = create<TagState>((set, get) => ({
   setSelectedTag: (tag) => set({ selectedTag: tag }),
   clearSelectedTag: () => set({ selectedTag: get().tags[0] || null }),
 
-  addSelectedTag: (tag) =>
-    set((state) =>
-      state.selectedTags.some((t) => t.id === tag.id) ? state : { selectedTags: [...state.selectedTags, tag] }
-    ),
+  addSelectedTag: async (tag) => {
+    const currentState = get();
+    const exists = currentState.selectedTags.some((t) => t.id === tag.id);
+    if (!exists) {
+      set({ selectedTags: [...currentState.selectedTags, tag] });
+      // 选中标签后重新获取关联标签
+      const selectedCollectionId = useCollectionStore.getState().selectedCollection?.id;
+      await get().fetchTags(selectedCollectionId);
+    }
+  },
 
-  removeSelectedTag: (id) =>
+  removeSelectedTag: async (id) => {
     set((state) => ({
       selectedTags: state.selectedTags.filter((t) => t.id !== id),
-    })),
+    }));
+    // 移除标签后重新获取关联标签
+    const selectedCollectionId = useCollectionStore.getState().selectedCollection?.id;
+    await get().fetchTags(selectedCollectionId);
+  },
 
-  toggleSelectedTag: (tag) =>
+  toggleSelectedTag: async (tag) => {
     set((state) => {
       const exists = state.selectedTags.some((t) => t.id === tag.id);
       return exists
         ? { selectedTags: state.selectedTags.filter((t) => t.id !== tag.id) }
         : { selectedTags: [...state.selectedTags, tag] };
-    }),
+    });
+    // 切换标签后重新获取关联标签
+    const selectedCollectionId = useCollectionStore.getState().selectedCollection?.id;
+    await get().fetchTags(selectedCollectionId);
+  },
 
   reset: () =>
     set({

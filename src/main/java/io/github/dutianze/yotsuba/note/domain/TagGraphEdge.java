@@ -32,7 +32,6 @@ public class TagGraphEdge {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    /** 工厂方法 */
     public static TagGraphEdge create(TagId source, TagId target, CollectionId collectionId, int weight) {
         TagGraphEdge edge = new TagGraphEdge();
         edge.id = new TagGraphEdgeId(source, target, collectionId);

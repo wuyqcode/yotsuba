@@ -1,5 +1,6 @@
 package io.github.dutianze.yotsuba.note.domain;
 
+import io.github.dutianze.yotsuba.file.FileResourceId;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
@@ -22,6 +23,11 @@ public class Tag implements Comparable<Tag> {
   private TagId id;
 
   private String name;
+
+  @Embedded
+  @AttributeOverride(name = "id", column = @Column(name = "cover_resource_id"))
+  @Nullable
+  private FileResourceId cover;
 
   @ManyToMany(mappedBy = "tags")
   private Set<Note> notes = new TreeSet<>();

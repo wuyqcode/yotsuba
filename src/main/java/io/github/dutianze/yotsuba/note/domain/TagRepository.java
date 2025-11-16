@@ -1,12 +1,21 @@
 package io.github.dutianze.yotsuba.note.domain;
 
 import java.util.List;
+
+import io.github.dutianze.yotsuba.note.domain.valueobject.CollectionId;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface TagRepository extends JpaRepository<Tag, TagId> {
+
+  @Query("""
+    SELECT t
+    FROM Tag t
+    WHERE t.collection.id = :collectionId
+    """)
+  List<Tag> findAllByCollectionId(CollectionId collectionId, Sort sort);
 
   @Query("""
     SELECT t

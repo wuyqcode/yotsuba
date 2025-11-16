@@ -1,0 +1,245 @@
+import { useState, useEffect } from 'react';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  Box,
+  Checkbox,
+  FormControlLabel,
+  Typography,
+  CircularProgress,
+  InputAdornment,
+  IconButton,
+} from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import AddIcon from '@mui/icons-material/Add';
+import { useTagStore } from '../hooks/useTagStore';
+import { NoteService } from 'Frontend/generated/endpoints';
+import TagDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/TagDto';
+import { useNoteStore } from '../hooks/useNotes';
+import { useCollectionStore } from '../hooks/useCollection';
+
+interface TagSelectDialogProps {
+  open: boolean;
+  onClose: () => void;
+  noteId: string;
+}
+
+export default function TagSelectDialog({ open, onClose, noteId }: TagSelectDialogProps) {
+  const tags = useTagStore((s) => s.tags);
+  const fetchTags = useTagStore((s) => s.fetchTags);
+  const addTag = useTagStore((s) => s.addTag);
+  const loading = useTagStore((s) => s.loading);
+  const fetchNotes = useNoteStore((s) => s.fetchNotes);
+  const selectedCollection = useCollectionStore((s) => s.selectedCollection);
+
+  const [selectedTagIds, setSelectedTagIds] = useState<Set<string>>(new Set());
+  const [searchText, setSearchText] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [creating, setCreating] = useState(false);
+
+  // 加载标签和笔记的标签
+  useEffect(() => {
+    if (open) {
+      fetchTags(selectedCollection?.id);
+      loadNoteTags();
+    }
+  }, [open, fetchTags, selectedCollection?.id]);
+
+  // 加载笔记的标签
+  const loadNoteTags = async () => {
+    try {
+      // 通过WikiNoteDto获取标签
+      const wikiNote = await NoteService.findWikiNoteById(noteId);
+      if (wikiNote.tags) {
+        const tagIds = wikiNote.tags
+          .filter((tag): tag is TagDto => tag !== null && tag !== undefined)
+          .map((tag) => tag.id);
+        setSelectedTagIds(new Set(tagIds));
+      }
+    } catch (error) {
+      console.error('加载笔记标签失败:', error);
+    }
+  };
+
+  const handleToggleTag = (tagId: string) => {
+    setSelectedTagIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(tagId)) {
+        newSet.delete(tagId);
+      } else {
+        newSet.add(tagId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await NoteService.updateNoteTags(noteId, Array.from(selectedTagIds));
+      await fetchNotes();
+      onClose();
+    } catch (error) {
+      console.error('保存标签失败:', error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // 过滤标签
+  const filteredTags = tags.filter((tag) =>
+    tag.name.toLowerCase().includes(searchText.toLowerCase())
+  );
+
+  // 检查搜索文本是否匹配现有标签
+  const searchTextLower = searchText.toLowerCase().trim();
+  const hasExactMatch = tags.some((tag) => tag.name.toLowerCase() === searchTextLower);
+  const showCreateOption = searchText.trim() && !hasExactMatch && filteredTags.length === 0;
+
+  // 创建新标签
+  const handleCreateTag = async () => {
+    if (!searchText.trim() || !selectedCollection?.id || creating) return;
+
+    const tagNameToCreate = searchText.trim();
+    try {
+      setCreating(true);
+      await addTag(selectedCollection.id, tagNameToCreate);
+      // addTag 内部已经调用了 fetchTags，等待一下确保状态更新
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      // 从 store 获取最新的标签列表
+      const updatedTags = useTagStore.getState().tags;
+      const newTag = updatedTags.find((tag) => tag.name.toLowerCase() === tagNameToCreate.toLowerCase());
+      if (newTag) {
+        setSelectedTagIds((prev) => new Set([...prev, newTag.id]));
+      }
+      // 清空搜索文本
+      setSearchText('');
+    } catch (error) {
+      console.error('创建标签失败:', error);
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle>为记事添加标签</DialogTitle>
+      <DialogContent>
+        <Box sx={{ mb: 2 }}>
+          <TextField
+            fullWidth
+            size="small"
+            placeholder="输入标签名称"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+
+        <Box
+          sx={{
+            maxHeight: 400,
+            overflowY: 'auto',
+            minHeight: 200,
+          }}>
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+              <CircularProgress size={24} />
+            </Box>
+          ) : (
+            <Box>
+              {/* 显示创建新标签选项 */}
+              {showCreateOption && (
+                <Box
+                  onClick={handleCreateTag}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    py: 1,
+                    px: 1,
+                    borderRadius: 1,
+                    cursor: 'pointer',
+                    backgroundColor: 'action.hover',
+                    '&:hover': {
+                      backgroundColor: 'action.selected',
+                    },
+                  }}>
+                  <AddIcon fontSize="small" color="primary" />
+                  <Typography variant="body2" color="primary">
+                    创建新标签: "{searchText}"
+                  </Typography>
+                  {creating && (
+                    <CircularProgress size={16} sx={{ ml: 'auto' }} />
+                  )}
+                </Box>
+              )}
+
+              {/* 显示匹配的标签列表 */}
+              {filteredTags.length > 0 && (
+                <>
+                  {filteredTags.map((tag: TagDto) => (
+                    <FormControlLabel
+                      key={tag.id}
+                      control={
+                        <Checkbox
+                          checked={selectedTagIds.has(tag.id)}
+                          onChange={() => handleToggleTag(tag.id)}
+                          size="small"
+                        />
+                      }
+                      label={tag.name}
+                      sx={{
+                        display: 'flex',
+                        width: '100%',
+                        py: 0.5,
+                        px: 1,
+                        borderRadius: 1,
+                        '&:hover': {
+                          backgroundColor: 'action.hover',
+                        },
+                        ...(selectedTagIds.has(tag.id) && {
+                          backgroundColor: 'action.selected',
+                        }),
+                      }}
+                    />
+                  ))}
+                </>
+              )}
+
+              {/* 没有搜索文本且没有标签时显示提示 */}
+              {!searchText && filteredTags.length === 0 && !showCreateOption && (
+                <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
+                  暂无标签
+                </Typography>
+              )}
+            </Box>
+          )}
+        </Box>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} disabled={saving}>
+          取消
+        </Button>
+        <Button
+          onClick={handleSave}
+          variant="contained"
+          disabled={saving}
+          startIcon={saving ? <CircularProgress size={16} /> : null}>
+          保存
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
