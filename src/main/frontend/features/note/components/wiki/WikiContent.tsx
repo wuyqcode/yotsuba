@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Box, Typography } from '@mui/material';
 import { useParams } from 'react-router';
 import RichTextEditor from 'reactjs-tiptap-editor';
@@ -9,10 +9,9 @@ import { WikiToc } from 'Frontend/features/note/components/wiki/WikiToc';
 import { useWikiEditor } from 'Frontend/features/note/hooks/useWikiEditor';
 import WikiHeader from 'Frontend/features/note/components/wiki/WikiHeader';
 import { useWikiNoteStore } from '../../hooks/useWikiNote';
+import { storage } from 'Frontend/utils/storage';
+import { STORAGE_KEYS } from 'Frontend/config/constants';
 
-// ==========================
-// 子组件：加载/错误/空状态
-// ==========================
 function WikiEditorPlaceholder({ loading, error }: { loading?: boolean; error?: string | null }) {
   return (
     <Box sx={{ p: 4 }}>
@@ -51,12 +50,9 @@ function WikiCommentSection() {
   );
 }
 
-// ==========================
-// 主组件
-// ==========================
 export default function WikiContent() {
   const { id } = useParams<{ id: string }>();
-  const { editor, setEditor, mode, extensions, isReadOnly } = useWikiEditor();
+  const { editor, setEditor, mode, extensions, isReadOnly, setMode } = useWikiEditor();
   const wiki = useWikiNoteStore((s) => s.wiki);
   const loading = useWikiNoteStore((s) => s.loading);
   const error = useWikiNoteStore((s) => s.error);
@@ -64,14 +60,78 @@ export default function WikiContent() {
   const updateWiki = useWikiNoteStore((s) => s.updateWiki);
   const setContent = (content: string) => updateWiki({ content });
 
-  // 状态分支
+  // 使用 ref 跟踪已处理的 id，避免重复处理
+  const processedIdRef = useRef<string | null>(null);
+
+  // 当 id 变化时，重置 processedIdRef
+  useEffect(() => {
+    if (processedIdRef.current !== id) {
+      console.log('[WikiContent] Id changed, resetting processedIdRef', { oldId: processedIdRef.current, newId: id });
+      processedIdRef.current = null;
+    }
+  }, [id]);
+
+  // 检查是否是新创建的笔记，如果是则设置为编辑模式
+  // 只在 id 变化且 wiki 加载完成后检查，确保每次切换笔记时都正确设置模式
+  useEffect(() => {
+    console.log('[WikiContent] useEffect triggered', { id, loading, hasWiki: !!wiki, currentMode: mode, processedId: processedIdRef.current });
+    
+    if (!id) {
+      console.log('[WikiContent] No id, skipping');
+      return;
+    }
+    
+    if (loading) {
+      console.log('[WikiContent] Still loading, skipping');
+      return;
+    }
+    
+    if (!wiki) {
+      console.log('[WikiContent] No wiki data, skipping');
+      return;
+    }
+
+    // 如果已经处理过这个 id，则跳过（避免重复执行）
+    if (processedIdRef.current === id) {
+      console.log('[WikiContent] Already processed this id, skipping');
+      return;
+    }
+
+    // 标记为已处理
+    processedIdRef.current = id;
+
+    const newNoteIds = storage.get<string[]>(STORAGE_KEYS.NEW_WIKI_NOTE_IDS) || [];
+    console.log('[WikiContent] Checking localStorage', {
+      newNoteIds,
+      currentId: id,
+      isNewNote: newNoteIds.includes(id),
+    });
+
+    if (newNoteIds.includes(id)) {
+      // 设置为编辑模式
+      console.log('[WikiContent] New note detected, setting mode to edit');
+      setMode('edit');
+      // 从 localStorage 中移除该 ID
+      const updatedIds = newNoteIds.filter((noteId) => noteId !== id);
+      if (updatedIds.length > 0) {
+        storage.set(STORAGE_KEYS.NEW_WIKI_NOTE_IDS, updatedIds);
+        console.log('[WikiContent] Updated localStorage, remaining IDs:', updatedIds);
+      } else {
+        storage.remove(STORAGE_KEYS.NEW_WIKI_NOTE_IDS);
+        console.log('[WikiContent] Removed localStorage key (no remaining IDs)');
+      }
+    } else {
+      // 默认设置为阅读模式
+      console.log('[WikiContent] Not a new note, setting mode to read');
+      setMode('read');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, loading]); // 只在 id 和 loading 变化时执行，通过检查 wiki 是否存在来判断加载完成
+
   if (loading || error || !wiki) {
     return <WikiEditorPlaceholder loading={loading} error={error} />;
   }
 
-  // ==========================
-  // 主渲染
-  // ==========================
   return (
     <Box
       sx={{

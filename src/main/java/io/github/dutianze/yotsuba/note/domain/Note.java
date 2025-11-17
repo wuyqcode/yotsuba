@@ -107,6 +107,29 @@ public class Note extends AbstractAggregateRoot<Note> implements Comparable<Note
     return note;
   }
 
+  public static Note createWithId(NoteId id, Collection collection, NoteTitle title, NoteType type) {
+    Note note = new Note();
+    note.id = id;
+    note.title = title;
+    note.noteType = type;
+    note.collection = collection;
+    note.content = new NoteContent();
+    note.registerEvent(new NoteCreated(note.id));
+    return note;
+  }
+
+  public static Note createWithIdAndContent(NoteId id, Collection collection, NoteTitle title,
+      NoteContent content, NoteType type) {
+    Note note = new Note();
+    note.id = id;
+    note.title = title;
+    note.noteType = type;
+    note.collection = collection;
+    note.content = content;
+    note.registerEvent(new NoteCreated(note.id));
+    return note;
+  }
+
   /** ----------- 领域行为 ----------- */
   public void rename(NoteTitle newTitle) {
     if (Objects.equals(this.title, newTitle)) {

@@ -46,8 +46,10 @@ export const useWikiNoteStore = create<WikiState>((set, get) => ({
     set({ loading: true, error: null });
     try {
       const data = await NoteService.findWikiNoteById(id);
+      // 设置 originalWiki，避免默认触发 dirty
       set({
         wiki: data,
+        originalWiki: { ...data },
         loading: false,
         isDirty: false,
       });

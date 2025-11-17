@@ -1,5 +1,5 @@
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
-import { Box, Fab, SwipeableDrawer, Typography, Grid, Divider, CircularProgress } from '@mui/material';
+import { Box, Fab, SwipeableDrawer, Typography, Grid, Divider, Skeleton } from '@mui/material';
 import { useState, useEffect } from 'react';
 import MenuIcon from '@mui/icons-material/Menu';
 import Sidebar from 'Frontend/features/note/components/Sidebar';
@@ -67,13 +67,7 @@ export default function NoteListView() {
         <Divider sx={{ my: 2 }} />
 
         {/* 内容 */}
-        <Box sx={{ flexGrow: 1 }}>
-          {isLoading && (
-            <Box textAlign="center" mt={4}>
-              <CircularProgress />
-            </Box>
-          )}
-
+        <Box sx={{ flexGrow: 1, position: 'relative' }}>
           {isError && (
             <Typography color="error" textAlign="center" mt={4}>
               Failed to load notes
@@ -86,19 +80,100 @@ export default function NoteListView() {
             </Typography>
           )}
 
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            {notes?.map((note) =>
-              searchText?.trim() ? (
-                <Grid key={note.id} size={{ xs: 12, sm: 12, md: 12, lg: 12 }}>
-                  <SearchResultCard note={note} />
-                </Grid>
-              ) : (
-                <Grid key={note.id} size={{ xs: 6, sm: 3, md: 2.4, lg: 2 }}>
-                  <NoteCard note={note} />
-                </Grid>
-              )
-            )}
-          </Grid>
+          <Box sx={{ position: 'relative', minHeight: isLoading ? '200px' : 0 }}>
+            {/* 骨架屏 */}
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                opacity: isLoading ? 1 : 0,
+                visibility: isLoading ? 'visible' : 'hidden',
+                transition: 'opacity 0.3s ease, visibility 0.3s ease',
+                pointerEvents: isLoading ? 'auto' : 'none',
+              }}>
+              <Grid container spacing={2} sx={{ mt: 1 }}>
+                {searchText?.trim() ? (
+                  // 搜索结果骨架屏
+                  Array.from({ length: 3 }).map((_, index) => (
+                    <Grid key={`skeleton-search-${index}`} size={{ xs: 12, sm: 12, md: 12, lg: 12 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: { xs: 'column', sm: 'row' },
+                          alignItems: 'center',
+                          borderRadius: 2,
+                          overflow: 'hidden',
+                          bgcolor: 'background.paper',
+                          border: '1px solid',
+                          borderColor: 'divider',
+                        }}>
+                        <Skeleton
+                          variant="rectangular"
+                          sx={{
+                            width: { xs: '100%', sm: 140 },
+                            height: { xs: 140, sm: 100 },
+                            flexShrink: 0,
+                          }}
+                        />
+                        <Box sx={{ flex: 1, p: 2, width: '100%' }}>
+                          <Skeleton variant="text" width="60%" height={24} sx={{ mb: 1 }} />
+                          <Skeleton variant="text" width="40%" height={20} sx={{ mb: 1 }} />
+                          <Skeleton variant="text" width="100%" height={20} />
+                          <Skeleton variant="text" width="80%" height={20} />
+                        </Box>
+                        <Box sx={{ pr: 1, display: 'flex', alignItems: 'center' }}>
+                          <Skeleton variant="circular" width={40} height={40} />
+                        </Box>
+                      </Box>
+                    </Grid>
+                  ))
+                ) : (
+                  // 笔记卡片骨架屏
+                  Array.from({ length: 12 }).map((_, index) => (
+                    <Grid key={`skeleton-note-${index}`} size={{ xs: 6, sm: 3, md: 2.4, lg: 2 }}>
+                      <Box sx={{ width: '100%' }}>
+                        <Skeleton
+                          variant="rectangular"
+                          sx={{
+                            width: '100%',
+                            aspectRatio: '16 / 9',
+                            borderRadius: 2,
+                            mb: 1,
+                          }}
+                        />
+                        <Skeleton variant="text" width="90%" height={20} sx={{ mb: 0.5 }} />
+                        <Skeleton variant="text" width="60%" height={16} />
+                      </Box>
+                    </Grid>
+                  ))
+                )}
+              </Grid>
+            </Box>
+
+            {/* 实际内容 */}
+            <Box
+              sx={{
+                opacity: isLoading ? 0 : 1,
+                visibility: isLoading ? 'hidden' : 'visible',
+                transition: 'opacity 0.3s ease, visibility 0.3s ease',
+              }}>
+              <Grid container spacing={2} sx={{ mt: 1 }}>
+                {notes?.map((note) =>
+                  searchText?.trim() ? (
+                    <Grid key={note.id} size={{ xs: 12, sm: 12, md: 12, lg: 12 }}>
+                      <SearchResultCard note={note} />
+                    </Grid>
+                  ) : (
+                    <Grid key={note.id} size={{ xs: 6, sm: 3, md: 2.4, lg: 2 }}>
+                      <NoteCard note={note} />
+                    </Grid>
+                  )
+                )}
+              </Grid>
+            </Box>
+          </Box>
         </Box>
 
         {/* 分页 */}

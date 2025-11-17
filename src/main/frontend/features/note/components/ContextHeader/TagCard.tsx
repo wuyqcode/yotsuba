@@ -1,7 +1,20 @@
 import { useState } from 'react';
-import { Box, Typography, IconButton, Tooltip } from '@mui/material';
+import {
+  Box,
+  Typography,
+  IconButton,
+  Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+  CircularProgress,
+} from '@mui/material';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useTagStore } from '../../hooks/useTagStore';
 import TagEditDialog from './TagEditDialog';
 import TagDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/TagDto';
@@ -12,11 +25,32 @@ interface TagCardProps {
 
 export default function TagCard({ tag }: TagCardProps) {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const deleteTag = useTagStore((s) => s.deleteTag);
 
   const handleEditClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setEditDialogOpen(true);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!tag?.id) return;
+    setDeleting(true);
+    try {
+      await deleteTag(tag.id);
+      setDeleteDialogOpen(false);
+    } catch (error) {
+      console.error('删除失败:', error);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -69,7 +103,7 @@ export default function TagCard({ tag }: TagCardProps) {
           <LocalOfferIcon sx={{ color: 'text.disabled', fontSize: 40 }} />
         )}
 
-        {/* 编辑按钮 - 悬停时显示在封面上 */}
+        {/* 编辑和删除按钮 - 悬停时显示在封面上 */}
         <Box
           sx={{
             position: 'absolute',
@@ -80,6 +114,7 @@ export default function TagCard({ tag }: TagCardProps) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            gap: 1,
             bgcolor: hovered ? 'rgba(0,0,0,0.4)' : 'transparent',
             opacity: hovered ? 1 : 0,
             transition: 'all 0.3s ease',
@@ -100,6 +135,23 @@ export default function TagCard({ tag }: TagCardProps) {
                 },
               }}>
               <EditIcon sx={{ fontSize: 20 }} />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="删除标签">
+            <IconButton
+              size="small"
+              onClick={handleDeleteClick}
+              sx={{
+                color: 'white',
+                bgcolor: 'rgba(255, 0, 0, 0.3)',
+                backdropFilter: 'blur(4px)',
+                width: 36,
+                height: 36,
+                '&:hover': {
+                  bgcolor: 'rgba(255, 0, 0, 0.5)',
+                },
+              }}>
+              <DeleteIcon sx={{ fontSize: 20 }} />
             </IconButton>
           </Tooltip>
         </Box>
@@ -130,6 +182,31 @@ export default function TagCard({ tag }: TagCardProps) {
         onClose={() => setEditDialogOpen(false)}
         tag={tag}
       />
+    )}
+
+    {/* 删除确认对话框 */}
+    {tag && (
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>确认删除</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            确定要删除标签「{tag.name}」吗？此操作无法撤销。
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} disabled={deleting}>
+            取消
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            color="error"
+            variant="contained"
+            disabled={deleting}
+            startIcon={deleting ? <CircularProgress size={16} /> : null}>
+            删除
+          </Button>
+        </DialogActions>
+      </Dialog>
     )}
     </>
   );

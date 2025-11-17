@@ -16,6 +16,8 @@ import { useNavigate } from 'react-router';
 import NoteType from 'Frontend/generated/io/github/dutianze/yotsuba/note/domain/valueobject/NoteType';
 import { useNoteStore } from '../../hooks/useNotes';
 import { useWikiEditorStore } from '../../hooks/useWikiEditor';
+import { storage } from 'Frontend/utils/storage';
+import { STORAGE_KEYS } from 'Frontend/config/constants';
 
 export default function SearchBar(): JSX.Element {
   const searchText = useNoteStore((s) => s.searchText);
@@ -34,16 +36,32 @@ export default function SearchBar(): JSX.Element {
 
   const handleCreate = async (type: NoteType) => {
     try {
+      console.log('[SearchBar] Creating note, type:', type);
       const newNoteId = await createNote(type);
-      if (!newNoteId) return;
+      if (!newNoteId) {
+        console.log('[SearchBar] No noteId returned');
+        return;
+      }
+      console.log('[SearchBar] Note created, id:', newNoteId);
 
       let path = '';
       if (type === NoteType.MEDIA) {
         path = `/note/media/${newNoteId}/edit`;
       } else if (type === NoteType.WIKI) {
         path = `/note/wiki/${newNoteId}`;
+        // 将新创建的 wiki 笔记 ID 存储到 localStorage，标记为需要编辑模式
+        const existingIds = storage.get<string[]>(STORAGE_KEYS.NEW_WIKI_NOTE_IDS) || [];
+        console.log('[SearchBar] Existing new note IDs in localStorage:', existingIds);
+        if (!existingIds.includes(newNoteId)) {
+          const updatedIds = [...existingIds, newNoteId];
+          storage.set(STORAGE_KEYS.NEW_WIKI_NOTE_IDS, updatedIds);
+          console.log('[SearchBar] Added noteId to localStorage:', updatedIds);
+        } else {
+          console.log('[SearchBar] NoteId already in localStorage, skipping');
+        }
       }
 
+      console.log('[SearchBar] Setting mode to edit and navigating to:', path);
       setMode('edit');
       navigate(path);
       setAnchorEl(null);

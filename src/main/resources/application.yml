@@ -18,18 +18,18 @@ spring:
       ddl-auto: none # create none
     properties:
       hibernate:
-        format_sql: true
-    show-sql: true
+        format_sql: false
+    show-sql: false
   flyway:
     enabled: false
-logging:
-  level:
-    org:
-      atmosphere: warn
-      hibernate:
-        orm:
-          jdbc:
-            bind: trace
+#logging:
+#  level:
+#    org:
+#      atmosphere: warn
+#      hibernate:
+#        orm:
+#          jdbc:
+#            bind: trace
 vaadin:
   launch-browser: 'true'
   allowed-packages: com.vaadin,org.vaadin,io.github.dutianze
