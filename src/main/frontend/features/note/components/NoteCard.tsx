@@ -33,7 +33,6 @@ export default function NoteCard({ note }: NoteCardProps) {
     setTagDialogOpen(true);
   };
 
-  // 格式化数字显示（如 10.2万）
   const formatNumber = (num: number): string => {
     if (num >= 10000) {
       return (num / 10000).toFixed(1) + '万';
@@ -42,10 +41,7 @@ export default function NoteCard({ note }: NoteCardProps) {
   };
 
   return (
-    <Box
-      sx={{ width: '100%' }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}>
+    <Box sx={{ width: '100%' }} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
       {/* 卡片图片区域 */}
       <Box
         onClick={handleNavigate}
@@ -249,13 +245,7 @@ export default function NoteCard({ note }: NoteCardProps) {
       )}
 
       {/* 标签选择对话框 */}
-      {note.id && (
-        <TagSelectDialog
-          open={tagDialogOpen}
-          onClose={() => setTagDialogOpen(false)}
-          noteId={note.id}
-        />
-      )}
+      {note.id && <TagSelectDialog open={tagDialogOpen} onClose={() => setTagDialogOpen(false)} noteId={note.id} />}
     </Box>
   );
 }

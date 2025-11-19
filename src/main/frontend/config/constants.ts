@@ -6,7 +6,6 @@ export const STORAGE_KEYS = {
   AUTH_TOKEN: 'auth_token',
   THEME: 'theme',
   LANGUAGE: 'language',
-  NEW_WIKI_NOTE_IDS: 'new_wiki_note_ids', // 新创建的 wiki 笔记 ID 列表，需要默认编辑模式
 } as const;
 
 export const BREAKPOINTS = {

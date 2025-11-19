@@ -1,7 +1,7 @@
 package io.github.dutianze.yotsuba.note.infrastructure;
 
 import io.github.dutianze.yotsuba.file.FileResourceId;
-import io.github.dutianze.yotsuba.note.domain.ExtractService;
+import io.github.dutianze.yotsuba.note.domain.service.ExtractService;
 import java.util.LinkedHashSet;
 import org.commonmark.node.AbstractVisitor;
 import org.commonmark.node.Image;

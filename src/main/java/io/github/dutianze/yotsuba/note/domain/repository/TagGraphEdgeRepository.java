@@ -1,7 +1,9 @@
-package io.github.dutianze.yotsuba.note.domain;
+package io.github.dutianze.yotsuba.note.domain.repository;
 
+import io.github.dutianze.yotsuba.note.domain.TagGraphEdge;
 import io.github.dutianze.yotsuba.note.domain.valueobject.CollectionId;
 import io.github.dutianze.yotsuba.note.domain.valueobject.TagGraphEdgeId;
+import io.github.dutianze.yotsuba.note.domain.valueobject.TagId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

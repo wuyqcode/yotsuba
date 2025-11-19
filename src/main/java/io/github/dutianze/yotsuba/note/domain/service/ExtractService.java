@@ -1,4 +1,4 @@
-package io.github.dutianze.yotsuba.note.domain;
+package io.github.dutianze.yotsuba.note.domain.service;
 
 import io.github.dutianze.yotsuba.file.FileResourceId;
 import java.util.LinkedHashSet;

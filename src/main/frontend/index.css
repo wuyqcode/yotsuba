@@ -84,3 +84,13 @@ h6 {
   box-shadow: none !important;
   border: none !important;
 }
+
+/* 移除 ProseMirror editor 的焦点轮廓（特别是 Firefox） */
+.ProseMirror,
+.ProseMirror-focused,
+.reactjs-tiptap-editor section,
+.reactjs-tiptap-editor section:focus,
+.reactjs-tiptap-editor section:focus-visible {
+  outline: none !important;
+  border: none !important;
+}

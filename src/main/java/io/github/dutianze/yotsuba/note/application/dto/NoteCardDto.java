@@ -1,6 +1,7 @@
 package io.github.dutianze.yotsuba.note.application.dto;
 
 import io.github.dutianze.yotsuba.note.domain.valueobject.NoteType;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,4 +20,5 @@ public class NoteCardDto {
   private long likes;
   private boolean verified;
   private NoteType noteType;
+  private List<String> tags;
 }

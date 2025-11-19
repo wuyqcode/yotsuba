@@ -1,13 +1,9 @@
-package io.github.dutianze.yotsuba.note.application;
+package io.github.dutianze.yotsuba.note.application.dto;
 
 import io.github.dutianze.yotsuba.file.FileResourceId;
-import io.github.dutianze.yotsuba.note.application.dto.CommentDto;
-import io.github.dutianze.yotsuba.note.application.dto.MediaNoteDto;
-import io.github.dutianze.yotsuba.note.application.dto.NoteCardDto;
-import io.github.dutianze.yotsuba.note.application.dto.TagDto;
-import io.github.dutianze.yotsuba.note.application.dto.WikiNoteDto;
 import io.github.dutianze.yotsuba.note.domain.MediaNote;
 import io.github.dutianze.yotsuba.note.domain.Note;
+import io.github.dutianze.yotsuba.note.domain.Tag;
 import io.github.dutianze.yotsuba.note.domain.valueobject.NoteContent;
 import jakarta.annotation.Nullable;
 import java.util.Optional;
@@ -32,6 +28,7 @@ public class NoteAssembler {
         .likes(0)
         .noteType(note.getNoteType())
         .verified(true)
+        .tags(note.getTags().stream().map(Tag::getName).toList())
         .build();
   }
 
@@ -40,7 +37,8 @@ public class NoteAssembler {
     return WikiNoteDto.builder()
         .id(note.getId().id())
         .title(note.getTitle().title())
-        .content(Optional.ofNullable(note.getContent()).map(NoteContent::content).orElse(""))
+        .initial(note.isInitial())
+        .content(Optional.of(note.getContent()).map(NoteContent::content).orElse(""))
         .cover(Optional.ofNullable(note.getCover()).map(FileResourceId::getUrl).orElse(""))
         .tags(note.getTags().stream().map(TagDto::fromEntity).collect(Collectors.toList()))
         .comments(

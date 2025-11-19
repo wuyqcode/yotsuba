@@ -3,6 +3,7 @@ package io.github.dutianze.yotsuba.note.domain;
 import io.github.dutianze.yotsuba.note.domain.valueobject.CollectionCategory;
 import io.github.dutianze.yotsuba.note.domain.valueobject.CollectionCategoryConverter;
 import io.github.dutianze.yotsuba.note.domain.valueobject.CollectionId;
+import io.github.dutianze.yotsuba.search.CollectionIdentifierBridge;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -18,6 +19,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 
 @Getter
 @Setter
@@ -26,6 +29,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Table(name = "collection")
 public class Collection {
 
+  @DocumentId(identifierBridge = @IdentifierBridgeRef(type = CollectionIdentifierBridge.class))
   @EmbeddedId
   @AttributeOverride(name = "id", column = @Column(name = "id"))
   private CollectionId id;

@@ -1,6 +1,9 @@
 package io.github.dutianze.yotsuba.note.domain;
 
 import io.github.dutianze.yotsuba.file.FileResourceId;
+import io.github.dutianze.yotsuba.note.domain.valueobject.CollectionId;
+import io.github.dutianze.yotsuba.note.domain.valueobject.TagId;
+import io.github.dutianze.yotsuba.search.TagIdentifierBridge;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
@@ -11,6 +14,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 
 @Data
 @Entity
@@ -18,6 +23,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @NoArgsConstructor
 public class Tag implements Comparable<Tag> {
 
+  @DocumentId(identifierBridge = @IdentifierBridgeRef(type = TagIdentifierBridge.class))
   @EmbeddedId
   @AttributeOverride(name = "id", column = @Column(name = "id"))
   private TagId id;
@@ -53,6 +59,14 @@ public class Tag implements Comparable<Tag> {
     Tag tag = new Tag();
     tag.id = new TagId();
     tag.name = name;
+    return tag;
+  }
+
+  public static Tag create(TagId tagId, String name, Collection collection) {
+    Tag tag = new Tag();
+    tag.id = tagId;
+    tag.name = name;
+    tag.collection = collection;
     return tag;
   }
 

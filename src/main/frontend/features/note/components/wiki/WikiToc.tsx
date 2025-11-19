@@ -12,18 +12,14 @@ import {
 } from '@mui/material';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { useWikiEditor } from '../../hooks/useWikiEditor';
-import type { HeadingItem } from '../../hooks/useWikiEditor';
+import { HeadingItem, useWikiNoteStore } from '../../hooks/useWikiNoteStore';
 
 export function WikiToc() {
   const theme = useTheme();
-  const { editor, headings, setMode } = useWikiEditor();
+  const { editor, headings } = useWikiNoteStore();
   const [open, setOpen] = useState(true);
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  // =====================================
-  // 监听选中标题变化，更新 activeId
-  // =====================================
   useEffect(() => {
     if (!editor) return;
 

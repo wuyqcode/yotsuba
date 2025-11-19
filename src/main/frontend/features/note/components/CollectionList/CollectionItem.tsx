@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Box, Card, CardContent, Typography, IconButton, TextField } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -14,7 +14,6 @@ interface Props {
 const CollectionItem: React.FC<Props> = ({ col }) => {
   const [editing, setEditing] = useState(false);
   const [tempName, setTempName] = useState(col.name);
-
   const selectedCollection = useCollectionStore((s) => s.selectedCollection);
   const updateCollection = useCollectionStore((s) => s.updateCollection);
   const deleteCollection = useCollectionStore((s) => s.deleteCollection);

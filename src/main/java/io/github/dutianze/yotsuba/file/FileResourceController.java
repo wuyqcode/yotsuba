@@ -34,7 +34,7 @@ public class FileResourceController {
         String contentType =
                 Optional.ofNullable(file.getContentType()).orElse(MediaType.APPLICATION_OCTET_STREAM_VALUE);
 
-        FileResource fileResource = new FileResource(null, filename, contentType, file.getBytes());
+        FileResource fileResource = FileResource.create(null, filename, contentType, file.getBytes());
 
         fileResourceRepository.save(fileResource);
         return ResponseEntity.ok().body(fileResource.getId().getUrl());

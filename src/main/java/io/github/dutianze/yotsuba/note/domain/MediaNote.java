@@ -2,6 +2,7 @@ package io.github.dutianze.yotsuba.note.domain;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.dutianze.yotsuba.note.domain.converter.JsonListConverter;
 import io.github.dutianze.yotsuba.note.domain.valueobject.MediaSeason;
 import io.github.dutianze.yotsuba.note.domain.valueobject.NoteId;
 import io.github.dutianze.yotsuba.search.NoteIdentifierBridge;

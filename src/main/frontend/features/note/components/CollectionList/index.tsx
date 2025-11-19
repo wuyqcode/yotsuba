@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import CollectionItem from './CollectionItem';
 import AddCollectionDialog from './AddCollectionDialog';
@@ -6,18 +6,7 @@ import { useCollectionStore } from '../../hooks/useCollection';
 
 const CollectionList = () => {
   const collections = useCollectionStore((s) => s.collections);
-  const addCollection = useCollectionStore((s) => s.addCollection);
-  const fetchCollections = useCollectionStore((s) => s.fetchCollections);
-
-  useEffect(() => {
-    fetchCollections();
-  }, []);
-
   const [openAddDialog, setOpenAddDialog] = useState(false);
-
-  const handleAddCollection = async (name: string) => {
-    await addCollection(name);
-  };
 
   return (
     <Box p={2}>
@@ -61,7 +50,7 @@ const CollectionList = () => {
         </Box>
       </Box>
       {/* Dialogs */}
-      <AddCollectionDialog open={openAddDialog} onClose={() => setOpenAddDialog(false)} onAdd={handleAddCollection} />
+      <AddCollectionDialog open={openAddDialog} onClose={() => setOpenAddDialog(false)} />
     </Box>
   );
 };

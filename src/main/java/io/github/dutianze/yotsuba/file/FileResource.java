@@ -44,12 +44,24 @@ public class FileResource implements Comparable<FileResource> {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public FileResource(ReferenceInfo reference, String filename, String contentType, byte[] data) {
-        this.id = new FileResourceId();
+    public static FileResource create(ReferenceInfo reference, String filename, String contentType, byte[] data) {
+        FileResource fileResource = new FileResource();
+        fileResource.id = new FileResourceId();
+        fileResource.filename = filename;
+        fileResource.contentType = contentType;
+        fileResource.data = data;
+        fileResource.reference = reference;
+        DataSize dataSize = DataSize.ofBytes(data.length);
+        fileResource.size = dataSize.toKilobytes();
+        fileResource.createdAt = LocalDateTime.now();
+        return fileResource;
+    }
+
+    public FileResource(FileResourceId fileResourceId, String filename, String contentType, byte[] data) {
+        this.id = fileResourceId;
         this.filename = filename;
         this.contentType = contentType;
         this.data = data;
-        this.reference = reference;
         DataSize dataSize = DataSize.ofBytes(data.length);
         this.size = dataSize.toKilobytes();
         this.createdAt = LocalDateTime.now();

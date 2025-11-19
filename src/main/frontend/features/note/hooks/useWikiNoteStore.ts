@@ -1,8 +1,16 @@
 import { create } from 'zustand';
-import { useEffect } from 'react';
 import { NoteService } from 'Frontend/generated/endpoints';
 import WikiNoteDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/WikiNoteDto';
-import { useLock } from 'Frontend/features/note/hooks/useLock';
+import { type Editor } from 'reactjs-tiptap-editor';
+
+export type EditorMode = 'read' | 'edit' | 'comment';
+
+export interface HeadingItem {
+  id: string;
+  level: number;
+  text: string;
+  pos: number;
+}
 
 interface WikiState {
   wiki: WikiNoteDto | null;
@@ -10,17 +18,22 @@ interface WikiState {
   loading: boolean;
   error: string | null;
   isDirty: boolean;
+  editor: Editor | null;
+  headings: HeadingItem[];
+  mode: EditorMode;
 
+  setEditor: (editor: Editor | null) => void;
+  setHeadings: (items: HeadingItem[]) => void;
+  setMode: (mode: EditorMode) => void;
+  isReadOnly: () => boolean;
   loadWiki: (id: string | undefined) => Promise<void>;
   saveWiki: () => Promise<void>;
   reset: () => void;
   updateWiki: (patch: Partial<WikiNoteDto>) => void;
-  resetDirty: () => void;
 }
 
 function computeDirty(wiki: WikiNoteDto | null, original: WikiNoteDto | null): boolean {
   if (!wiki || !original) {
-    console.log('[computeDirty] wiki or original is null → return false');
     return false;
   }
 
@@ -37,6 +50,14 @@ export const useWikiNoteStore = create<WikiState>((set, get) => ({
   loading: false,
   error: null,
   isDirty: false,
+  editor: null,
+  headings: [],
+  mode: 'read',
+
+  setEditor: (editor) => set({ editor }),
+  setHeadings: (items) => set({ headings: items }),
+  setMode: (mode) => set({ mode }),
+  isReadOnly: () => get().mode !== 'edit',
 
   async loadWiki(id: string | undefined) {
     if (!id) {
@@ -46,12 +67,15 @@ export const useWikiNoteStore = create<WikiState>((set, get) => ({
     set({ loading: true, error: null });
     try {
       const data = await NoteService.findWikiNoteById(id);
-      // 设置 originalWiki，避免默认触发 dirty
+
+      const mode = data.initial ? 'edit' : 'read';
+
       set({
         wiki: data,
         originalWiki: { ...data },
         loading: false,
         isDirty: false,
+        mode,
       });
     } catch (err: any) {
       set({ loading: false, error: err.message || '加载失败' });
@@ -60,14 +84,21 @@ export const useWikiNoteStore = create<WikiState>((set, get) => ({
 
   async saveWiki() {
     const { wiki } = get();
-    if (!wiki) return;
+    if (!wiki) {
+      return;
+    }
 
-    await NoteService.updateNote(wiki.id, wiki.title, wiki.content);
-    set({ originalWiki: { ...wiki }, isDirty: false });
+    try {
+      await NoteService.updateNote(wiki.id, wiki.title, wiki.content);
+      set({ originalWiki: { ...wiki }, isDirty: false });
+    } catch (err: any) {
+      console.error('[saveWiki] save failed:', err);
+      throw err;
+    }
   },
 
   reset() {
-    set({ wiki: null, originalWiki: null, isDirty: false });
+    set({ wiki: null, originalWiki: null, isDirty: false, headings: [], mode: 'edit', editor: null });
   },
 
   updateWiki(patch) {
@@ -76,20 +107,16 @@ export const useWikiNoteStore = create<WikiState>((set, get) => ({
         return state;
       }
 
+      const originalWiki = state.originalWiki || { ...state.wiki };
+
       const newWiki = { ...state.wiki, ...patch };
-      if (state.originalWiki == null) {
-        state.originalWiki = newWiki;
-      }
+      const isDirty = computeDirty(newWiki, originalWiki);
 
       return {
         wiki: newWiki,
-        isDirty: computeDirty(newWiki, state.originalWiki),
+        originalWiki,
+        isDirty,
       };
     });
-  },
-
-  resetDirty() {
-    const { originalWiki } = get();
-    set({ isDirty: false, wiki: originalWiki ? { ...originalWiki } : null });
   },
 }));

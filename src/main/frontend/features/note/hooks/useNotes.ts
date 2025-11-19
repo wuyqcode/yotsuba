@@ -4,6 +4,7 @@ import { NoteService } from 'Frontend/generated/endpoints';
 import NoteCardDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/NoteCardDto';
 import NoteType from 'Frontend/generated/io/github/dutianze/yotsuba/note/domain/valueobject/NoteType';
 import { useCollectionStore } from './useCollection';
+import { useTagStore } from './useTagStore';
 
 type NoteState = {
   notes: NoteCardDto[];
@@ -29,7 +30,7 @@ type NoteState = {
 export const useNoteStore = create<NoteState>((set, get) => ({
   notes: [],
   page: 1,
-  pageSize: 10,
+  pageSize: 12,
   totalPages: 0,
   totalElements: 0,
   searchText: '',
@@ -45,6 +46,7 @@ export const useNoteStore = create<NoteState>((set, get) => ({
   /** 拉取笔记列表 */
   fetchNotes: async () => {
     const selectedCollectionId = useCollectionStore.getState().selectedCollection?.id;
+    const selectedTagIdList = useTagStore.getState().selectedTags.map((tag) => tag.id);
     const { page, pageSize, searchText } = get();
 
     if (!selectedCollectionId) {
@@ -60,7 +62,13 @@ export const useNoteStore = create<NoteState>((set, get) => ({
 
     set({ loading: true, error: null });
     try {
-      const res = await NoteService.searchNotes(selectedCollectionId, searchText, page - 1, pageSize);
+      const res = await NoteService.searchNotes(
+        selectedCollectionId,
+        searchText,
+        selectedTagIdList,
+        page - 1,
+        pageSize
+      );
       set({
         notes: res.content,
         totalPages: res.totalPages,

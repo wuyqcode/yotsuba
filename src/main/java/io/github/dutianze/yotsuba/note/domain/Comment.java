@@ -1,5 +1,6 @@
 package io.github.dutianze.yotsuba.note.domain;
 
+import io.github.dutianze.yotsuba.note.domain.valueobject.CommentId;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Stack, Box } from '@mui/material';
 import SearchBar from './SearchBar';
 import TagCard from './TagCard';

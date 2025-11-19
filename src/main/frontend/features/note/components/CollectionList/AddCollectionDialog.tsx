@@ -1,14 +1,15 @@
 import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from '@mui/material';
 import React, { useEffect, useState } from 'react';
+import { useCollectionStore } from '../../hooks/useCollection';
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  onAdd: (name: string) => Promise<void> | void;
 }
 
-const AddCollectionDialog: React.FC<Props> = ({ open, onClose, onAdd }) => {
+const AddCollectionDialog: React.FC<Props> = ({ open, onClose }) => {
   const [name, setName] = useState('');
+  const addCollection = useCollectionStore((s) => s.addCollection);
 
   useEffect(() => {
     if (!open) {
@@ -23,7 +24,7 @@ const AddCollectionDialog: React.FC<Props> = ({ open, onClose, onAdd }) => {
 
   const handleAdd = () => {
     if (name.trim()) {
-      Promise.resolve(onAdd(name.trim()))
+      Promise.resolve(addCollection(name.trim()))
         .then(() => {
           setName('');
           onClose();

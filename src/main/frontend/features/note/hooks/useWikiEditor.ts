@@ -1,5 +1,4 @@
-import { useRef, useState, useMemo, useCallback, useEffect } from 'react';
-import { create } from 'zustand';
+import { useMemo, useCallback } from 'react';
 import { BaseKit, type Editor } from 'reactjs-tiptap-editor';
 import { Heading } from 'reactjs-tiptap-editor/heading';
 import { Bold } from 'reactjs-tiptap-editor/bold';
@@ -16,63 +15,34 @@ import { HorizontalRule } from 'reactjs-tiptap-editor/horizontalrule';
 import { History } from 'reactjs-tiptap-editor/history';
 import { SlashCommand } from 'reactjs-tiptap-editor/slashcommand';
 import { useUpload } from 'Frontend/features/note/hooks/useUpload';
-
-export type EditorMode = 'read' | 'edit' | 'comment';
-
-export interface HeadingItem {
-  id: string;
-  level: number;
-  text: string;
-  pos: number;
-}
-
-interface WikiEditorState {
-  editor: Editor | null;
-  headings: HeadingItem[];
-  mode: EditorMode;
-  setEditor: (editor: Editor | null) => void;
-  setHeadings: (items: HeadingItem[]) => void;
-  setMode: (mode: EditorMode) => void;
-  reset: () => void;
-  isReadOnly: () => boolean;
-}
-
-export const useWikiEditorStore = create<WikiEditorState>((set, get) => ({
-  editor: null,
-  headings: [],
-  mode: 'read',
-
-  setEditor: (editor) => set({ editor }),
-  setHeadings: (items) => set({ headings: items }),
-  setMode: (mode) => set({ mode }),
-  reset: () => set({ headings: [], mode: 'edit', editor: null }),
-  isReadOnly: () => get().mode !== 'edit',
-}));
+import { HeadingItem, useWikiNoteStore } from './useWikiNoteStore';
 
 export function useWikiEditor() {
   const { upload } = useUpload();
-  const { editor: currentEditor, setEditor, headings, setHeadings, mode, setMode, isReadOnly } = useWikiEditorStore();
-  const CustomHeading = Heading.extend({
-    addAttributes() {
-      return {
-        ...this.parent?.(),
-        id: {
-          default: null,
-          parseHTML: (element) => element.getAttribute('id'),
-          renderHTML: (attributes) => {
-            if (!attributes.id) return {};
-            return { id: attributes.id };
-          },
-        },
-      };
-    },
-  });
+  const currentEditor = useWikiNoteStore((state) => state.editor);
+  const setEditor = useWikiNoteStore((state) => state.setEditor);
+  const setHeadings = useWikiNoteStore((state) => state.setHeadings);
+
   const extensions = useMemo(
     () => [
       BaseKit.configure({
         placeholder: { showOnlyCurrent: true, placeholder: '请输入正文内容...' },
       }),
-      CustomHeading,
+      Heading.extend({
+        addAttributes() {
+          return {
+            ...this.parent?.(),
+            id: {
+              default: null,
+              parseHTML: (element) => element.getAttribute('id'),
+              renderHTML: (attributes) => {
+                if (!attributes.id) return {};
+                return { id: attributes.id };
+              },
+            },
+          };
+        },
+      }),
       Bold,
       Italic,
       TextUnderline,
@@ -137,12 +107,7 @@ export function useWikiEditor() {
   );
 
   return {
-    editor: currentEditor,
     setEditor: setEditorWithListener,
     extensions,
-    headings,
-    mode,
-    setMode,
-    isReadOnly,
   };
 }

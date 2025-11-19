@@ -4,20 +4,24 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.hilla.Endpoint;
 import io.github.dutianze.yotsuba.file.FileResourceId;
 import io.github.dutianze.yotsuba.note.application.dto.MediaNoteDto;
+import io.github.dutianze.yotsuba.note.application.dto.NoteAssembler;
 import io.github.dutianze.yotsuba.note.application.dto.NoteCardDto;
 import io.github.dutianze.yotsuba.note.application.dto.PageDto;
 import io.github.dutianze.yotsuba.note.application.dto.WikiNoteDto;
 import io.github.dutianze.yotsuba.note.domain.*;
+import io.github.dutianze.yotsuba.note.domain.repository.CollectionRepository;
+import io.github.dutianze.yotsuba.note.domain.repository.MediaNoteRepository;
+import io.github.dutianze.yotsuba.note.domain.repository.NoteRepository;
+import io.github.dutianze.yotsuba.note.domain.repository.TagGraphEdgeRepository;
+import io.github.dutianze.yotsuba.note.domain.repository.TagRepository;
+import io.github.dutianze.yotsuba.note.domain.service.ExtractService;
 import io.github.dutianze.yotsuba.note.domain.valueobject.*;
 import io.github.dutianze.yotsuba.search.NoteSearch;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityNotFoundException;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -74,15 +78,11 @@ public class NoteService {
     }
 
     @Transactional(readOnly = true)
-    public PageDto<NoteCardDto> searchNotes(String collectionId, String searchText, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-
-        if (StringUtils.isBlank(searchText)) {
-            Page<Note> notes = noteRepository.findAllByCollectionId(collectionId, pageable);
-            return PageDto.from(notes.map(noteAssembler::toCardDto));
-        }
-
-        return PageDto.from(noteSearch.search(searchText, pageable));
+    public PageDto<NoteCardDto> searchNotes(String collectionId, String searchText, List<String> tagIdList, int page, int size) {
+        List<TagId> tagIds = tagIdList.stream().map(TagId::new).toList();
+        Page<NoteCardDto> dtoPage =
+                noteSearch.search(new CollectionId(collectionId), tagIds, searchText, PageRequest.of(page, size));
+        return PageDto.from(dtoPage);
     }
 
     /**
@@ -91,7 +91,7 @@ public class NoteService {
     @Transactional
     public String createNote(String collectionId, NoteType noteType) {
         Collection collection = collectionRepository.findById(new CollectionId(collectionId)).orElseThrow();
-        Note note = Note.create(collection, new NoteTitle("untitled"), noteType);
+        Note note = Note.init(collection, noteType);
         return noteRepository.save(note).getId().id();
     }
 
@@ -99,7 +99,6 @@ public class NoteService {
     public void updateNote(@Nonnull String id, @Nonnull String title, @Nonnull String content) {
         Note note = noteRepository.findById(new NoteId(id))
                                   .orElseThrow(() -> new EntityNotFoundException("Note not found: " + id));
-
         LinkedHashSet<FileResourceId> oldRefs =
                 extractService.extractFileReferenceIds(note.getContent().content());
         LinkedHashSet<FileResourceId> newRefs =
@@ -107,6 +106,7 @@ public class NoteService {
 
         note.rename(new NoteTitle(title));
         note.refreshContent(new NoteContent(content), oldRefs, newRefs);
+        note.markAsInitialized();
         noteRepository.save(note);
     }
 
@@ -125,8 +125,8 @@ public class NoteService {
                                   .orElseThrow(() -> new EntityNotFoundException("Note not found: " + id));
 
         // 获取旧的标签集合
-        Set<Tag> oldTags = new java.util.HashSet<>(note.getTags());
-        
+        Set<Tag> oldTags = new HashSet<>(note.getTags());
+
         Set<Tag> newTags = tagIds.stream()
                                  .map(TagId::new)
                                  .map(tagRepository::findById)
@@ -154,11 +154,11 @@ public class NoteService {
         Set<TagGraphEdgeId> newEdgeIds = calculateEdgeIds.apply(newTags);
 
         // 找出新增的标签对
-        Set<TagGraphEdgeId> addedEdgeIds = new java.util.HashSet<>(newEdgeIds);
+        Set<TagGraphEdgeId> addedEdgeIds = new HashSet<>(newEdgeIds);
         addedEdgeIds.removeAll(oldEdgeIds);
 
         // 找出移除的标签对
-        Set<TagGraphEdgeId> removedEdgeIds = new java.util.HashSet<>(oldEdgeIds);
+        Set<TagGraphEdgeId> removedEdgeIds = new HashSet<>(oldEdgeIds);
         removedEdgeIds.removeAll(newEdgeIds);
 
         // 处理新增的标签对：增加或创建边

@@ -3,6 +3,8 @@ package io.github.dutianze.yotsuba.note.domain;
 import io.github.dutianze.yotsuba.file.FileResourceId;
 import io.github.dutianze.yotsuba.file.FileResourceReferenceAddedEvent;
 import io.github.dutianze.yotsuba.file.FileResourceReferenceRemovedEvent;
+import io.github.dutianze.yotsuba.note.domain.event.NoteCreated;
+import io.github.dutianze.yotsuba.note.domain.event.NoteUpdatedEvent;
 import io.github.dutianze.yotsuba.note.domain.valueobject.NoteContent;
 import io.github.dutianze.yotsuba.note.domain.valueobject.NoteId;
 import io.github.dutianze.yotsuba.note.domain.valueobject.NoteTitle;
@@ -25,21 +27,21 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.atmosphere.interceptor.AtmosphereResourceStateRecovery.B;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.springframework.data.domain.AbstractAggregateRoot;
@@ -56,22 +58,27 @@ public class Note extends AbstractAggregateRoot<Note> implements Comparable<Note
   @AttributeOverride(name = "id", column = @Column(name = "id"))
   private NoteId id;
 
+  @IndexedEmbedded
   @Embedded
   @AttributeOverride(name = "title", column = @Column(name = "title"))
   private NoteTitle title;
+
+  @IndexedEmbedded
+  private NoteContent content;
 
   @Embedded
   @AttributeOverride(name = "id", column = @Column(name = "cover_resource_id"))
   @Nullable
   private FileResourceId cover;
 
-  @IndexedEmbedded
-  private NoteContent content;
+  @Column(name = "initial", nullable = false)
+  private boolean initial = false;
 
   @Column(name = "note_type")
   @Enumerated(EnumType.STRING)
   private NoteType noteType = NoteType.MEDIA;
 
+  @IndexedEmbedded(includeEmbeddedObjectId = true)
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "collection_id")
   private Collection collection;
@@ -79,6 +86,7 @@ public class Note extends AbstractAggregateRoot<Note> implements Comparable<Note
   @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, orphanRemoval = true)
   private final List<Comment> comments = new ArrayList<>();
 
+  @IndexedEmbedded(includeEmbeddedObjectId = true)
   @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
   @JoinTable(
       name = "note_tag",
@@ -87,6 +95,7 @@ public class Note extends AbstractAggregateRoot<Note> implements Comparable<Note
   )
   private final Set<Tag> tags = new TreeSet<>();
 
+  @GenericField(sortable = Sortable.YES)
   @Nullable
   @CreationTimestamp
   private LocalDateTime createdAt;
@@ -95,42 +104,40 @@ public class Note extends AbstractAggregateRoot<Note> implements Comparable<Note
   @UpdateTimestamp
   private LocalDateTime updatedAt;
 
-  /** ----------- 工厂方法 ----------- */
-  public static Note create(Collection collection, NoteTitle title, NoteType type) {
+  public static Note init(Collection collection, NoteType type) {
     Note note = new Note();
     note.id = new NoteId();
-    note.title = title;
+    note.title = new NoteTitle();
     note.noteType = type;
     note.collection = collection;
     note.content = new NoteContent();
+    note.initial = true;
     note.registerEvent(new NoteCreated(note.id));
     return note;
   }
 
-  public static Note createWithId(NoteId id, Collection collection, NoteTitle title, NoteType type) {
-    Note note = new Note();
-    note.id = id;
-    note.title = title;
-    note.noteType = type;
-    note.collection = collection;
-    note.content = new NoteContent();
-    note.registerEvent(new NoteCreated(note.id));
-    return note;
+  public void markAsInitialized() {
+    this.initial = false;
   }
 
   public static Note createWithIdAndContent(NoteId id, Collection collection, NoteTitle title,
-      NoteContent content, NoteType type) {
+      NoteContent content, NoteType type, FileResourceId cover, long createAt, long updateAt) {
     Note note = new Note();
     note.id = id;
     note.title = title;
     note.noteType = type;
     note.collection = collection;
     note.content = content;
+    note.cover = cover;
+    note.createdAt =
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(createAt),
+                                    TimeZone.getDefault().toZoneId());
+    note.updatedAt = LocalDateTime.ofInstant(Instant.ofEpochMilli(updateAt),
+                                             TimeZone.getDefault().toZoneId());  ;
     note.registerEvent(new NoteCreated(note.id));
     return note;
   }
 
-  /** ----------- 领域行为 ----------- */
   public void rename(NoteTitle newTitle) {
     if (Objects.equals(this.title, newTitle)) {
       return;
@@ -142,7 +149,6 @@ public class Note extends AbstractAggregateRoot<Note> implements Comparable<Note
   public void refreshContent(NoteContent newContent,
       LinkedHashSet<FileResourceId> oldRefs,
       LinkedHashSet<FileResourceId> newRefs) {
-
     if (Objects.equals(this.content, newContent) && Objects.equals(oldRefs, newRefs)) {
       return;
     }
@@ -156,7 +162,6 @@ public class Note extends AbstractAggregateRoot<Note> implements Comparable<Note
     this.registerEvent(new NoteUpdatedEvent(this.id));
   }
 
-  /** ----------- 内部领域逻辑 ----------- */
   private void updateCover(@Nullable FileResourceId newCover) {
     if (Objects.equals(this.cover, newCover)) {
       return;
@@ -184,7 +189,6 @@ public class Note extends AbstractAggregateRoot<Note> implements Comparable<Note
         .forEach(id -> registerEvent(FileResourceReferenceAddedEvent.forNoteContent(ref, id)));
   }
 
-  /** ----------- 比较与相等 ----------- */
   @Override
   public int compareTo(Note other) {
     return this.id.id().compareTo(other.id.id());

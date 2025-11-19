@@ -74,7 +74,7 @@ export default function PaginationBar() {
             setPage(1);
             setPageSize(Number(e.target.value));
           }}>
-          {[5, 10, 20, 50].map((size) => (
+          {[12, 24, 48, 96, 192].map((size) => (
             <MenuItem key={size} value={size}>
               {size}/页
             </MenuItem>

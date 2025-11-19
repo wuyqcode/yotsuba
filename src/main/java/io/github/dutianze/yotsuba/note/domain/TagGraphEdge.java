@@ -2,6 +2,7 @@ package io.github.dutianze.yotsuba.note.domain;
 
 import io.github.dutianze.yotsuba.note.domain.valueobject.CollectionId;
 import io.github.dutianze.yotsuba.note.domain.valueobject.TagGraphEdgeId;
+import io.github.dutianze.yotsuba.note.domain.valueobject.TagId;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;

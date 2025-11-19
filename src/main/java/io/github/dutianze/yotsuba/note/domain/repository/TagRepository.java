@@ -1,6 +1,9 @@
-package io.github.dutianze.yotsuba.note.domain;
+package io.github.dutianze.yotsuba.note.domain.repository;
 
+import io.github.dutianze.yotsuba.note.domain.Tag;
+import io.github.dutianze.yotsuba.note.domain.valueobject.TagId;
 import java.util.List;
+import java.util.Optional;
 
 import io.github.dutianze.yotsuba.note.domain.valueobject.CollectionId;
 import org.springframework.data.domain.Sort;
@@ -41,5 +44,7 @@ public interface TagRepository extends JpaRepository<Tag, TagId> {
       @Param("size") int size,
       Sort sort
   );
+
+  Optional<Tag> findByIdAndCollectionId(TagId tagId, CollectionId collectionId);
 
 }

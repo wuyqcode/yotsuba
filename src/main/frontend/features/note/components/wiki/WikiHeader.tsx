@@ -1,57 +1,19 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Typography, Button, Stack, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Typography, Button, Stack } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import ForumIcon from '@mui/icons-material/Forum';
 import SaveIcon from '@mui/icons-material/Save';
-import { useBlocker, type BlockerFunction } from 'react-router';
-import { useWikiEditor } from 'Frontend/features/note/hooks/useWikiEditor';
-import { useWikiNoteStore } from '../../hooks/useWikiNote';
+import { useWikiNoteStore } from '../../hooks/useWikiNoteStore';
 
 export default function WikiHeader(): JSX.Element {
-  const { mode, setMode } = useWikiEditor();
+  const { mode, setMode } = useWikiNoteStore();
   const wiki = useWikiNoteStore((s) => s.wiki);
+  const isDirty = useWikiNoteStore((s) => s.isDirty);
 
   const updateWiki = useWikiNoteStore((s) => s.updateWiki);
   const setTitle = (title: string) => updateWiki({ title });
 
   const saveWiki = useWikiNoteStore((s) => s.saveWiki);
-
-  const isDirty = useWikiNoteStore((s) => s.isDirty);
-  const resetDirty = useWikiNoteStore((s) => s.resetDirty);
-
-  const [openDialog, setOpenDialog] = useState(false);
-
-  const shouldBlock = useCallback<BlockerFunction>(
-    ({ currentLocation, nextLocation }) => isDirty && currentLocation.pathname !== nextLocation.pathname,
-    [isDirty]
-  );
-
-  const blocker = useBlocker(shouldBlock);
-
-  useEffect(() => {
-    if (blocker.state === 'blocked' && !openDialog) {
-      setOpenDialog(true);
-    }
-  }, [blocker.state, openDialog]);
-
-  const handleSaveAndLeave = async (): Promise<void> => {
-    await saveWiki();
-    resetDirty();
-    setOpenDialog(false);
-    blocker.proceed?.();
-  };
-
-  const handleDiscardAndLeave = (): void => {
-    resetDirty();
-    setOpenDialog(false);
-    blocker.proceed?.();
-  };
-
-  const handleCancel = (): void => {
-    setOpenDialog(false);
-    blocker.proceed?.();
-  };
 
   return (
     <>
@@ -132,34 +94,18 @@ export default function WikiHeader(): JSX.Element {
             size="small"
             sx={{
               textTransform: 'none',
-              color: isDirty ? 'primary.main' : 'text.secondary',
-              bgcolor: isDirty ? 'rgba(25,118,210,0.1)' : 'transparent',
-              border: isDirty ? '1px solid rgba(25,118,210,0.3)' : '1px solid transparent',
+              color: mode === 'edit' && isDirty ? 'primary.main' : 'text.secondary',
+              bgcolor: mode === 'edit' && isDirty ? 'rgba(25,118,210,0.1)' : 'transparent',
+              border: mode === 'edit' && isDirty ? '1px solid rgba(25,118,210,0.3)' : '1px solid transparent',
             }}
-            disabled={!isDirty}
+            disabled={mode !== 'edit' || !isDirty}
             onClick={async () => {
               await saveWiki();
-              resetDirty();
             }}>
             {isDirty ? '保存 *' : '保存'}
           </Button>
         </Stack>
       </Stack>
-
-      {/* 离开确认弹窗 */}
-      <Dialog open={openDialog} onClose={handleCancel} aria-labelledby="unsaved-dialog-title">
-        <DialogTitle id="unsaved-dialog-title">未保存的更改</DialogTitle>
-        <DialogContent>您有未保存的更改，是否在离开前保存？</DialogContent>
-        <DialogActions>
-          <Button onClick={handleCancel}>取消</Button>
-          <Button onClick={handleDiscardAndLeave} color="error">
-            不保存离开
-          </Button>
-          <Button onClick={handleSaveAndLeave} color="primary" variant="contained">
-            保存并离开
-          </Button>
-        </DialogActions>
-      </Dialog>
     </>
   );
 }

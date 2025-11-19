@@ -1,4 +1,4 @@
-package io.github.dutianze.yotsuba.note.domain;
+package io.github.dutianze.yotsuba.note.domain.valueobject;
 
 import io.hypersistence.tsid.TSID;
 import jakarta.persistence.Embeddable;

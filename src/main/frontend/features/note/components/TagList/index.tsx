@@ -1,21 +1,13 @@
-import { useEffect } from 'react';
 import { Box, Stack, Typography, CircularProgress, Alert } from '@mui/material';
 import { useTagStore } from 'Frontend/features/note/hooks/useTagStore';
-import { useCollectionStore } from 'Frontend/features/note/hooks/useCollection';
 import TagChip from './TagChip';
 import TagDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/TagDto';
 
 const TagList = () => {
   const tags = useTagStore((s) => s.tags);
   const selectedTags = useTagStore((s) => s.selectedTags);
-  const fetchTags = useTagStore((s) => s.fetchTags);
   const loading = useTagStore((s) => s.loading);
   const error = useTagStore((s) => s.error);
-  const selectedCollection = useCollectionStore((s) => s.selectedCollection);
-
-  useEffect(() => {
-    fetchTags(selectedCollection?.id);
-  }, [fetchTags, selectedCollection?.id]);
 
   return (
     <Box
@@ -52,10 +44,12 @@ const TagList = () => {
               {error}
             </Alert>
           )}
-          {!loading && !error && tags.map((tag: TagDto) => {
-            const selected = selectedTags.some((t) => t.id === tag.id);
-            return <TagChip key={tag.id} tag={tag} selected={selected} />;
-          })}
+          {!loading &&
+            !error &&
+            tags.map((tag: TagDto) => {
+              const selected = selectedTags.some((t) => t.id === tag.id);
+              return <TagChip key={tag.id} tag={tag} selected={selected} />;
+            })}
         </Stack>
       </Stack>
     </Box>

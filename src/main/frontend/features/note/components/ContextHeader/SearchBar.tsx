@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Paper,
   InputBase,
   IconButton,
   Button,
-  Box,
   Menu,
   MenuItem,
   ListItemIcon,
@@ -15,24 +14,46 @@ import { Search, Add, LibraryBooks, Movie } from '@mui/icons-material';
 import { useNavigate } from 'react-router';
 import NoteType from 'Frontend/generated/io/github/dutianze/yotsuba/note/domain/valueobject/NoteType';
 import { useNoteStore } from '../../hooks/useNotes';
-import { useWikiEditorStore } from '../../hooks/useWikiEditor';
-import { storage } from 'Frontend/utils/storage';
-import { STORAGE_KEYS } from 'Frontend/config/constants';
+import { useTagStore } from '../../hooks/useTagStore';
+
+function useDebounce(fn: (...args: any[]) => void, delay: number) {
+  const fnRef = useRef(fn);
+  fnRef.current = fn;
+
+  const timerRef = useRef<any>();
+
+  const debouncedFn = useCallback(
+    (...args: any[]) => {
+      clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => {
+        fnRef.current(...args);
+      }, delay);
+    },
+    [delay]
+  );
+
+  return debouncedFn;
+}
 
 export default function SearchBar(): JSX.Element {
   const searchText = useNoteStore((s) => s.searchText);
   const setSearchText = useNoteStore((s) => s.setSearchText);
   const fetchNotes = useNoteStore((s) => s.fetchNotes);
   const createNote = useNoteStore((s) => s.createNote);
-  const setMode = useWikiEditorStore((s) => s.setMode);
+  const page = useNoteStore((s) => s.page);
+  const pageSize = useNoteStore((s) => s.pageSize);
+  const selectedTags = useTagStore((s) => s.selectedTags);
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  const handleSearch = (e?: React.FormEvent<HTMLFormElement>) => {
-    e?.preventDefault();
+  const debouncedSearch = useDebounce(() => {
     fetchNotes();
-  };
+  }, 300);
+
+  useEffect(() => {
+    debouncedSearch();
+  }, [searchText, debouncedSearch, selectedTags, page, pageSize]);
 
   const handleCreate = async (type: NoteType) => {
     try {
@@ -49,20 +70,9 @@ export default function SearchBar(): JSX.Element {
         path = `/note/media/${newNoteId}/edit`;
       } else if (type === NoteType.WIKI) {
         path = `/note/wiki/${newNoteId}`;
-        // 将新创建的 wiki 笔记 ID 存储到 localStorage，标记为需要编辑模式
-        const existingIds = storage.get<string[]>(STORAGE_KEYS.NEW_WIKI_NOTE_IDS) || [];
-        console.log('[SearchBar] Existing new note IDs in localStorage:', existingIds);
-        if (!existingIds.includes(newNoteId)) {
-          const updatedIds = [...existingIds, newNoteId];
-          storage.set(STORAGE_KEYS.NEW_WIKI_NOTE_IDS, updatedIds);
-          console.log('[SearchBar] Added noteId to localStorage:', updatedIds);
-        } else {
-          console.log('[SearchBar] NoteId already in localStorage, skipping');
-        }
       }
 
       console.log('[SearchBar] Setting mode to edit and navigating to:', path);
-      setMode('edit');
       navigate(path);
       setAnchorEl(null);
     } catch (err) {
@@ -73,7 +83,7 @@ export default function SearchBar(): JSX.Element {
   return (
     <Paper
       component="form"
-      onSubmit={handleSearch}
+      onSubmit={(e) => e.preventDefault()}
       sx={{
         display: 'flex',
         alignItems: 'center',

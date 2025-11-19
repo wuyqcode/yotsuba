@@ -37,19 +37,15 @@ export const useTagStore = create<TagState>((set, get) => ({
 
     try {
       const currentState = get();
-      // 使用 selectedTags 的 id 列表作为 tagIdList
-      const tagIdList = currentState.selectedTags.length > 0
-        ? currentState.selectedTags.map((tag) => tag.id)
-        : undefined;
-      
+      const tagIdList =
+        currentState.selectedTags.length > 0 ? currentState.selectedTags.map((tag) => tag.id) : undefined;
+
       const res = await TagService.findAllTags(collectionId, tagIdList);
 
-      // 同步更新 selectedTags：根据 id 从新列表中匹配并更新
       const updatedSelectedTags = currentState.selectedTags
         .map((selectedTag) => res.find((tag) => tag.id === selectedTag.id))
         .filter((tag): tag is TagDto => tag !== undefined);
 
-      // 同步更新 selectedTag
       const updatedSelectedTag = currentState.selectedTag
         ? res.find((tag) => tag.id === currentState.selectedTag?.id) || null
         : null;
@@ -96,7 +92,6 @@ export const useTagStore = create<TagState>((set, get) => ({
         set({ selectedTag: get().tags[0] || null });
       }
 
-      // 多选同步
       set({
         selectedTags: get().selectedTags.filter((t) => t.id !== id),
       });
@@ -113,7 +108,6 @@ export const useTagStore = create<TagState>((set, get) => ({
     const exists = currentState.selectedTags.some((t) => t.id === tag.id);
     if (!exists) {
       set({ selectedTags: [...currentState.selectedTags, tag] });
-      // 选中标签后重新获取关联标签
       const selectedCollectionId = useCollectionStore.getState().selectedCollection?.id;
       await get().fetchTags(selectedCollectionId);
     }
@@ -123,7 +117,6 @@ export const useTagStore = create<TagState>((set, get) => ({
     set((state) => ({
       selectedTags: state.selectedTags.filter((t) => t.id !== id),
     }));
-    // 移除标签后重新获取关联标签
     const selectedCollectionId = useCollectionStore.getState().selectedCollection?.id;
     await get().fetchTags(selectedCollectionId);
   },
@@ -135,7 +128,6 @@ export const useTagStore = create<TagState>((set, get) => ({
         ? { selectedTags: state.selectedTags.filter((t) => t.id !== tag.id) }
         : { selectedTags: [...state.selectedTags, tag] };
     });
-    // 切换标签后重新获取关联标签
     const selectedCollectionId = useCollectionStore.getState().selectedCollection?.id;
     await get().fetchTags(selectedCollectionId);
   },

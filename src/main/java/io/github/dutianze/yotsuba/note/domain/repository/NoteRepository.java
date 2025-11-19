@@ -1,5 +1,6 @@
-package io.github.dutianze.yotsuba.note.domain;
+package io.github.dutianze.yotsuba.note.domain.repository;
 
+import io.github.dutianze.yotsuba.note.domain.Note;
 import io.github.dutianze.yotsuba.note.domain.valueobject.NoteId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
