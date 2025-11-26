@@ -1,78 +1,43 @@
 package io.github.dutianze.yotsuba.file;
 
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.ContentDisposition;
+import io.github.dutianze.yotsuba.file.domain.FileResource;
+import io.github.dutianze.yotsuba.file.domain.valueobject.FileResourceId;
+import io.github.dutianze.yotsuba.file.service.FileService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Optional;
-
-/**
- * @author dutianze
- * @date 2024/8/3
- */
+@Slf4j
 @RestController
 @RequestMapping("/api/file-resource")
+@RequiredArgsConstructor
 public class FileResourceController {
 
-    private final FileResourceRepository fileResourceRepository;
+  private final FileService fileService;
+  private static final String PASSWORD = "123";
 
-    public FileResourceController(FileResourceRepository fileResourceRepository) {
-        this.fileResourceRepository = fileResourceRepository;
-    }
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<String> upload(@RequestParam MultipartFile file) throws Exception {
+    FileResource fileResource = fileService.upload(file, PASSWORD);
+    return ResponseEntity.ok().body(fileResource.getId().getUrl());
+  }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> upload(@RequestParam MultipartFile file) throws IOException {
-
-        String filename = Optional.ofNullable(file.getOriginalFilename()).orElse("unnamed");
-        String contentType =
-                Optional.ofNullable(file.getContentType()).orElse(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-
-        FileResource fileResource = FileResource.create(null, filename, contentType, file.getBytes());
-
-        fileResourceRepository.save(fileResource);
-        return ResponseEntity.ok().body(fileResource.getId().getUrl());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<InputStreamResource> download(@PathVariable("id") FileResourceId resourceId) {
-        Optional<FileResource> noteImageOptional = fileResourceRepository.findById(resourceId);
-        return noteImageOptional
-                .map(fileResource -> {
-                    InputStreamResource resource =
-                            new InputStreamResource(new ByteArrayInputStream(fileResource.getData()));
-
-                    MediaType mediaType = MediaType.parseMediaType(fileResource.getContentType());
-
-                    boolean isPreview =
-                            mediaType.getType().equalsIgnoreCase("image")
-                            || mediaType.getType().equalsIgnoreCase("video")
-                            || mediaType.getType().equalsIgnoreCase("audio")
-                            || mediaType.equals(MediaType.APPLICATION_PDF)
-                            || mediaType.getType().equalsIgnoreCase("text");
-
-                    ContentDisposition contentDisposition = isPreview
-                                                            ? ContentDisposition.inline()
-                                                                                .filename(fileResource.getFilename(),
-                                                                                          StandardCharsets.UTF_8)
-                                                                                .build()
-                                                            : ContentDisposition.attachment()
-                                                                                .filename(fileResource.getFilename(),
-                                                                                          StandardCharsets.UTF_8)
-                                                                                .build();
-
-                    return ResponseEntity.ok()
-                                         .contentType(mediaType)
-                                         .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
-                                         .body(resource);
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
+  @GetMapping("/{id}")
+  public ResponseEntity<ResourceRegion> download(@PathVariable String id, @RequestHeader HttpHeaders headers)
+      throws Exception {
+    FileResourceId fileResourceId = new FileResourceId(id);
+    return fileService.downloadFile(fileResourceId, headers);
+  }
 }

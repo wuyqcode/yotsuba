@@ -1,6 +1,6 @@
 package io.github.dutianze.yotsuba.note.domain.valueobject;
 
-import io.github.dutianze.yotsuba.file.FileResourceId;
+import io.github.dutianze.yotsuba.file.domain.valueobject.FileResourceId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

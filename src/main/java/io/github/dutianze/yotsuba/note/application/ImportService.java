@@ -1,8 +1,8 @@
 package io.github.dutianze.yotsuba.note.application;
 
-import io.github.dutianze.yotsuba.file.FileResource;
-import io.github.dutianze.yotsuba.file.FileResourceId;
-import io.github.dutianze.yotsuba.file.FileResourceRepository;
+import io.github.dutianze.yotsuba.file.domain.FileResource;
+import io.github.dutianze.yotsuba.file.domain.FileResourceRepository;
+import io.github.dutianze.yotsuba.file.domain.valueobject.FileResourceId;
 import io.github.dutianze.yotsuba.note.domain.Collection;
 import io.github.dutianze.yotsuba.note.domain.Note;
 import io.github.dutianze.yotsuba.note.domain.Tag;

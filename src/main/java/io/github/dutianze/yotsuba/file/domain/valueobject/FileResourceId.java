@@ -1,4 +1,4 @@
-package io.github.dutianze.yotsuba.file;
+package io.github.dutianze.yotsuba.file.domain.valueobject;
 
 import io.github.dutianze.yotsuba.shared.common.Constant;
 import io.hypersistence.tsid.TSID;

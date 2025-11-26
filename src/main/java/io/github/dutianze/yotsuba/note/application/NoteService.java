@@ -2,7 +2,7 @@ package io.github.dutianze.yotsuba.note.application;
 
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.hilla.Endpoint;
-import io.github.dutianze.yotsuba.file.FileResourceId;
+import io.github.dutianze.yotsuba.file.domain.valueobject.FileResourceId;
 import io.github.dutianze.yotsuba.note.application.dto.MediaNoteDto;
 import io.github.dutianze.yotsuba.note.application.dto.NoteAssembler;
 import io.github.dutianze.yotsuba.note.application.dto.NoteCardDto;

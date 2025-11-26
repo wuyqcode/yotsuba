@@ -1,7 +1,6 @@
 package io.github.dutianze.yotsuba.note.domain;
 
-import io.github.dutianze.yotsuba.file.FileResourceId;
-import io.github.dutianze.yotsuba.note.domain.valueobject.CollectionId;
+import io.github.dutianze.yotsuba.file.domain.valueobject.FileResourceId;
 import io.github.dutianze.yotsuba.note.domain.valueobject.TagId;
 import io.github.dutianze.yotsuba.search.TagIdentifierBridge;
 import jakarta.annotation.Nullable;

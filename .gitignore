@@ -9,3 +9,4 @@ vite.generated.ts
 index
 *.db-shm
 *.db-wal
+files

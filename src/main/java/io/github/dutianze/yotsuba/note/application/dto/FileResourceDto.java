@@ -1,6 +1,7 @@
 package io.github.dutianze.yotsuba.note.application.dto;
 
-import io.github.dutianze.yotsuba.file.FileResource;
+
+import io.github.dutianze.yotsuba.file.domain.FileResource;
 
 /**
  * @author dutianze

@@ -1,8 +1,8 @@
 package io.github.dutianze.yotsuba.note.domain;
 
-import io.github.dutianze.yotsuba.file.FileResourceId;
-import io.github.dutianze.yotsuba.file.FileResourceReferenceAddedEvent;
-import io.github.dutianze.yotsuba.file.FileResourceReferenceRemovedEvent;
+import io.github.dutianze.yotsuba.file.domain.event.FileResourceReferenceAddedEvent;
+import io.github.dutianze.yotsuba.file.domain.event.FileResourceReferenceRemovedEvent;
+import io.github.dutianze.yotsuba.file.domain.valueobject.FileResourceId;
 import io.github.dutianze.yotsuba.note.domain.event.NoteCreated;
 import io.github.dutianze.yotsuba.note.domain.event.NoteUpdatedEvent;
 import io.github.dutianze.yotsuba.note.domain.valueobject.NoteContent;
