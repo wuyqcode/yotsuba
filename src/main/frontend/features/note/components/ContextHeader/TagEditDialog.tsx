@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -34,6 +34,15 @@ export default function TagEditDialog({ open, onClose, tag }: TagEditDialogProps
   const [coverUrl, setCoverUrl] = useState('');
   const [saving, setSaving] = useState(false);
 
+  const handleCoverUpload = useCallback(async (file: File) => {
+    try {
+      const url = await upload(file);
+      setCoverUrl(url);
+    } catch (error) {
+      console.error('上传封面失败:', error);
+    }
+  }, [upload]);
+
   useEffect(() => {
     if (tag) {
       setTagName(tag.name || '');
@@ -41,14 +50,32 @@ export default function TagEditDialog({ open, onClose, tag }: TagEditDialogProps
     }
   }, [tag, open]);
 
-  const handleCoverUpload = async (file: File) => {
-    try {
-      const url = await upload(file);
-      setCoverUrl(url);
-    } catch (error) {
-      console.error('上传封面失败:', error);
-    }
-  };
+  // 处理剪贴板粘贴
+  useEffect(() => {
+    if (!open) return;
+
+    const handlePaste = async (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.type.indexOf('image') !== -1) {
+          e.preventDefault();
+          const file = item.getAsFile();
+          if (file) {
+            await handleCoverUpload(file);
+          }
+          break;
+        }
+      }
+    };
+
+    window.addEventListener('paste', handlePaste);
+    return () => {
+      window.removeEventListener('paste', handlePaste);
+    };
+  }, [open, handleCoverUpload]);
 
   const handleSave = async () => {
     if (!tag || !tagName.trim()) return;
