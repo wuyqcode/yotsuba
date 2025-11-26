@@ -5,14 +5,11 @@ import io.github.dutianze.yotsuba.file.domain.valueobject.FileResourceId;
 import io.github.dutianze.yotsuba.file.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.support.ResourceRegion;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,9 +32,8 @@ public class FileResourceController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<ResourceRegion> download(@PathVariable String id, @RequestHeader HttpHeaders headers)
-      throws Exception {
+  public ResponseEntity<StreamingResponseBody> download(@PathVariable String id) throws Exception {
     FileResourceId fileResourceId = new FileResourceId(id);
-    return fileService.downloadFile(fileResourceId, headers);
+    return fileService.downloadFile(fileResourceId);
   }
 }

@@ -27,20 +27,20 @@ public interface TagRepository extends JpaRepository<Tag, TagId> {
         SELECT DISTINCT t2.id.id
         FROM Note n
         JOIN n.tags t2
-        WHERE n.id.id IN (
-            SELECT n2.id.id
+        WHERE n.id IN (
+            SELECT n2.id
             FROM Note n2
             JOIN n2.tags t3
-            WHERE t3.id.id IN :tagIds
+            WHERE t3.id IN :tagIds
               AND n2.collection.id = :collectionId
             GROUP BY n2.id.id
-            HAVING COUNT(DISTINCT t3.id.id) = :size
+            HAVING COUNT(DISTINCT t3.id) = :size
         )
     )
     """)
   List<Tag> findRelatedTagsInCollection(
-      @Param("collectionId") Long collectionId,
-      @Param("tagIds") List<Long> tagIds,
+      @Param("collectionId") CollectionId collectionId,
+      @Param("tagIds") List<TagId> tagIds,
       @Param("size") int size,
       Sort sort
   );
