@@ -39,17 +39,20 @@ export default function TagSelectDialog({ open, onClose, noteId }: TagSelectDial
   const [saving, setSaving] = useState(false);
   const [creating, setCreating] = useState(false);
 
+  const loadTags = async () => {
+    try {
+      const result = await TagService.findAllTags(selectedCollection?.id, []);
+      setTags(result);
+      return result;
+    } catch (e) {
+      console.error('加载所有标签失败:', e);
+      return [];
+    }
+  };
+
   useEffect(() => {
     if (!open) return;
 
-    const loadTags = async () => {
-      try {
-        const result = await TagService.findAllTags(selectedCollection?.id, []);
-        setTags(result);
-      } catch (e) {
-        console.error('加载所有标签失败:', e);
-      }
-    };
     const loadNoteTags = async () => {
       try {
         const wikiNote = await NoteService.findWikiNoteById(noteId);
@@ -91,8 +94,16 @@ export default function TagSelectDialog({ open, onClose, noteId }: TagSelectDial
     }
   };
 
-  // 过滤标签
-  const filteredTags = tags.filter((tag) => tag.name.toLowerCase().includes(searchText.toLowerCase()));
+  // 过滤标签并排序：已选中的标签排在前面
+  const filteredTags = tags
+    .filter((tag) => tag.name.toLowerCase().includes(searchText.toLowerCase()))
+    .sort((a, b) => {
+      const aSelected = selectedTagIds.has(a.id);
+      const bSelected = selectedTagIds.has(b.id);
+      if (aSelected && !bSelected) return -1;
+      if (!aSelected && bSelected) return 1;
+      return 0; // 保持原有顺序
+    });
 
   // 检查搜索文本是否匹配现有标签
   const searchTextLower = searchText.toLowerCase().trim();
@@ -106,8 +117,9 @@ export default function TagSelectDialog({ open, onClose, noteId }: TagSelectDial
     try {
       setCreating(true);
       await addTag(selectedCollection.id, tagNameToCreate);
-      await new Promise((resolve) => setTimeout(resolve, 50));
-      const updatedTags = useTagStore.getState().tags;
+      // 刷新标签列表并获取更新后的标签
+      const updatedTags = await loadTags();
+      // 找到新创建的标签并选中
       const newTag = updatedTags.find((tag) => tag.name.toLowerCase() === tagNameToCreate.toLowerCase());
       if (newTag) {
         setSelectedTagIds((prev) => new Set([...prev, newTag.id]));

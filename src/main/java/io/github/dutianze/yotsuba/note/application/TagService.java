@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Endpoint
@@ -54,9 +55,17 @@ public class TagService {
                 sort
         );
 
+        // 如果返回空列表，使用输入的标签列表
+        if (relatedTags.isEmpty()) {
+            return tagIds.stream()
+                    .map(tagRepository::findById)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .map(TagDto::fromEntity)
+                    .collect(Collectors.toList());
+        }
+
         return relatedTags.stream()
-                .filter(tag -> tag.getCollection().getId().equals(collId))
-                .sorted(Comparator.comparing(Tag::getCreatedAt))
                 .map(TagDto::fromEntity)
                 .collect(Collectors.toList());
     }

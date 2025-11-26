@@ -10,7 +10,7 @@ import {
   ListItemText,
   Divider,
 } from '@mui/material';
-import { Search, Add, LibraryBooks, Movie } from '@mui/icons-material';
+import { Search, Add, LibraryBooks, Movie, Clear } from '@mui/icons-material';
 import { useNavigate } from 'react-router';
 import NoteType from 'Frontend/generated/io/github/dutianze/yotsuba/note/domain/valueobject/NoteType';
 import { useNoteStore } from '../../hooks/useNotes';
@@ -109,6 +109,20 @@ export default function SearchBar(): JSX.Element {
           fontSize: 14,
         }}
       />
+      {searchText && (
+        <IconButton
+          size="small"
+          onClick={() => setSearchText('')}
+          sx={{
+            mr: 0.5,
+            color: 'text.secondary',
+            '&:hover': {
+              bgcolor: 'action.hover',
+            },
+          }}>
+          <Clear fontSize="small" />
+        </IconButton>
+      )}
       <IconButton
         type="submit"
         size="small"

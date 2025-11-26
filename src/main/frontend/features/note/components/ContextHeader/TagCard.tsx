@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -28,7 +28,44 @@ export default function TagCard({ tag }: TagCardProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [cardWidth, setCardWidth] = useState<number>(120);
+  const imgRef = useRef<HTMLImageElement>(null);
   const deleteTag = useTagStore((s) => s.deleteTag);
+
+  // 固定图片显示高度
+  const IMAGE_HEIGHT = 120;
+
+  // 根据图片宽高比计算卡片宽度
+  useEffect(() => {
+    if (!tag?.cover || !imgRef.current) {
+      setCardWidth(120); // 默认宽度
+      return;
+    }
+
+    const img = imgRef.current;
+    const handleLoad = () => {
+      if (img.naturalWidth && img.naturalHeight) {
+        const aspectRatio = img.naturalWidth / img.naturalHeight;
+        const calculatedWidth = IMAGE_HEIGHT * aspectRatio;
+        // 限制宽度范围，最小80px，最大200px
+        const clampedWidth = Math.max(80, Math.min(200, calculatedWidth));
+        setCardWidth(clampedWidth);
+      }
+    };
+
+    // 如果图片已经加载完成
+    if (img.complete && img.naturalWidth > 0) {
+      handleLoad();
+    } else {
+      img.addEventListener('load', handleLoad);
+    }
+
+    return () => {
+      if (img) {
+        img.removeEventListener('load', handleLoad);
+      }
+    };
+  }, [tag?.cover]);
 
   const handleEditClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -69,7 +106,7 @@ export default function TagCard({ tag }: TagCardProps) {
           transition: 'all 0.3s ease',
           position: 'relative',
           overflow: 'hidden',
-          width: 120,
+          width: cardWidth,
           flexShrink: 0,
           '&:hover': {
             transform: 'translateY(-2px)',
@@ -81,7 +118,7 @@ export default function TagCard({ tag }: TagCardProps) {
         sx={{
           position: 'relative',
           width: '100%',
-          aspectRatio: '1',
+          height: IMAGE_HEIGHT,
           bgcolor: 'grey.100',
           display: 'flex',
           alignItems: 'center',
@@ -90,6 +127,7 @@ export default function TagCard({ tag }: TagCardProps) {
         }}>
         {tag?.cover ? (
           <Box
+            ref={imgRef}
             component="img"
             src={tag?.cover}
             alt={tag?.name || '标签封面'}
@@ -97,6 +135,7 @@ export default function TagCard({ tag }: TagCardProps) {
               width: '100%',
               height: '100%',
               objectFit: 'cover',
+              display: 'block',
             }}
           />
         ) : (

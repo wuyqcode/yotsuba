@@ -85,16 +85,20 @@ export const useTagStore = create<TagState>((set, get) => ({
     try {
       await TagService.deleteTag(id);
       const selectedCollectionId = useCollectionStore.getState().selectedCollection?.id;
-      await get().fetchTags(selectedCollectionId);
-
-      const cur = get().selectedTag;
-      if (cur?.id === id) {
-        set({ selectedTag: get().tags[0] || null });
-      }
-
+      
+      // 先更新 selectedTags，移除被删除的标签
       set({
         selectedTags: get().selectedTags.filter((t) => t.id !== id),
       });
+      
+      // 重新获取标签列表
+      await get().fetchTags(selectedCollectionId);
+
+      // 如果删除的是当前选中的标签，选择第一个标签
+      const currentState = get();
+      if (currentState.selectedTag?.id === id) {
+        set({ selectedTag: currentState.tags[0] || null });
+      }
     } catch (err: any) {
       set({ error: err.message || '删除失败' });
     }
