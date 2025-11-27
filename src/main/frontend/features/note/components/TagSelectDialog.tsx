@@ -39,16 +39,16 @@ export default function TagSelectDialog({ open, onClose, noteId }: TagSelectDial
   const [saving, setSaving] = useState(false);
   const [creating, setCreating] = useState(false);
 
-  const loadTags = async () => {
-    try {
-      const result = await TagService.findAllTags(selectedCollection?.id, []);
-      setTags(result);
+    const loadTags = async () => {
+      try {
+        const result = await TagService.findAllTags(selectedCollection?.id, []);
+        setTags(result);
       return result;
-    } catch (e) {
-      console.error('加载所有标签失败:', e);
+      } catch (e) {
+        console.error('加载所有标签失败:', e);
       return [];
-    }
-  };
+      }
+    };
 
   useEffect(() => {
     if (!open) return;
