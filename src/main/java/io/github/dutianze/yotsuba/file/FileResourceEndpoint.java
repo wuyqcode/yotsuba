@@ -5,10 +5,12 @@ import com.vaadin.hilla.Endpoint;
 import io.github.dutianze.yotsuba.file.domain.FileResource;
 import io.github.dutianze.yotsuba.file.domain.FileResourceRepository;
 import io.github.dutianze.yotsuba.file.domain.valueobject.FileResourceId;
+import io.github.dutianze.yotsuba.shared.common.ReferenceCategory;
 import io.github.dutianze.yotsuba.file.dto.FileResourceDto;
 import io.github.dutianze.yotsuba.file.service.FileService;
 import io.github.dutianze.yotsuba.note.application.dto.PageDto;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,14 +36,23 @@ public class FileResourceEndpoint {
   }
 
   @Nonnull
-  public FileResource upload(MultipartFile file) throws Exception {
+  public FileResource upload(MultipartFile file, @Nullable String referenceId,
+                             @Nullable ReferenceCategory referenceCategory) throws Exception {
     String password = "123";
-    return fileService.upload(file, password);
+    return fileService.upload(file, password, referenceId, referenceCategory);
   }
 
   @Nonnull
   public Boolean deleteFile(String id) {
     return fileService.deleteFileFromDatabaseAndFileSystem(new FileResourceId(id));
+  }
+
+  @Nonnull
+  public PageDto<FileResourceDto> listByNoteId(String noteId, int page, int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    Page<FileResourceDto> fileResources = fileResourceRepository.findByNoteIdAndCategory(
+            noteId, ReferenceCategory.NOTE_ATTACHMENT, pageable);
+    return PageDto.from(fileResources);
   }
 
 }

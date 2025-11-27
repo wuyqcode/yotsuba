@@ -3,7 +3,10 @@ package io.github.dutianze.yotsuba.file.service;
 import io.github.dutianze.yotsuba.file.domain.FileResource;
 import io.github.dutianze.yotsuba.file.domain.FileResourceRepository;
 import io.github.dutianze.yotsuba.file.domain.valueobject.FileResourceId;
+import io.github.dutianze.yotsuba.shared.common.ReferenceCategory;
+import io.github.dutianze.yotsuba.file.domain.valueobject.ReferenceInfo;
 import io.github.dutianze.yotsuba.file.domain.valueobject.ResourceType;
+import io.github.dutianze.yotsuba.shared.common.FileReferenceId;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +44,8 @@ public class FileService {
     private final PasswordEncoder passwordEncoder;
     private final AesCtrFileEncryptionService aesCtrFileEncryptionService;
 
-    public FileResource upload(MultipartFile file, String password) throws Exception {
+    public FileResource upload(MultipartFile file, String password, String referenceId,
+                               ReferenceCategory referenceCategory) throws Exception {
         logger.info("Saving file: {}", file.getName());
         FileResourceId fileResourceId = new FileResourceId();
         try (InputStream in = new BufferedInputStream(file.getInputStream())) {
@@ -56,6 +60,7 @@ public class FileService {
         fileResource.setResourceType(ResourceType.LOCAL);
         fileResource.setFileSize(file.getSize());
         fileResource.setContentType(contentType);
+        fileResource.setReference(new ReferenceInfo(new FileReferenceId(referenceId), referenceCategory));
         if (StringUtils.isNotBlank(password)) {
             fileResource.setEncrypted(true);
             fileResource.setPasswordHash(passwordEncoder.encode(password));

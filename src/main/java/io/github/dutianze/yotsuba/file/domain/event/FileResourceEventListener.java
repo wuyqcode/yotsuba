@@ -44,7 +44,7 @@ public class FileResourceEventListener {
       return;
     }
 
-    fileResource.linkReference(new ReferenceInfo(event.fileReferenceId(), event.referenceType()));
+    fileResource.linkReference(new ReferenceInfo(event.fileReferenceId(), event.referenceCategory()));
     fileResourceRepository.save(fileResource);
     logger.info("Reference added for resourceId: {}", event.fileResourceId());
   }

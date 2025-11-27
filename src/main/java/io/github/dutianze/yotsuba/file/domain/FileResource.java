@@ -1,10 +1,11 @@
 package io.github.dutianze.yotsuba.file.domain;
 
 import io.github.dutianze.yotsuba.file.domain.valueobject.FileResourceId;
-import io.github.dutianze.yotsuba.file.domain.valueobject.ResourceType;
 import io.github.dutianze.yotsuba.file.domain.valueobject.ReferenceInfo;
+import io.github.dutianze.yotsuba.file.domain.valueobject.ResourceType;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.EmbeddedId;
@@ -49,7 +50,11 @@ public class FileResource implements Comparable<FileResource> {
   private byte[] data;
 
   @Embedded
-  @AttributeOverride(name = "referenceId.id", column = @Column(name = "reference_id"))
+  @AttributeOverrides({
+          @AttributeOverride(name = "referenceId.id", column = @Column(name = "reference_id")),
+          @AttributeOverride(name = "referenceTypeDeprecated", column = @Column(name = "reference_type")),
+          @AttributeOverride(name = "referenceCategory", column = @Column(name = "reference_category"))
+  })
   private ReferenceInfo reference;
 
   @Nullable
@@ -61,7 +66,7 @@ public class FileResource implements Comparable<FileResource> {
   private LocalDateTime updatedAt;
 
   public static FileResource create(ReferenceInfo reference, String filename, String contentType,
-      byte[] data, String passwordHash) {
+                                    byte[] data, String passwordHash) {
     FileResource fileResource = new FileResource();
     fileResource.id = new FileResourceId();
     fileResource.filename = filename;
@@ -76,7 +81,7 @@ public class FileResource implements Comparable<FileResource> {
   }
 
   public FileResource(FileResourceId fileResourceId, String filename, String contentType,
-      byte[] data) {
+                      byte[] data) {
     this.id = fileResourceId;
     this.filename = filename;
     this.contentType = contentType;

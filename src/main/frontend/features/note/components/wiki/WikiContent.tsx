@@ -8,6 +8,8 @@ import 'prism-code-editor-lightweight/themes/github-dark.css';
 import { useWikiEditor } from 'Frontend/features/note/hooks/useWikiEditor';
 import WikiHeader from 'Frontend/features/note/components/wiki/WikiHeader';
 import { useWikiNoteStore } from '../../hooks/useWikiNoteStore';
+import NoteComment from './NoteComment';
+import NoteFile from './NoteFile';
 
 function WikiEditorPlaceholder({ loading, error }: { loading?: boolean; error?: string | null }) {
   return (
@@ -27,19 +29,6 @@ function WikiEditorPlaceholder({ loading, error }: { loading?: boolean; error?: 
           暂无内容
         </Typography>
       )}
-    </Box>
-  );
-}
-
-function WikiCommentSection() {
-  return (
-    <Box sx={{ maxWidth: 820, mx: 'auto', mt: 4 }}>
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        评论区
-      </Typography>
-      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-        （此处可以放评论输入框和评论列表）
-      </Typography>
     </Box>
   );
 }
@@ -70,39 +59,41 @@ export default function WikiContent() {
       }}>
       <WikiHeader />
 
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-          '.reactjs-tiptap-editor': {
+      {mode === 'comment' ? (
+        <NoteComment />
+      ) : mode === 'file' ? (
+        <NoteFile />
+      ) : (
+        <Box
+          sx={{
             display: 'flex',
             flexDirection: 'column',
-            flex: 1,
             overflow: 'hidden',
-            '& > *': {
-              display: 'contents',
-              '& > *': {
-                display: 'contents',
-              },
-            },
-            '.wiki-editor-content': {
-              flex: 1,
-              overflowY: 'auto',
-              minHeight: 0,
-              paddingBottom: '40vh',
-            },
-            '.editor': {
-              flex: 1,
-              minHeight: 0,
+            '.reactjs-tiptap-editor': {
               display: 'flex',
               flexDirection: 'column',
+              flex: 1,
+              overflow: 'hidden',
+              '& > *': {
+                display: 'contents',
+                '& > *': {
+                  display: 'contents',
+                },
+              },
+              '.wiki-editor-content': {
+                flex: 1,
+                overflowY: 'auto',
+                minHeight: 0,
+                paddingBottom: '40vh',
+              },
+              '.editor': {
+                flex: 1,
+                minHeight: 0,
+                display: 'flex',
+                flexDirection: 'column',
+              },
             },
-          },
-        }}>
-        {mode === 'comment' ? (
-          <WikiCommentSection />
-        ) : (
+          }}>
           <RichTextEditor
             ref={(instance) => {
               if (instance?.editor && editor !== instance.editor) {
@@ -122,8 +113,8 @@ export default function WikiContent() {
             useEditorOptions={{ autofocus: false }}
             disabled={isReadOnly()}
           />
-        )}
-      </Box>
+        </Box>
+      )}
     </Box>
   );
 }

@@ -1,4 +1,4 @@
-import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -10,26 +10,24 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  Pagination,
   Stack,
   Chip,
+  Card,
+  CardContent,
+  CardActions,
+  LinearProgress,
 } from '@mui/material';
-import { useState, useEffect } from 'react';
-import { FileResourceEndpoint } from 'Frontend/generated/endpoints';
-import FileResourceDto from 'Frontend/generated/io/github/dutianze/yotsuba/file/dto/FileResourceDto';
-import PageDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/PageDto';
-import { GlassBox } from 'Frontend/components/GlassBox';
+import UploadIcon from '@mui/icons-material/Upload';
+import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import ImageIcon from '@mui/icons-material/Image';
 import VideoFileIcon from '@mui/icons-material/VideoFile';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
-import UploadIcon from '@mui/icons-material/Upload';
-import DeleteIcon from '@mui/icons-material/Delete';
-import LinearProgress from '@mui/material/LinearProgress';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardActions from '@mui/material/CardActions';
+import FileResourceDto from 'Frontend/generated/io/github/dutianze/yotsuba/file/dto/FileResourceDto';
+import { FileResourceEndpoint } from 'Frontend/generated/endpoints';
+import ReferenceCategory from 'Frontend/generated/io/github/dutianze/yotsuba/shared/common/ReferenceCategory';
+import { useParams } from 'react-router';
 
 // 文件卡片组件
 function FileCard({
@@ -162,20 +160,11 @@ function FileCard({
   );
 }
 
-export const config: ViewConfig = {
-  menu: { order: 6, icon: 'FolderIcon' },
-  title: '文件列表',
-};
-
-
-export default function FileListView() {
+export default function NoteFile() {
+  const { id } = useParams<{ id: string }>();
   const [files, setFiles] = useState<FileResourceDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(0);
-  const [pageSize] = useState(20);
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalElements, setTotalElements] = useState(0);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewFile, setPreviewFile] = useState<FileResourceDto | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -186,13 +175,12 @@ export default function FileListView() {
   const [fileInputRef, setFileInputRef] = useState<HTMLInputElement | null>(null);
 
   const fetchFiles = async () => {
+    if (!id) return;
     setLoading(true);
     setError(null);
     try {
-      const result = await FileResourceEndpoint.list(page, pageSize);
-      setFiles(result.content);
-      setTotalPages(result.totalPages);
-      setTotalElements(result.totalElements);
+      const fileList = await FileResourceEndpoint.listByNoteId(id, 0, 100);
+      setFiles(fileList.content);
     } catch (err) {
       setError(err instanceof Error ? err.message : '加载文件列表失败');
     } finally {
@@ -202,7 +190,7 @@ export default function FileListView() {
 
   useEffect(() => {
     fetchFiles();
-  }, [page]);
+  }, [id]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -216,16 +204,13 @@ export default function FileListView() {
   };
 
   const handleUpload = async (file: File) => {
+    if (!id) return;
     setUploading(true);
     setUploadProgress(0);
     setError(null);
 
     try {
-      // 创建 FormData
-      const formData = new FormData();
-      formData.append('file', file);
-
-      // 模拟上传进度（实际进度需要后端支持）
+      // 模拟上传进度
       const progressInterval = setInterval(() => {
         setUploadProgress((prev) => {
           if (prev >= 90) {
@@ -236,7 +221,7 @@ export default function FileListView() {
         });
       }, 200);
 
-      await FileResourceEndpoint.upload(file, undefined, undefined);
+      await FileResourceEndpoint.upload(file, id, ReferenceCategory.NOTE_ATTACHMENT);
       
       clearInterval(progressInterval);
       setUploadProgress(100);
@@ -244,7 +229,7 @@ export default function FileListView() {
       // 上传成功后刷新列表
       await fetchFiles();
       
-      // 延迟一下再重置状态，让用户看到完成状态
+      // 延迟一下再重置状态
       setTimeout(() => {
         setUploading(false);
         setUploadProgress(0);
@@ -301,7 +286,6 @@ export default function FileListView() {
     try {
       const success = await FileResourceEndpoint.deleteFile(file.id.id);
       if (success) {
-        // 删除成功后刷新列表
         await fetchFiles();
       } else {
         setError('删除失败');
@@ -340,211 +324,197 @@ export default function FileListView() {
   const isText = (contentType: string | undefined) => contentType?.startsWith('text/') ?? false;
 
   return (
-    <GlassBox height={'100%'}>
-      <Box sx={{ p: 3 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-          <Box>
-            <Typography variant="h4" gutterBottom>
-              文件列表
+    <Box sx={{ p: 2, flex: 1, overflowY: 'auto' }}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Box>
+          <Typography variant="h6" gutterBottom>
+            附件文件
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            共 {files.length} 个文件
+          </Typography>
+        </Box>
+        <Box>
+          <input
+            ref={setFileInputRef}
+            type="file"
+            style={{ display: 'none' }}
+            onChange={handleFileSelect}
+            disabled={uploading}
+          />
+          <Button
+            variant="contained"
+            startIcon={<UploadIcon />}
+            onClick={() => {
+              if (fileInputRef) {
+                fileInputRef.click();
+              }
+            }}
+            disabled={uploading}
+            sx={{ textTransform: 'none' }}>
+            {uploading ? '上传中...' : '上传文件'}
+          </Button>
+        </Box>
+      </Box>
+
+      {uploading && (
+        <Box sx={{ mb: 3 }}>
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+            <Typography variant="body2" color="text.secondary">
+              上传中...
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              共 {totalElements} 个文件
+              {uploadProgress}%
             </Typography>
           </Box>
-          <Box>
-            <input
-              ref={setFileInputRef}
-              type="file"
-              style={{ display: 'none' }}
-              onChange={handleFileSelect}
-              disabled={uploading}
-            />
-            <Button
-              variant="contained"
-              startIcon={<UploadIcon />}
-              onClick={() => {
-                if (fileInputRef) {
-                  fileInputRef.click();
-                }
-              }}
-              disabled={uploading}>
-              {uploading ? '上传中...' : '上传文件'}
-            </Button>
-          </Box>
+          <LinearProgress variant="determinate" value={uploadProgress} />
         </Box>
+      )}
 
-        {uploading && (
-          <Box sx={{ mb: 3 }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
+
+      {loading ? (
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+          <CircularProgress />
+        </Box>
+      ) : (
+        <>
+          {files.length === 0 ? (
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
               <Typography variant="body2" color="text.secondary">
-                上传中...
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {uploadProgress}%
+                暂无文件
               </Typography>
             </Box>
-            <LinearProgress variant="determinate" value={uploadProgress} />
-          </Box>
-        )}
-
-        {error && (
-          <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
-            {error}
-          </Alert>
-        )}
-
-        {loading ? (
-          <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-            <CircularProgress />
-          </Box>
-        ) : (
-          <>
-            {files.length === 0 ? (
-              <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-                <Typography variant="body2" color="text.secondary">
-                  暂无文件
-                </Typography>
-              </Box>
-            ) : (
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 2,
-                }}>
-                {files.map((file) => {
-                  const fileUrl = file.id?.id ? `/api/file-resource/${file.id.id}` : null;
-                  const isImageFile = isImage(file.contentType);
-                  
-                  return (
-                    <Box
-                      key={file.id?.id || ''}
-                      sx={{
-                        width: { xs: '100%', sm: 'calc(50% - 8px)', md: 'calc(33.333% - 11px)', lg: 'calc(25% - 12px)' },
-                        minWidth: 250,
-                      }}>
-                      <FileCard
-                        file={file}
-                        fileUrl={fileUrl}
-                        isImageFile={isImageFile}
-                        getFileIcon={getFileIcon}
-                        handlePreview={handlePreview}
-                        handleDelete={handleDelete}
-                        formatFileSize={formatFileSize}
-                        formatDate={formatDate}
-                        isImage={isImage}
-                        isVideo={isVideo}
-                        isText={isText}
-                      />
-                    </Box>
-                  );
-                })}
-              </Box>
-            )}
-
-            {totalPages > 1 && (
-              <Box display="flex" justifyContent="center" mt={3}>
-                <Pagination
-                  count={totalPages}
-                  page={page + 1}
-                  onChange={(_, newPage) => setPage(newPage - 1)}
-                  color="primary"
-                  showFirstButton
-                  showLastButton
-                />
-              </Box>
-            )}
-          </>
-        )}
-
-        {/* 预览对话框 */}
-        <Dialog
-          open={previewOpen}
-          onClose={handleClosePreview}
-          maxWidth="lg"
-          fullWidth
-          PaperProps={{
-            sx: {
-              maxHeight: '90vh',
-            },
-          }}>
-          <DialogTitle>
-            {previewFile?.filename || '-'}
-            <Button
-              size="small"
-              href={previewUrl || '#'}
-              target="_blank"
-              download
-              sx={{ ml: 2 }}>
-              下载
-            </Button>
-          </DialogTitle>
-          <DialogContent dividers>
-            {previewFile && previewUrl && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
-                {isImage(previewFile.contentType) && (
-                  <img
-                    src={previewUrl}
-                    alt={previewFile.filename || ''}
-                    style={{
-                      maxWidth: '100%',
-                      maxHeight: '70vh',
-                      objectFit: 'contain',
-                    }}
-                  />
-                )}
-                {isVideo(previewFile.contentType) && (
-                  <video
-                    src={previewUrl}
-                    controls
-                    style={{
-                      maxWidth: '100%',
-                      maxHeight: '70vh',
-                    }}>
-                    您的浏览器不支持视频播放
-                  </video>
-                )}
-                {isText(previewFile.contentType) && (
+          ) : (
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 2,
+              }}>
+              {files.map((file) => {
+                const fileUrl = file.id?.id ? `/api/file-resource/${file.id.id}` : null;
+                const isImageFile = isImage(file.contentType);
+                
+                return (
                   <Box
+                    key={file.id?.id || ''}
                     sx={{
-                      width: '100%',
-                      minHeight: 400,
-                      maxHeight: '70vh',
-                      overflow: 'auto',
-                      p: 2,
-                      bgcolor: 'background.default',
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      borderRadius: 1,
+                      width: { xs: '100%', sm: 'calc(50% - 8px)', md: 'calc(33.333% - 11px)', lg: 'calc(25% - 12px)' },
+                      minWidth: 250,
                     }}>
-                    {loadingText ? (
-                      <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}>
-                        <CircularProgress />
-                      </Box>
-                    ) : (
-                      <Typography
-                        component="pre"
-                        sx={{
-                          fontFamily: 'monospace',
-                          fontSize: '0.875rem',
-                          whiteSpace: 'pre-wrap',
-                          wordBreak: 'break-word',
-                          margin: 0,
-                        }}>
-                        {textContent || '无内容'}
-                      </Typography>
-                    )}
+                    <FileCard
+                      file={file}
+                      fileUrl={fileUrl}
+                      isImageFile={isImageFile}
+                      getFileIcon={getFileIcon}
+                      handlePreview={handlePreview}
+                      handleDelete={handleDelete}
+                      formatFileSize={formatFileSize}
+                      formatDate={formatDate}
+                      isImage={isImage}
+                      isVideo={isVideo}
+                      isText={isText}
+                    />
                   </Box>
-                )}
-              </Box>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClosePreview}>关闭</Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
-    </GlassBox>
+                );
+              })}
+            </Box>
+          )}
+        </>
+      )}
+
+      {/* 预览对话框 */}
+      <Dialog
+        open={previewOpen}
+        onClose={handleClosePreview}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          sx: {
+            maxHeight: '90vh',
+          },
+        }}>
+        <DialogTitle>
+          {previewFile?.filename || '-'}
+          <Button
+            size="small"
+            href={previewUrl || '#'}
+            target="_blank"
+            download
+            sx={{ ml: 2 }}>
+            下载
+          </Button>
+        </DialogTitle>
+        <DialogContent dividers>
+          {previewFile && previewUrl && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
+              {isImage(previewFile.contentType) && (
+                <img
+                  src={previewUrl}
+                  alt={previewFile.filename || ''}
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '70vh',
+                    objectFit: 'contain',
+                  }}
+                />
+              )}
+              {isVideo(previewFile.contentType) && (
+                <video
+                  src={previewUrl}
+                  controls
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '70vh',
+                  }}>
+                  您的浏览器不支持视频播放
+                </video>
+              )}
+              {isText(previewFile.contentType) && (
+                <Box
+                  sx={{
+                    width: '100%',
+                    minHeight: 400,
+                    maxHeight: '70vh',
+                    overflow: 'auto',
+                    p: 2,
+                    bgcolor: 'background.default',
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    borderRadius: 1,
+                  }}>
+                  {loadingText ? (
+                    <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}>
+                      <CircularProgress />
+                    </Box>
+                  ) : (
+                    <Typography
+                      component="pre"
+                      sx={{
+                        fontFamily: 'monospace',
+                        fontSize: '0.875rem',
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-word',
+                        margin: 0,
+                      }}>
+                      {textContent || '无内容'}
+                    </Typography>
+                  )}
+                </Box>
+              )}
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClosePreview}>关闭</Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 }
 

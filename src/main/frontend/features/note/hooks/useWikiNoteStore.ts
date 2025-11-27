@@ -3,7 +3,7 @@ import { NoteService } from 'Frontend/generated/endpoints';
 import WikiNoteDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/WikiNoteDto';
 import { type Editor } from 'reactjs-tiptap-editor';
 
-export type EditorMode = 'read' | 'edit' | 'comment';
+export type EditorMode = 'read' | 'edit' | 'comment' | 'file';
 
 export interface HeadingItem {
   id: string;

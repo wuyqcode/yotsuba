@@ -1,6 +1,7 @@
 package io.github.dutianze.yotsuba.shared.common;
 
-public enum ReferenceType {
+public enum ReferenceCategory {
     NOTE_CONTENT,
-    NOTE_COVER
+    NOTE_ATTACHMENT,
+    TAG_COVER
 }

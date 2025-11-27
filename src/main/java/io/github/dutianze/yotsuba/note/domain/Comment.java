@@ -43,6 +43,7 @@ public class Comment {
   public Comment(String content, Note note) {
     this.id = new CommentId();
     this.content = content;
+    this.note = note;
   }
 
 }

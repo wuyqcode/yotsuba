@@ -2,6 +2,7 @@ package io.github.dutianze.yotsuba.file;
 
 import io.github.dutianze.yotsuba.file.domain.FileResource;
 import io.github.dutianze.yotsuba.file.domain.valueobject.FileResourceId;
+import io.github.dutianze.yotsuba.shared.common.ReferenceCategory;
 import io.github.dutianze.yotsuba.file.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +27,10 @@ public class FileResourceController {
   private static final String PASSWORD = "123";
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<String> upload(@RequestParam MultipartFile file) throws Exception {
-    FileResource fileResource = fileService.upload(file, PASSWORD);
+  public ResponseEntity<String> upload(@RequestParam MultipartFile file,
+                                       @RequestParam(required = false) String referenceId,
+                                       @RequestParam(required = false) ReferenceCategory referenceCategory) throws Exception {
+    FileResource fileResource = fileService.upload(file, PASSWORD, referenceId, referenceCategory);
     return ResponseEntity.ok().body(fileResource.getId().getUrl());
   }
 
