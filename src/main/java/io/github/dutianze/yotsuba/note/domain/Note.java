@@ -4,6 +4,7 @@ import io.github.dutianze.yotsuba.file.domain.event.FileResourceReferenceAddedEv
 import io.github.dutianze.yotsuba.file.domain.event.FileResourceReferenceRemovedEvent;
 import io.github.dutianze.yotsuba.file.domain.valueobject.FileResourceId;
 import io.github.dutianze.yotsuba.note.domain.event.NoteCreated;
+import io.github.dutianze.yotsuba.note.domain.event.NoteDeleted;
 import io.github.dutianze.yotsuba.note.domain.event.NoteUpdatedEvent;
 import io.github.dutianze.yotsuba.note.domain.valueobject.NoteContent;
 import io.github.dutianze.yotsuba.note.domain.valueobject.NoteId;
@@ -118,6 +119,10 @@ public class Note extends AbstractAggregateRoot<Note> implements Comparable<Note
 
   public void markAsInitialized() {
     this.initial = false;
+  }
+
+  public void markAsDeleted() {
+    registerEvent(new NoteDeleted(this.id));
   }
 
   public static Note createWithIdAndContent(NoteId id, Collection collection, NoteTitle title,

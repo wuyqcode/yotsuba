@@ -6,15 +6,16 @@ import io.github.dutianze.yotsuba.file.domain.valueobject.FileResourceId;
 import io.github.dutianze.yotsuba.shared.common.ReferenceCategory;
 import io.github.dutianze.yotsuba.file.domain.valueobject.ReferenceInfo;
 import io.github.dutianze.yotsuba.file.domain.valueobject.ResourceType;
+import io.github.dutianze.yotsuba.file.domain.valueobject.StorageVersion;
 import io.github.dutianze.yotsuba.shared.common.FileReferenceId;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +27,6 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -40,16 +39,21 @@ public class FileService {
     private static final Logger logger = LoggerFactory.getLogger(FileService.class);
     private static final String FILE_STORAGE_PATH = "files";
     private static final String PASSWORD = "123";
+
     private final FileResourceRepository fileResourceRepository;
     private final PasswordEncoder passwordEncoder;
     private final AesCtrFileEncryptionService aesCtrFileEncryptionService;
+    private final ThumbnailHandler thumbnailHandler;
 
     public FileResource upload(MultipartFile file, String password, String referenceId,
                                ReferenceCategory referenceCategory) throws Exception {
         logger.info("Saving file: {}", file.getName());
         FileResourceId fileResourceId = new FileResourceId();
+        StorageVersion storageVersion = StorageVersion.V3;
+        List<Integer> thumbnailIndexList;
         try (InputStream in = new BufferedInputStream(file.getInputStream())) {
-            aesCtrFileEncryptionService.encryptFile(in, fileResourceId, password);
+            aesCtrFileEncryptionService.encryptFile(in, Path.of(fileResourceId.id()), password, storageVersion);
+            thumbnailIndexList = thumbnailHandler.generateThumbnail(file, fileResourceId.id(), password, storageVersion);
         }
 
         FileResource fileResource = new FileResource();
@@ -60,6 +64,8 @@ public class FileService {
         fileResource.setResourceType(ResourceType.LOCAL);
         fileResource.setFileSize(file.getSize());
         fileResource.setContentType(contentType);
+        fileResource.setThumbnailIndexList(thumbnailIndexList);
+        fileResource.setStorageVersion(storageVersion);
         fileResource.setReference(new ReferenceInfo(new FileReferenceId(referenceId), referenceCategory));
         if (StringUtils.isNotBlank(password)) {
             fileResource.setEncrypted(true);
@@ -93,7 +99,10 @@ public class FileService {
 
     private boolean deleteFileFromFileSystem(FileResourceId id) {
         try {
-            boolean deleted = aesCtrFileEncryptionService.deleteFile(id);
+            Optional<FileResource> fileResource = fileResourceRepository.findById(id);
+            StorageVersion storageVersion = fileResource.map(FileResource::getStorageVersion)
+                .orElse(StorageVersion.V1);
+            boolean deleted = aesCtrFileEncryptionService.deleteFile(id, storageVersion);
             if (deleted) {
                 logger.info("File deleted: {}", id.id());
             }
@@ -104,16 +113,8 @@ public class FileService {
         }
     }
 
-    public ResponseEntity<StreamingResponseBody> downloadFile(FileResourceId fileResourceId) {
-        FileResource res = fileResourceRepository.findById(fileResourceId).orElse(null);
-        if (res == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        ContentDisposition contentDisposition = this.buildDisposition(res.getContentType(),
-                                                                      res.getFilename());
-
-        StreamingResponseBody streamBody = outputStream -> {
+    public StreamingResponseBody downloadFile(FileResource res, String index) {
+        return outputStream -> {
             InputStream inputStream = null;
             try {
                 switch (res.getResourceType()) {
@@ -124,7 +125,12 @@ public class FileService {
                         }
                         inputStream = new ByteArrayInputStream(data);
                     }
-                    case LOCAL -> inputStream = aesCtrFileEncryptionService.decryptFile(res.getId(), PASSWORD);
+                    case LOCAL -> {
+                        Path path = (index == null)
+                            ? Path.of(res.getId().id())
+                            : Path.of(res.getId().id(), index);
+                        inputStream = aesCtrFileEncryptionService.decryptFile(path, PASSWORD, res.getStorageVersion());
+                    }
                 }
 
                 byte[] buffer = new byte[8192];
@@ -134,10 +140,10 @@ public class FileService {
                 }
                 outputStream.flush();
             } catch (java.io.IOException e) {
-                logger.error("Error streaming file: {}", fileResourceId.id(), e);
+                logger.error("Error streaming file: {}", res.getId().id(), e);
                 throw new java.io.UncheckedIOException("Failed to stream file", e);
             } catch (Exception e) {
-                logger.error("Error streaming file: {}", fileResourceId.id(), e);
+                logger.error("Error streaming file: {}", res.getId().id(), e);
                 throw new RuntimeException("Failed to stream file", e);
             } finally {
                 if (inputStream != null) {
@@ -149,18 +155,6 @@ public class FileService {
                 }
             }
         };
-
-        return ResponseEntity.ok()
-                             .header(HttpHeaders.CONTENT_TYPE, res.getContentType())
-                             .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
-                             .body(streamBody);
-    }
-
-    private ContentDisposition buildDisposition(String contentType, String filename) {
-        String encoded = URLEncoder.encode(filename, StandardCharsets.UTF_8);
-        return !"application/octet-stream".equals(contentType)
-               ? ContentDisposition.inline().filename(encoded).build()
-               : ContentDisposition.attachment().filename(encoded).build();
     }
 
     public boolean checkFilePassword(FileResourceId id, String password) {
@@ -172,4 +166,5 @@ public class FileService {
         FileResource fileEntity = referenceById.get();
         return passwordEncoder.matches(password, fileEntity.getPasswordHash());
     }
+
 }

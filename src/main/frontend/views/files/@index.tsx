@@ -4,163 +4,23 @@ import {
   Typography,
   CircularProgress,
   Alert,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
-  Pagination,
-  Stack,
-  Chip,
+  Checkbox,
+  FormControlLabel,
+  Toolbar,
 } from '@mui/material';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { FileResourceEndpoint } from 'Frontend/generated/endpoints';
 import FileResourceDto from 'Frontend/generated/io/github/dutianze/yotsuba/file/dto/FileResourceDto';
-import PageDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/PageDto';
 import { GlassBox } from 'Frontend/components/GlassBox';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import ImageIcon from '@mui/icons-material/Image';
-import VideoFileIcon from '@mui/icons-material/VideoFile';
-import TextSnippetIcon from '@mui/icons-material/TextSnippet';
-import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import UploadIcon from '@mui/icons-material/Upload';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LinearProgress from '@mui/material/LinearProgress';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardActions from '@mui/material/CardActions';
+import FileCard from 'Frontend/components/file/FileCard';
+import FilePreviewModal from 'Frontend/components/file/FilePreviewModal';
+import { isText } from 'Frontend/components/file/utils/fileTypeUtils';
+import PaginationBar from 'Frontend/components/PaginationBar';
 
-// 文件卡片组件
-function FileCard({
-  file,
-  fileUrl,
-  isImageFile,
-  getFileIcon,
-  handlePreview,
-  handleDelete,
-  formatFileSize,
-  formatDate,
-  isImage,
-  isVideo,
-  isText,
-}: {
-  file: FileResourceDto;
-  fileUrl: string | null;
-  isImageFile: boolean;
-  getFileIcon: (contentType: string | undefined) => JSX.Element;
-  handlePreview: (file: FileResourceDto) => void;
-  handleDelete: (file: FileResourceDto) => void;
-  formatFileSize: (bytes: number | undefined) => string;
-  formatDate: (dateString: string | undefined) => string;
-  isImage: (contentType: string | undefined) => boolean;
-  isVideo: (contentType: string | undefined) => boolean;
-  isText: (contentType: string | undefined) => boolean;
-}) {
-  const [imageError, setImageError] = useState(false);
-
-  return (
-    <Card
-      sx={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        transition: 'transform 0.2s, box-shadow 0.2s',
-        '&:hover': {
-          transform: 'translateY(-4px)',
-          boxShadow: 4,
-        },
-      }}>
-      {/* 预览图/图标 */}
-      <Box
-        sx={{
-          width: '100%',
-          height: 200,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          bgcolor: 'background.default',
-          position: 'relative',
-          overflow: 'hidden',
-        }}>
-        {isImageFile && fileUrl && !imageError ? (
-          <img
-            src={fileUrl}
-            alt={file.filename || ''}
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              cursor: 'pointer',
-            }}
-            onClick={() => handlePreview(file)}
-            onError={() => setImageError(true)}
-          />
-        ) : (
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%',
-              height: '100%',
-            }}>
-            {getFileIcon(file.contentType)}
-          </Box>
-        )}
-      </Box>
-
-      <CardContent sx={{ flexGrow: 1, pb: 1 }}>
-        <Typography
-          variant="h6"
-          component="div"
-          sx={{
-            fontSize: '1rem',
-            fontWeight: 600,
-            mb: 1,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}>
-          {file.filename || '-'}
-        </Typography>
-
-        {file.contentType && (
-          <Chip
-            label={file.contentType}
-            size="small"
-            sx={{ mb: 1, fontSize: '0.7rem', height: 20 }}
-          />
-        )}
-
-        <Stack spacing={0.5} sx={{ mt: 1 }}>
-          <Typography variant="caption" color="text.secondary">
-            大小: {formatFileSize(file.size)}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            创建: {formatDate(file.createdAt)}
-          </Typography>
-        </Stack>
-      </CardContent>
-
-      <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
-        <Button
-          size="small"
-          startIcon={<VisibilityIcon />}
-          onClick={() => handlePreview(file)}
-          disabled={!isImage(file.contentType) && !isVideo(file.contentType) && !isText(file.contentType)}>
-          预览
-        </Button>
-        <IconButton
-          size="small"
-          color="error"
-          onClick={() => handleDelete(file)}>
-          <DeleteIcon />
-        </IconButton>
-      </CardActions>
-    </Card>
-  );
-}
 
 export const config: ViewConfig = {
   menu: { order: 6, icon: 'FolderIcon' },
@@ -173,7 +33,7 @@ export default function FileListView() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
-  const [pageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(20);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -184,6 +44,9 @@ export default function FileListView() {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [fileInputRef, setFileInputRef] = useState<HTMLInputElement | null>(null);
+  const [filterOrphan, setFilterOrphan] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
+  const [deleting, setDeleting] = useState(false);
 
   const fetchFiles = async () => {
     setLoading(true);
@@ -202,7 +65,69 @@ export default function FileListView() {
 
   useEffect(() => {
     fetchFiles();
-  }, [page]);
+  }, [page, pageSize]);
+
+  // 过滤孤立文件（没有 referenceId 的文件）
+  const filteredFiles = useMemo(() => {
+    if (!filterOrphan) {
+      return files;
+    }
+    return files.filter((file) => !file.reference?.referenceId?.id);
+  }, [files, filterOrphan]);
+
+  // 全选/取消全选
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allIds = new Set(filteredFiles.map((f) => f.id?.id).filter((id): id is string => !!id));
+      setSelectedFiles(allIds);
+    } else {
+      setSelectedFiles(new Set());
+    }
+  };
+
+  // 切换单个文件的选择状态
+  const handleToggleSelect = (fileId: string) => {
+    setSelectedFiles((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(fileId)) {
+        newSet.delete(fileId);
+      } else {
+        newSet.add(fileId);
+      }
+      return newSet;
+    });
+  };
+
+  // 批量删除选中的文件
+  const handleBatchDelete = async () => {
+    if (selectedFiles.size === 0) {
+      return;
+    }
+
+    if (!window.confirm(`确定要删除选中的 ${selectedFiles.size} 个文件吗？此操作不可恢复！`)) {
+      return;
+    }
+
+    setDeleting(true);
+    setError(null);
+
+    try {
+      const deletePromises = Array.from(selectedFiles).map((fileId) =>
+        FileResourceEndpoint.deleteFile(fileId).catch((err) => {
+          console.error(`删除文件 ${fileId} 失败:`, err);
+          return false;
+        })
+      );
+
+      await Promise.all(deletePromises);
+      setSelectedFiles(new Set());
+      await fetchFiles();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '批量删除失败，请重试');
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -267,7 +192,7 @@ export default function FileListView() {
     setPreviewUrl(fileUrl);
 
     // 如果是文本文件，加载文本内容
-    if (isText(file.contentType)) {
+    if (isText(file)) {
       setLoadingText(true);
       setTextContent(null);
       try {
@@ -311,16 +236,6 @@ export default function FileListView() {
     }
   };
 
-  const getFileIcon = (contentType: string | undefined) => {
-    if (contentType?.startsWith('image/')) {
-      return <ImageIcon color="primary" />;
-    } else if (contentType?.startsWith('video/')) {
-      return <VideoFileIcon color="secondary" />;
-    } else if (contentType?.startsWith('text/')) {
-      return <TextSnippetIcon color="info" />;
-    }
-    return <InsertDriveFileIcon />;
-  };
 
   const formatFileSize = (bytes: number | undefined) => {
     if (!bytes || bytes === 0) return '0 B';
@@ -335,10 +250,6 @@ export default function FileListView() {
     return new Date(dateString).toLocaleString('zh-CN');
   };
 
-  const isImage = (contentType: string | undefined) => contentType?.startsWith('image/') ?? false;
-  const isVideo = (contentType: string | undefined) => contentType?.startsWith('video/') ?? false;
-  const isText = (contentType: string | undefined) => contentType?.startsWith('text/') ?? false;
-
   return (
     <GlassBox height={'100%'}>
       <Box sx={{ p: 3 }}>
@@ -349,9 +260,22 @@ export default function FileListView() {
             </Typography>
             <Typography variant="body2" color="text.secondary">
               共 {totalElements} 个文件
+              {filterOrphan && ` (过滤后: ${filteredFiles.length} 个孤立文件)`}
             </Typography>
           </Box>
-          <Box>
+          <Box display="flex" gap={2} alignItems="center">
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={filterOrphan}
+                  onChange={(e) => {
+                    setFilterOrphan(e.target.checked);
+                    setSelectedFiles(new Set()); // 切换过滤时清空选择
+                  }}
+                />
+              }
+              label="仅显示孤立文件"
+            />
             <input
               ref={setFileInputRef}
               type="file"
@@ -372,6 +296,39 @@ export default function FileListView() {
             </Button>
           </Box>
         </Box>
+
+        {/* 多选工具栏 */}
+        {filterOrphan && filteredFiles.length > 0 && (
+          <Toolbar
+            sx={{
+              mb: 2,
+              bgcolor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: 1,
+              minHeight: '48px !important',
+            }}>
+            <Box display="flex" alignItems="center" gap={2} width="100%">
+              <Checkbox
+                checked={selectedFiles.size > 0 && selectedFiles.size === filteredFiles.length}
+                indeterminate={selectedFiles.size > 0 && selectedFiles.size < filteredFiles.length}
+                onChange={(e) => handleSelectAll(e.target.checked)}
+              />
+              <Typography variant="body2" sx={{ flexGrow: 1 }}>
+                已选择 {selectedFiles.size} / {filteredFiles.length} 个文件
+              </Typography>
+              <Button
+                variant="contained"
+                color="error"
+                startIcon={<DeleteIcon />}
+                onClick={handleBatchDelete}
+                disabled={selectedFiles.size === 0 || deleting}
+                size="small">
+                {deleting ? '删除中...' : '删除选中'}
+              </Button>
+            </Box>
+          </Toolbar>
+        )}
 
         {uploading && (
           <Box sx={{ mb: 3 }}>
@@ -399,10 +356,10 @@ export default function FileListView() {
           </Box>
         ) : (
           <>
-            {files.length === 0 ? (
+            {filteredFiles.length === 0 ? (
               <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
                 <Typography variant="body2" color="text.secondary">
-                  暂无文件
+                  {filterOrphan ? '暂无孤立文件' : '暂无文件'}
                 </Typography>
               </Box>
             ) : (
@@ -412,29 +369,43 @@ export default function FileListView() {
                   flexWrap: 'wrap',
                   gap: 2,
                 }}>
-                {files.map((file) => {
+                {filteredFiles.map((file) => {
                   const fileUrl = file.id?.id ? `/api/file-resource/${file.id.id}` : null;
-                  const isImageFile = isImage(file.contentType);
+                  const fileId = file.id?.id || '';
+                  const isSelected = selectedFiles.has(fileId);
                   
                   return (
                     <Box
-                      key={file.id?.id || ''}
+                      key={fileId}
                       sx={{
                         width: { xs: '100%', sm: 'calc(50% - 8px)', md: 'calc(33.333% - 11px)', lg: 'calc(25% - 12px)' },
                         minWidth: 250,
+                        position: 'relative',
                       }}>
+                      {filterOrphan && (
+                        <Checkbox
+                          checked={isSelected}
+                          onChange={() => handleToggleSelect(fileId)}
+                          sx={{
+                            position: 'absolute',
+                            top: 8,
+                            left: 8,
+                            zIndex: 3,
+                            bgcolor: 'background.paper',
+                            '&:hover': {
+                              bgcolor: 'background.paper',
+                            },
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      )}
                       <FileCard
                         file={file}
                         fileUrl={fileUrl}
-                        isImageFile={isImageFile}
-                        getFileIcon={getFileIcon}
                         handlePreview={handlePreview}
                         handleDelete={handleDelete}
                         formatFileSize={formatFileSize}
                         formatDate={formatDate}
-                        isImage={isImage}
-                        isVideo={isVideo}
-                        isText={isText}
                       />
                     </Box>
                   );
@@ -442,107 +413,32 @@ export default function FileListView() {
               </Box>
             )}
 
-            {totalPages > 1 && (
-              <Box display="flex" justifyContent="center" mt={3}>
-                <Pagination
-                  count={totalPages}
+            {totalPages > 0 && (
+              <PaginationBar
                   page={page + 1}
-                  onChange={(_, newPage) => setPage(newPage - 1)}
-                  color="primary"
-                  showFirstButton
-                  showLastButton
-                />
-              </Box>
+                totalPages={totalPages}
+                totalElements={totalElements}
+                pageSize={pageSize}
+                pageSizeOptions={[12, 20, 48, 96]}
+                onPageChange={(newPage) => setPage(newPage - 1)}
+                onPageSizeChange={(newPageSize) => {
+                  setPage(0);
+                  setPageSize(newPageSize);
+                }}
+              />
             )}
           </>
         )}
 
         {/* 预览对话框 */}
-        <Dialog
+        <FilePreviewModal
           open={previewOpen}
+          file={previewFile}
+          previewUrl={previewUrl}
           onClose={handleClosePreview}
-          maxWidth="lg"
-          fullWidth
-          PaperProps={{
-            sx: {
-              maxHeight: '90vh',
-            },
-          }}>
-          <DialogTitle>
-            {previewFile?.filename || '-'}
-            <Button
-              size="small"
-              href={previewUrl || '#'}
-              target="_blank"
-              download
-              sx={{ ml: 2 }}>
-              下载
-            </Button>
-          </DialogTitle>
-          <DialogContent dividers>
-            {previewFile && previewUrl && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
-                {isImage(previewFile.contentType) && (
-                  <img
-                    src={previewUrl}
-                    alt={previewFile.filename || ''}
-                    style={{
-                      maxWidth: '100%',
-                      maxHeight: '70vh',
-                      objectFit: 'contain',
-                    }}
-                  />
-                )}
-                {isVideo(previewFile.contentType) && (
-                  <video
-                    src={previewUrl}
-                    controls
-                    style={{
-                      maxWidth: '100%',
-                      maxHeight: '70vh',
-                    }}>
-                    您的浏览器不支持视频播放
-                  </video>
-                )}
-                {isText(previewFile.contentType) && (
-                  <Box
-                    sx={{
-                      width: '100%',
-                      minHeight: 400,
-                      maxHeight: '70vh',
-                      overflow: 'auto',
-                      p: 2,
-                      bgcolor: 'background.default',
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      borderRadius: 1,
-                    }}>
-                    {loadingText ? (
-                      <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}>
-                        <CircularProgress />
-                      </Box>
-                    ) : (
-                      <Typography
-                        component="pre"
-                        sx={{
-                          fontFamily: 'monospace',
-                          fontSize: '0.875rem',
-                          whiteSpace: 'pre-wrap',
-                          wordBreak: 'break-word',
-                          margin: 0,
-                        }}>
-                        {textContent || '无内容'}
-                      </Typography>
-                    )}
-                  </Box>
-                )}
-              </Box>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClosePreview}>关闭</Button>
-          </DialogActions>
-        </Dialog>
+          loadingText={loadingText}
+          textContent={textContent}
+        />
       </Box>
     </GlassBox>
   );

@@ -17,14 +17,16 @@ import { GlassBox } from 'Frontend/components/GlassBox';
 import { SearchManagementService } from 'Frontend/generated/endpoints';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import InfoIcon from '@mui/icons-material/Info';
+import CleanupIcon from '@mui/icons-material/CleaningServices';
 
 export const config: ViewConfig = {
   menu: { order: 5, icon: 'SearchIcon' },
-  title: '搜索管理',
+  title: '索引管理',
 };
 
 export default function SearchManagementView() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isVacuuming, setIsVacuuming] = useState(false);
   const [async, setAsync] = useState(true);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -44,15 +46,31 @@ export default function SearchManagementView() {
     }
   };
 
+  const handleVacuumDatabase = async () => {
+    setIsVacuuming(true);
+    setError(null);
+    setResult(null);
+
+    try {
+      const message = await SearchManagementService.vacuumFileDatabase();
+      setResult(message ?? null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'VACUUM 操作失败，请重试');
+    } finally {
+      setIsVacuuming(false);
+    }
+  };
+
+
   return (
     <GlassBox height={'100%'}>
       <Box sx={{ p: 3, maxWidth: 800, mx: 'auto' }}>
         <Box textAlign="center" mb={4}>
           <Typography variant="h4" gutterBottom>
-            Hibernate Search 管理
+            索引管理
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            管理 Lucene 全文搜索索引
+            管理 Lucene 全文搜索索引和 Note 更新
           </Typography>
         </Box>
 
@@ -111,6 +129,43 @@ export default function SearchManagementView() {
                 disabled={isLoading}
                 startIcon={isLoading ? <CircularProgress size={20} /> : <RefreshIcon />}>
                 {isLoading ? '重建中...' : '开始重建索引'}
+              </Button>
+            </CardActions>
+          </Card>
+
+          {/* 数据库清理（VACUUM）卡片 */}
+          <Card elevation={2}>
+            <CardContent>
+              <Box display="flex" alignItems="center" mb={2}>
+                <CleanupIcon color="primary" sx={{ mr: 1 }} />
+                <Typography variant="h6">数据库清理（VACUUM）</Typography>
+              </Box>
+              
+              <Typography variant="body2" color="text.secondary" paragraph>
+                执行 SQLite VACUUM 操作以减小数据库文件大小。当数据被删除或设置为 null 后，SQLite 不会立即释放空间，需要执行 VACUUM 来回收空间。
+              </Typography>
+
+              <Alert severity="warning" icon={<InfoIcon />} sx={{ mb: 2 }}>
+                <Typography variant="body2">
+                  <strong>注意事项：</strong>
+                  <ul style={{ margin: '0.5rem 0', paddingLeft: '1.5rem' }}>
+                    <li>VACUUM 会重建整个数据库文件，可能需要较长时间</li>
+                    <li>VACUUM 需要独占数据库连接，执行期间其他操作可能被阻塞</li>
+                    <li>建议在数据迁移完成后执行，而不是频繁执行</li>
+                    <li>执行前建议备份数据库文件</li>
+                  </ul>
+                </Typography>
+              </Alert>
+            </CardContent>
+
+            <CardActions sx={{ justifyContent: 'flex-end', px: 2, pb: 2 }}>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={handleVacuumDatabase}
+                disabled={isVacuuming || isLoading}
+                startIcon={isVacuuming ? <CircularProgress size={20} /> : <CleanupIcon />}>
+                {isVacuuming ? '清理中...' : '执行 VACUUM'}
               </Button>
             </CardActions>
           </Card>

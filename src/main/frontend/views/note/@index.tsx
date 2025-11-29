@@ -1,6 +1,7 @@
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
 import { Box, Fab, SwipeableDrawer, Typography, Grid, Divider } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 import MenuIcon from '@mui/icons-material/Menu';
 import Sidebar from 'Frontend/features/note/components/Sidebar';
 import ContextHeader from 'Frontend/features/note/components/ContextHeader';
@@ -11,6 +12,7 @@ import { useNoteStore } from 'Frontend/features/note/hooks/useNotes';
 import { useCollectionStore } from 'Frontend/features/note/hooks/useCollection';
 import { useTagStore } from 'Frontend/features/note/hooks/useTagStore';
 import { useLock } from 'Frontend/features/note/hooks/useLock';
+import { TagService } from 'Frontend/generated/endpoints';
 
 export const config: ViewConfig = {
   menu: { order: 2, icon: 'DescriptionIcon' },
@@ -19,6 +21,8 @@ export const config: ViewConfig = {
 
 export default function NoteListView() {
   const [open, setOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
   const notes = useNoteStore((s) => s.notes);
   const isEmpty = useNoteStore((s) => s.notes.length === 0 && !s.loading);
   const isLoading = useNoteStore((s) => s.loading);
@@ -26,7 +30,9 @@ export default function NoteListView() {
   const searchText = useNoteStore((s) => s.searchText);
   const fetchCollections = useCollectionStore((s) => s.fetchCollections);
   const fetchTags = useTagStore((s) => s.fetchTags);
+  const addSelectedTag = useTagStore((s) => s.addSelectedTag);
   const selectedCollection = useCollectionStore((s) => s.selectedCollection);
+  const fetchNotes = useNoteStore((s) => s.fetchNotes);
   const { run: runFetchTags } = useLock('fetchTags');
 
   useEffect(() => {
@@ -39,6 +45,34 @@ export default function NoteListView() {
 
     runFetchTags(() => fetchTags(id));
   }, [selectedCollection?.id]);
+
+  // 从 URL 读取 tagId 参数并设置选中的标签
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tagId = params.get('tagId');
+    
+    if (tagId && selectedCollection?.id) {
+      // 获取标签信息并添加到选中列表
+      const loadTagAndSelect = async () => {
+        try {
+          const tags = await TagService.findAllTags(selectedCollection.id, [tagId]);
+          const tag = tags.find((t) => t.id === tagId);
+          if (tag) {
+            await addSelectedTag(tag);
+            // 触发重新获取笔记列表
+            fetchNotes();
+            // 清除 URL 参数，避免重复触发
+            params.delete('tagId');
+            navigate({ search: params.toString() }, { replace: true });
+          }
+        } catch (error) {
+          console.error('加载标签失败:', error);
+        }
+      };
+      
+      loadTagAndSelect();
+    }
+  }, [location.search, selectedCollection?.id, addSelectedTag, fetchNotes, navigate]);
 
   console.log('NoteListView render');
   return (

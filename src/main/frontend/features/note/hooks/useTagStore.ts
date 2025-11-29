@@ -74,8 +74,25 @@ export const useTagStore = create<TagState>((set, get) => ({
   async updateTag(id, name) {
     try {
       await TagService.updateTag(id, name);
-      const selectedCollectionId = useCollectionStore.getState().selectedCollection?.id;
-      await get().fetchTags(selectedCollectionId);
+      const currentState = get();
+      
+          const updatedTags = currentState.tags.map((tag) =>
+            tag.id === id ? { ...tag, name } : tag
+          );
+      
+      const updatedSelectedTags = currentState.selectedTags.map((tag) =>
+        tag.id === id ? { ...tag, name } : tag
+      );
+      
+      const updatedSelectedTag = currentState.selectedTag?.id === id
+        ? { ...currentState.selectedTag, name }
+        : currentState.selectedTag;
+
+      set({
+        tags: updatedTags,
+        selectedTags: updatedSelectedTags,
+        selectedTag: updatedSelectedTag,
+      });
     } catch (err: any) {
       set({ error: err.message || '更新失败' });
     }

@@ -106,11 +106,15 @@ public class NoteService {
 
     @Transactional
     public void deleteNote(String id) {
-        noteRepository.findById(new NoteId(id))
-                      .ifPresentOrElse(noteRepository::delete,
-                                       () -> {
-                                           throw new EntityNotFoundException("Note not found: " + id);
-                                       });
+        Note note = noteRepository.findById(new NoteId(id))
+                                  .orElseThrow(() -> new EntityNotFoundException("Note not found: " + id));
+        
+        // 在删除之前注册并发布删除事件
+        note.markAsDeleted();
+        // 保存以触发事件发布
+        noteRepository.save(note);
+        // 然后删除
+        noteRepository.delete(note);
     }
 
     @Transactional

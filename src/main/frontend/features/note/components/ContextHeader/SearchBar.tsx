@@ -51,9 +51,13 @@ export default function SearchBar(): JSX.Element {
     fetchNotes();
   }, 300);
 
+  // 使用 selectedTags 的 ID 列表作为依赖，而不是整个 selectedTags 数组
+  // 这样可以避免在标签信息更新（如名称、封面）时触发不必要的刷新
+  const selectedTagIds = selectedTags.map((tag) => tag.id).sort().join(',');
+
   useEffect(() => {
     debouncedSearch();
-  }, [searchText, debouncedSearch, selectedTags, page, pageSize]);
+  }, [searchText, debouncedSearch, selectedTagIds, page, pageSize]);
 
   const handleCreate = async (type: NoteType) => {
     try {

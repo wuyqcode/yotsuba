@@ -93,8 +93,25 @@ export default function TagEditDialog({ open, onClose, tag }: TagEditDialogProps
       }
       await TagService.updateTagCover(tag.id, coverResourceId);
       
-      // 刷新标签列表以显示更新后的封面
-      await fetchTags(selectedCollection?.id);
+      // 检查修改的 tag 是否在 selectedTags 中
+      const selectedTags = useTagStore.getState().selectedTags;
+      const isInSelectedTags = selectedTags.some((t: TagDto) => t.id === tag.id);
+      
+      if (isInSelectedTags) {
+        // 如果在 selectedTags 中，需要刷新标签列表以更新 selectedTags
+        await fetchTags(selectedCollection?.id);
+      } else {
+        // 如果不在 selectedTags 中，只更新 tags 数组中的封面信息，不触发 fetchTags（避免页面重新加载）
+        const tags = useTagStore.getState().tags;
+        const tagToUpdate = tags.find((t: TagDto) => t.id === tag.id);
+        // 只有当封面真的改变时才更新，避免不必要的数组引用变化
+        if (tagToUpdate && tagToUpdate.cover !== coverUrl) {
+          const updatedTags = tags.map((t: TagDto) =>
+            t.id === tag.id ? { ...t, cover: coverUrl || undefined } : t
+          );
+          useTagStore.setState({ tags: updatedTags });
+        }
+      }
       
       onClose();
     } catch (error) {

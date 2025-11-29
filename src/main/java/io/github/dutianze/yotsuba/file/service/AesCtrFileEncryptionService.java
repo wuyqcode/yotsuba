@@ -1,6 +1,9 @@
 package io.github.dutianze.yotsuba.file.service;
 
 import io.github.dutianze.yotsuba.file.domain.valueobject.FileResourceId;
+import io.github.dutianze.yotsuba.file.domain.valueobject.StorageVersion;
+import java.util.Comparator;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +14,6 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -31,16 +33,12 @@ public class AesCtrFileEncryptionService {
     private static final int KEY_LENGTH_BITS = 256;
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
+    public void encryptFile(InputStream inputStream, Path path, String password, StorageVersion storageVersion) throws Exception {
+        Path fullPath = getStoragePath(path, storageVersion);
+        Files.createDirectories(fullPath.getParent());
+        Path encryptedPath = fullPath.resolveSibling(fullPath.getFileName() + ".encrypted");
 
-    private Path getEncryptedFilePath(FileResourceId fileResourceId) {
-        return Paths.get(FILE_STORAGE_PATH, fileResourceId.id() + ".encrypted");
-    }
-
-    public void encryptFile(InputStream inputStream, FileResourceId fileResourceId, String password) throws Exception {
-        Path encryptedFilePath = getEncryptedFilePath(fileResourceId);
-        Files.createDirectories(encryptedFilePath.getParent());
-
-        try (OutputStream out = createEncryptedOutputStream(encryptedFilePath, password)) {
+        try (OutputStream out = createEncryptedOutputStream(encryptedPath, password)) {
             byte[] buffer = new byte[BUFFER_SIZE];
             int bytesRead;
             while ((bytesRead = inputStream.read(buffer)) != -1) {
@@ -48,7 +46,7 @@ public class AesCtrFileEncryptionService {
             }
         }
 
-        log.info("Encrypted file {} as single encrypted file", fileResourceId.id());
+        log.info("Encrypted file {} as single encrypted file", encryptedPath);
     }
 
     private OutputStream createEncryptedOutputStream(Path filePath, String password) throws Exception {
@@ -79,13 +77,15 @@ public class AesCtrFileEncryptionService {
         }
     }
 
-    public InputStream decryptFile(FileResourceId fileResourceId, String password) throws Exception {
-        Path encryptedFilePath = getEncryptedFilePath(fileResourceId);
-        if (!Files.exists(encryptedFilePath)) {
-            throw new IOException("Encrypted file not found: " + encryptedFilePath);
+    public InputStream decryptFile(Path path, String password, StorageVersion storageVersion) throws Exception {
+      Path encryptedPath = getStoragePath(path, storageVersion)
+          .resolveSibling(path.getFileName() + ".encrypted");
+
+        if (!Files.exists(encryptedPath)) {
+            throw new IOException("Encrypted file not found: " + encryptedPath);
         }
 
-        return createDecryptedInputStream(encryptedFilePath, password);
+        return createDecryptedInputStream(encryptedPath, password);
     }
 
     private InputStream createDecryptedInputStream(Path filePath, String password) throws Exception {
@@ -118,18 +118,76 @@ public class AesCtrFileEncryptionService {
         }
     }
 
-    public boolean deleteFile(FileResourceId fileResourceId) {
+    public boolean deleteFile(FileResourceId fileResourceId, StorageVersion storageVersion) {
         try {
-            Path encryptedFilePath = getEncryptedFilePath(fileResourceId);
+            boolean deleted = false;
+            Path encryptedFilePath = getEncryptedFilePath(fileResourceId, storageVersion);
+            Path dirPath = encryptedFilePath.getParent().resolve(fileResourceId.id());
             if (Files.exists(encryptedFilePath)) {
                 Files.delete(encryptedFilePath);
                 log.info("Deleted encrypted file: {}", encryptedFilePath);
-                return true;
+                deleted = true;
             }
+            if (Files.exists(dirPath) && Files.isDirectory(dirPath)) {
+                try (Stream<Path> paths = Files.walk(dirPath)) {
+                    paths.sorted(Comparator.reverseOrder())
+                        .forEach(path -> {
+                            try {
+                                Files.delete(path);
+                                log.info("Deleted: {}", path);
+                            } catch (Exception ex) {
+                                log.error("Failed to delete {}", path, ex);
+                            }
+                        });
+                }
+                deleted = true;
+            }
+            return deleted;
         } catch (Exception e) {
             log.error("Failed to delete file: {}", fileResourceId.id(), e);
-        }
         return false;
+    }
+    }
+
+    private Path getEncryptedFilePath(FileResourceId fileResourceId, StorageVersion storageVersion) {
+        return getStoragePath(Path.of(fileResourceId.id()), storageVersion)
+            .resolveSibling(fileResourceId.id() + ".encrypted");
+    }
+
+    private Path getStoragePath(Path path, StorageVersion storageVersion) {
+        if (storageVersion == StorageVersion.V2) {
+            // 获取路径的第一部分（文件ID）
+            Path firstPart = path.getName(0);
+            String id = firstPart.toString();
+            if (id != null && !id.isEmpty()) {
+                String firstChar = id.substring(0, 1);
+                // 构建路径：files/第一个字符/完整路径
+                Path basePath = Path.of(FILE_STORAGE_PATH, firstChar);
+                // 如果路径有多个部分，保留剩余部分
+                if (path.getNameCount() > 1) {
+                    return basePath.resolve(path);
+                } else {
+                    return basePath.resolve(id);
+                }
+            }
+        } else if (storageVersion == StorageVersion.V3) {
+            // 获取路径的第一部分（文件ID）
+            Path firstPart = path.getName(0);
+            String id = firstPart.toString();
+            if (id != null && !id.isEmpty()) {
+                // 使用前4个字符作为目录
+                String prefix = id.length() >= 4 ? id.substring(0, 4) : id;
+                // 构建路径：files/前4个字符/完整路径
+                Path basePath = Path.of(FILE_STORAGE_PATH, prefix);
+                // 如果路径有多个部分，保留剩余部分
+                if (path.getNameCount() > 1) {
+                    return basePath.resolve(path);
+                } else {
+                    return basePath.resolve(id);
+                }
+            }
+        }
+        return Path.of(FILE_STORAGE_PATH).resolve(path);
     }
 
     private SecretKey generateKeyFromPassword(String password, byte[] salt)

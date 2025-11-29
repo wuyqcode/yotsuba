@@ -1,6 +1,4 @@
-import { useEffect } from 'react';
 import { Box, Typography } from '@mui/material';
-import { useParams } from 'react-router';
 import RichTextEditor from 'reactjs-tiptap-editor';
 import 'reactjs-tiptap-editor/style.css';
 import 'prism-code-editor-lightweight/layout.css';
@@ -9,7 +7,7 @@ import { useWikiEditor } from 'Frontend/features/note/hooks/useWikiEditor';
 import WikiHeader from 'Frontend/features/note/components/wiki/WikiHeader';
 import { useWikiNoteStore } from '../../hooks/useWikiNoteStore';
 import NoteComment from './NoteComment';
-import NoteFile from './NoteFile';
+import NoteFileList from './NoteFileList';
 
 function WikiEditorPlaceholder({ loading, error }: { loading?: boolean; error?: string | null }) {
   return (
@@ -62,7 +60,7 @@ export default function WikiContent() {
       {mode === 'comment' ? (
         <NoteComment />
       ) : mode === 'file' ? (
-        <NoteFile />
+        <NoteFileList />
       ) : (
         <Box
           sx={{

@@ -7,6 +7,7 @@ import io.github.dutianze.yotsuba.file.domain.FileResourceRepository;
 import io.github.dutianze.yotsuba.file.domain.valueobject.FileResourceId;
 import io.github.dutianze.yotsuba.shared.common.ReferenceCategory;
 import io.github.dutianze.yotsuba.file.dto.FileResourceDto;
+import java.util.List;
 import io.github.dutianze.yotsuba.file.service.FileService;
 import io.github.dutianze.yotsuba.note.application.dto.PageDto;
 import jakarta.annotation.Nonnull;
@@ -50,9 +51,10 @@ public class FileResourceEndpoint {
   @Nonnull
   public PageDto<FileResourceDto> listByNoteId(String noteId, int page, int size) {
     Pageable pageable = PageRequest.of(page, size);
-    Page<FileResourceDto> fileResources = fileResourceRepository.findByNoteIdAndCategory(
-            noteId, ReferenceCategory.NOTE_ATTACHMENT, pageable);
+    Page<FileResourceDto> fileResources = fileResourceRepository.findByNoteIdAndCategories(
+            noteId, List.of(ReferenceCategory.NOTE_CONTENT, ReferenceCategory.NOTE_ATTACHMENT), pageable);
     return PageDto.from(fileResources);
   }
+
 
 }

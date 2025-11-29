@@ -3,10 +3,15 @@ package io.github.dutianze.yotsuba.file.domain;
 import io.github.dutianze.yotsuba.file.domain.valueobject.FileResourceId;
 import io.github.dutianze.yotsuba.file.domain.valueobject.ReferenceInfo;
 import io.github.dutianze.yotsuba.file.domain.valueobject.ResourceType;
+import io.github.dutianze.yotsuba.file.domain.valueobject.StorageVersion;
+import io.github.dutianze.yotsuba.note.domain.converter.JsonListConverter;
+import io.github.dutianze.yotsuba.note.domain.valueobject.MediaSeason;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Converter;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -14,6 +19,8 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -47,7 +54,15 @@ public class FileResource implements Comparable<FileResource> {
   @Column(name = "file_size")
   private Long fileSize;
 
+  @Column(name = "storage_version")
+  @Enumerated(EnumType.STRING)
+  private StorageVersion storageVersion = StorageVersion.V1;
+
   private byte[] data;
+
+  @Column(name = "thumbnail_index_list")
+  @Convert(converter = IntegerListConverter.class)
+  private List<Integer> thumbnailIndexList = new ArrayList<>();
 
   @Embedded
   @AttributeOverrides({
@@ -77,6 +92,7 @@ public class FileResource implements Comparable<FileResource> {
     fileResource.fileSize = dataSize.toKilobytes();
     fileResource.resourceType = ResourceType.LOCAL;
     fileResource.passwordHash = passwordHash;
+    fileResource.storageVersion = StorageVersion.V1;
     return fileResource;
   }
 
@@ -105,5 +121,13 @@ public class FileResource implements Comparable<FileResource> {
 
   public void linkReference(ReferenceInfo reference) {
     this.reference = reference;
+  }
+
+
+  @Converter
+  public static class IntegerListConverter extends JsonListConverter<Integer> {
+    public IntegerListConverter() {
+      super(Integer.class);
+    }
   }
 }
