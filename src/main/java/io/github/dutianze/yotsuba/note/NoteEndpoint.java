@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashSet;
@@ -75,7 +76,7 @@ public class NoteEndpoint{
     public PageDto<NoteCardDto> searchNotes(String collectionId, String searchText, List<String> tagIdList, int page,
                                             int size) {
         List<TagId> tagIds = tagIdList.stream().map(TagId::new).toList();
-        PageRequest pageRequest = PageRequest.of(page, size);
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         
         if (StringUtils.isBlank(searchText)) {
             Page<Note> notePage;
