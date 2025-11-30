@@ -10,7 +10,7 @@ import {
   ListItemText,
   Divider,
 } from '@mui/material';
-import { Search, Add, LibraryBooks, Movie, Clear } from '@mui/icons-material';
+import { Search, Add, LibraryBooks, Movie, Clear, ViewModule, ViewList } from '@mui/icons-material';
 import { useNavigate } from 'react-router';
 import NoteType from 'Frontend/generated/io/github/dutianze/yotsuba/note/domain/valueobject/NoteType';
 import { useNoteStore } from '../../hooks/useNotes';
@@ -42,6 +42,8 @@ export default function SearchBar(): JSX.Element {
   const createNote = useNoteStore((s) => s.createNote);
   const page = useNoteStore((s) => s.page);
   const pageSize = useNoteStore((s) => s.pageSize);
+  const viewMode = useNoteStore((s) => s.viewMode);
+  const toggleViewMode = useNoteStore((s) => s.toggleViewMode);
   const selectedTags = useTagStore((s) => s.selectedTags);
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -138,6 +140,21 @@ export default function SearchBar(): JSX.Element {
           },
         }}>
         <Search fontSize="small" />
+      </IconButton>
+
+      <IconButton
+        size="small"
+        onClick={toggleViewMode}
+        sx={{
+          mr: 0.5,
+          color: 'text.secondary',
+          '&:hover': {
+            bgcolor: 'action.hover',
+            color: 'primary.main',
+          },
+        }}
+        title={viewMode === 'card' ? '切换到列表视图' : '切换到卡片视图'}>
+        {viewMode === 'card' ? <ViewList fontSize="small" /> : <ViewModule fontSize="small" />}
       </IconButton>
 
       <Button

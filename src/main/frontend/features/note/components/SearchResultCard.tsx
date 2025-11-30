@@ -183,7 +183,7 @@ export default function SearchResultCard({ note }: Props) {
           <FavoriteBorderIcon fontSize="small" />
         </IconButton>
       </Box>
-      {note.id && <TagSelectDialog open={tagDialogOpen} onClose={() => setTagDialogOpen(false)} noteId={note.id} />}
+      {note.id && <TagSelectDialog open={tagDialogOpen} onClose={() => setTagDialogOpen(false)} note={note} />}
     </Card>
   );
 }

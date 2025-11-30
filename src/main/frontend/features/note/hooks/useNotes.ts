@@ -1,10 +1,11 @@
 import { create } from 'zustand';
-import { shallow } from 'zustand/shallow';
-import { NoteService } from 'Frontend/generated/endpoints';
 import NoteCardDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/NoteCardDto';
 import NoteType from 'Frontend/generated/io/github/dutianze/yotsuba/note/domain/valueobject/NoteType';
 import { useCollectionStore } from './useCollection';
 import { useTagStore } from './useTagStore';
+import { NoteEndpoint } from 'Frontend/generated/endpoints';
+
+export type ViewMode = 'card' | 'list';
 
 type NoteState = {
   notes: NoteCardDto[];
@@ -13,6 +14,7 @@ type NoteState = {
   totalPages: number;
   totalElements: number;
   searchText: string;
+  viewMode: ViewMode;
 
   loading: boolean;
   error: string | null;
@@ -25,6 +27,8 @@ type NoteState = {
   setPageSize: (size: number) => void;
   setSearchText: (text: string) => void;
   clearSearch: () => void;
+  setViewMode: (mode: ViewMode) => void;
+  toggleViewMode: () => void;
 };
 
 export const useNoteStore = create<NoteState>((set, get) => ({
@@ -34,6 +38,7 @@ export const useNoteStore = create<NoteState>((set, get) => ({
   totalPages: 0,
   totalElements: 0,
   searchText: '',
+  viewMode: 'card',
 
   loading: false,
   error: null,
@@ -42,6 +47,8 @@ export const useNoteStore = create<NoteState>((set, get) => ({
   setPageSize: (size) => set({ pageSize: size, page: 1 }),
   setSearchText: (text) => set({ searchText: text, page: 1 }),
   clearSearch: () => set({ searchText: '', page: 1 }),
+  setViewMode: (mode) => set({ viewMode: mode }),
+  toggleViewMode: () => set((state) => ({ viewMode: state.viewMode === 'card' ? 'list' : 'card' })),
 
   /** 拉取笔记列表 */
   fetchNotes: async () => {
@@ -62,7 +69,7 @@ export const useNoteStore = create<NoteState>((set, get) => ({
 
     set({ loading: true, error: null });
     try {
-      const res = await NoteService.searchNotes(
+      const res = await NoteEndpoint.searchNotes(
         selectedCollectionId,
         searchText,
         selectedTagIdList,
@@ -91,7 +98,7 @@ export const useNoteStore = create<NoteState>((set, get) => ({
 
     set({ loading: true, error: null });
     try {
-      const id = await NoteService.createNote(selectedCollectionId, type);
+      const id = await NoteEndpoint.createNote(selectedCollectionId, type);
       await get().fetchNotes();
       return id;
     } catch (e: any) {
@@ -107,7 +114,7 @@ export const useNoteStore = create<NoteState>((set, get) => ({
   removeNote: async (id: string) => {
     set({ loading: true, error: null });
     try {
-      await NoteService.deleteNote(id);
+      await NoteEndpoint.deleteNote(id);
       await get().fetchNotes();
     } catch (e: any) {
       console.error('removeNote failed:', e);

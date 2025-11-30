@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import TagDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/TagDto';
-import { TagService } from 'Frontend/generated/endpoints';
 import { useCollectionStore } from './useCollection';
+import { TagEndpoint } from 'Frontend/generated/endpoints';
 
 interface TagState {
   tags: TagDto[];
@@ -40,7 +40,7 @@ export const useTagStore = create<TagState>((set, get) => ({
       const tagIdList =
         currentState.selectedTags.length > 0 ? currentState.selectedTags.map((tag) => tag.id) : undefined;
 
-      const res = await TagService.findAllTags(collectionId, tagIdList);
+      const res = await TagEndpoint.findAllTags(collectionId, tagIdList);
 
       const updatedSelectedTags = currentState.selectedTags
         .map((selectedTag) => res.find((tag) => tag.id === selectedTag.id))
@@ -64,7 +64,7 @@ export const useTagStore = create<TagState>((set, get) => ({
   async addTag(collectionId, name) {
     if (!collectionId || !name.trim()) return;
     try {
-      await TagService.createTag(collectionId, name);
+      await TagEndpoint.createTag(collectionId, name);
       await get().fetchTags(collectionId);
     } catch (err: any) {
       set({ error: err.message || '创建失败' });
@@ -73,7 +73,7 @@ export const useTagStore = create<TagState>((set, get) => ({
 
   async updateTag(id, name) {
     try {
-      await TagService.updateTag(id, name);
+      await TagEndpoint.updateTag(id, name);
       const currentState = get();
       
           const updatedTags = currentState.tags.map((tag) =>
@@ -100,7 +100,7 @@ export const useTagStore = create<TagState>((set, get) => ({
 
   async deleteTag(id) {
     try {
-      await TagService.deleteTag(id);
+      await TagEndpoint.deleteTag(id);
       const selectedCollectionId = useCollectionStore.getState().selectedCollection?.id;
       
       // 先更新 selectedTags，移除被删除的标签

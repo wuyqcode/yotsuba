@@ -1,4 +1,4 @@
-package io.github.dutianze.yotsuba.note.application;
+package io.github.dutianze.yotsuba.note;
 
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.hilla.Endpoint;
@@ -17,6 +17,7 @@ import io.github.dutianze.yotsuba.note.domain.valueobject.*;
 import io.github.dutianze.yotsuba.search.NoteSearch;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
 
 @Endpoint
 @AnonymousAllowed
-public class NoteService {
+public class NoteEndpoint{
 
     private final NoteRepository noteRepository;
     private final NoteSearch noteSearch;
@@ -40,7 +41,7 @@ public class NoteService {
     private final CollectionRepository collectionRepository;
     private final TagRepository tagRepository;
 
-    public NoteService(NoteRepository noteRepository, NoteSearch noteSearch,
+    public NoteEndpoint(NoteRepository noteRepository, NoteSearch noteSearch,
                        @Qualifier("htmlExtractServiceImpl") ExtractService extractService,
                        NoteAssembler noteAssembler, MediaNoteRepository mediaNoteRepository,
                        CollectionRepository collectionRepository, TagRepository tagRepository) {
@@ -74,9 +75,22 @@ public class NoteService {
     public PageDto<NoteCardDto> searchNotes(String collectionId, String searchText, List<String> tagIdList, int page,
                                             int size) {
         List<TagId> tagIds = tagIdList.stream().map(TagId::new).toList();
-        Page<NoteCardDto> dtoPage =
-                noteSearch.search(new CollectionId(collectionId), tagIds, searchText, PageRequest.of(page, size));
-        return PageDto.from(dtoPage);
+        PageRequest pageRequest = PageRequest.of(page, size);
+        
+        if (StringUtils.isBlank(searchText)) {
+            Page<Note> notePage;
+            if (tagIds.isEmpty()) {
+                notePage = noteRepository.findAllByCollectionId(collectionId, pageRequest);
+            } else {
+                notePage = noteRepository.findAllByCollectionIdAndTags(collectionId, tagIds, pageRequest);
+            }
+            Page<NoteCardDto> dtoPage = notePage.map(noteAssembler::toCardDto);
+            return PageDto.from(dtoPage);
+        } else {
+            Page<NoteCardDto> dtoPage =
+                    noteSearch.search(new CollectionId(collectionId), tagIds, searchText, pageRequest);
+            return PageDto.from(dtoPage);
+        }
     }
 
     /**

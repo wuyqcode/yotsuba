@@ -12,7 +12,7 @@ import { useNoteStore } from 'Frontend/features/note/hooks/useNotes';
 import { useCollectionStore } from 'Frontend/features/note/hooks/useCollection';
 import { useTagStore } from 'Frontend/features/note/hooks/useTagStore';
 import { useLock } from 'Frontend/features/note/hooks/useLock';
-import { TagService } from 'Frontend/generated/endpoints';
+import { TagEndpoint } from 'Frontend/generated/endpoints';
 
 export const config: ViewConfig = {
   menu: { order: 2, icon: 'DescriptionIcon' },
@@ -27,7 +27,7 @@ export default function NoteListView() {
   const isEmpty = useNoteStore((s) => s.notes.length === 0 && !s.loading);
   const isLoading = useNoteStore((s) => s.loading);
   const isError = useNoteStore((s) => !!s.error);
-  const searchText = useNoteStore((s) => s.searchText);
+  const viewMode = useNoteStore((s) => s.viewMode);
   const fetchCollections = useCollectionStore((s) => s.fetchCollections);
   const fetchTags = useTagStore((s) => s.fetchTags);
   const addSelectedTag = useTagStore((s) => s.addSelectedTag);
@@ -55,7 +55,7 @@ export default function NoteListView() {
       // 获取标签信息并添加到选中列表
       const loadTagAndSelect = async () => {
         try {
-          const tags = await TagService.findAllTags(selectedCollection.id, [tagId]);
+          const tags = await TagEndpoint.findAllTags(selectedCollection.id, [tagId]);
           const tag = tags.find((t) => t.id === tagId);
           if (tag) {
             await addSelectedTag(tag);
@@ -130,7 +130,7 @@ export default function NoteListView() {
               }}>
               <Grid container spacing={2} sx={{ mt: 1 }}>
                 {notes?.map((note) =>
-                  searchText?.trim() ? (
+                  viewMode === 'list' ? (
                     <Grid key={note.id} size={{ xs: 12, sm: 12, md: 12, lg: 12 }}>
                       <SearchResultCard note={note} />
                     </Grid>

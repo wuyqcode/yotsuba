@@ -16,7 +16,7 @@ import { GlassBox } from 'Frontend/components/GlassBox';
 
 export const config: ViewConfig = {
   menu: { order: 7, icon: 'NumbersIcon' },
-  title: 'Base10 ↔ Base62 转换器',
+  title: 'Base62转换器',
 };
 
 const BASE62_CHARSET = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';

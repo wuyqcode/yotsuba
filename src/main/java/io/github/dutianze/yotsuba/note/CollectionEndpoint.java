@@ -1,4 +1,4 @@
-package io.github.dutianze.yotsuba.note.application;
+package io.github.dutianze.yotsuba.note;
 
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.hilla.Endpoint;
@@ -18,12 +18,12 @@ import java.util.stream.Collectors;
 
 @Endpoint
 @AnonymousAllowed
-public class CollectionService {
+public class CollectionEndpoint {
 
     private final CollectionRepository collectionRepository;
     private final NoteRepository noteRepository;
 
-    public CollectionService(CollectionRepository collectionRepository, NoteRepository noteRepository) {
+    public CollectionEndpoint(CollectionRepository collectionRepository, NoteRepository noteRepository) {
         this.collectionRepository = collectionRepository;
         this.noteRepository = noteRepository;
     }

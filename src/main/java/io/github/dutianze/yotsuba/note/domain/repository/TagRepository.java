@@ -47,4 +47,15 @@ public interface TagRepository extends JpaRepository<Tag, TagId> {
 
   Optional<Tag> findByIdAndCollectionId(TagId tagId, CollectionId collectionId);
 
+  @Query("""
+    SELECT t
+    FROM Tag t
+    WHERE t.collection.id = :collectionId
+      AND t.name = :name
+    """)
+  Optional<Tag> findByCollectionIdAndName(
+      @Param("collectionId") CollectionId collectionId,
+      @Param("name") String name
+  );
+
 }

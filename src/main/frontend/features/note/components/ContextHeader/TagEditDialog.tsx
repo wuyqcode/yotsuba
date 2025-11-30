@@ -15,8 +15,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useTagStore } from '../../hooks/useTagStore';
 import { useCollectionStore } from '../../hooks/useCollection';
 import { useUpload } from '../../hooks/useUpload';
-import { TagService } from 'Frontend/generated/endpoints';
 import TagDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/TagDto';
+import { TagEndpoint } from 'Frontend/generated/endpoints';
 
 interface TagEditDialogProps {
   open: boolean;
@@ -91,7 +91,7 @@ export default function TagEditDialog({ open, onClose, tag }: TagEditDialogProps
         const urlParts = coverUrl.split('/');
         coverResourceId = urlParts[urlParts.length - 1] || '';
       }
-      await TagService.updateTagCover(tag.id, coverResourceId);
+      await TagEndpoint.updateTagCover(tag.id, coverResourceId);
       
       // 检查修改的 tag 是否在 selectedTags 中
       const selectedTags = useTagStore.getState().selectedTags;

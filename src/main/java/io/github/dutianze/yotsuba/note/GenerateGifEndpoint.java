@@ -1,4 +1,4 @@
-package io.github.dutianze.yotsuba.note.api;
+package io.github.dutianze.yotsuba.note;
 
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.hilla.Endpoint;
@@ -22,7 +22,7 @@ import java.nio.file.Files;
 @Endpoint
 @AnonymousAllowed
 @RequiredArgsConstructor
-public class SpriteSeekToGifEndpoint {
+public class GenerateGifEndpoint {
 
     private final SpriteSeekToGifService spriteSeekToGifService;
     private final FileService fileService;

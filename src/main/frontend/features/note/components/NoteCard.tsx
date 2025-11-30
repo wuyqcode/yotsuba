@@ -245,7 +245,7 @@ export default function NoteCard({ note }: NoteCardProps) {
       )}
 
       {/* 标签选择对话框 */}
-      {note.id && <TagSelectDialog open={tagDialogOpen} onClose={() => setTagDialogOpen(false)} noteId={note.id} />}
+      {note.id && <TagSelectDialog open={tagDialogOpen} onClose={() => setTagDialogOpen(false)} note={note} />}
     </Box>
   );
 }

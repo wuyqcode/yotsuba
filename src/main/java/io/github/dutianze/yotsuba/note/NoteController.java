@@ -1,6 +1,5 @@
-package io.github.dutianze.yotsuba.note.api;
+package io.github.dutianze.yotsuba.note;
 
-import io.github.dutianze.yotsuba.note.application.NoteService;
 import io.github.dutianze.yotsuba.note.domain.Collection;
 import io.github.dutianze.yotsuba.note.domain.repository.CollectionRepository;
 import io.github.dutianze.yotsuba.note.domain.valueobject.CollectionCategory;
@@ -24,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class NoteController {
 
-    private final NoteService noteService;
+    private final NoteEndpoint noteEndpoint;
     private final CollectionRepository collectionRepository;
 
     /**
@@ -62,10 +61,10 @@ public class NoteController {
                     .orElseThrow(() -> new EntityNotFoundException("Default collection not found"));
 
             // 创建新的 WIKI 类型的 Note
-            String noteId = noteService.createNote(collection.getId().id(), NoteType.WIKI);
+            String noteId = noteEndpoint.createNote(collection.getId().id(), NoteType.WIKI);
 
             // 更新 Note 的标题和内容
-            noteService.updateNote(noteId, request.title(), request.content());
+            noteEndpoint.updateNote(noteId, request.title(), request.content());
 
             log.info("Created note from script: noteId={}, title={}", noteId, request.title());
 

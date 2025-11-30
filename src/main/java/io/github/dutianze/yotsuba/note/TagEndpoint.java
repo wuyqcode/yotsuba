@@ -1,4 +1,4 @@
-package io.github.dutianze.yotsuba.note.application;
+package io.github.dutianze.yotsuba.note;
 
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.hilla.Endpoint;
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @Endpoint
 @AnonymousAllowed
 @RequiredArgsConstructor
-public class TagService {
+public class TagEndpoint {
 
     private final TagRepository tagRepository;
     private final CollectionRepository collectionRepository;
@@ -93,6 +93,13 @@ public class TagService {
                 .findById(new CollectionId(collectionId))
                 .orElseThrow(() -> new EntityNotFoundException("Collection not found: " + collectionId));
 
+        // 检查同一集合内是否已存在相同名称的标签
+        CollectionId collId = new CollectionId(collectionId);
+        tagRepository.findByCollectionIdAndName(collId, name)
+                .ifPresent(existingTag -> {
+                    throw new IllegalArgumentException("Tag with name '" + name + "' already exists in this collection");
+                });
+
         Tag tag = Tag.create(name);
         tag.setCollection(collection);
         tagRepository.save(tag);
@@ -103,8 +110,22 @@ public class TagService {
 
     @Transactional
     public void updateTag(String id, String name) {
+        if (StringUtils.isBlank(name)) {
+            throw new IllegalArgumentException("Tag title cannot be empty");
+        }
+
         Tag tag = tagRepository.findById(new TagId(id))
                                .orElseThrow(() -> new EntityNotFoundException("Tag not found: " + id));
+
+        // 检查同一集合内是否已存在相同名称的其他标签
+        CollectionId collectionId = tag.getCollection().getId();
+        tagRepository.findByCollectionIdAndName(collectionId, name)
+                .ifPresent(existingTag -> {
+                    // 如果找到的标签不是当前要更新的标签，则抛出异常
+                    if (!existingTag.getId().equals(tag.getId())) {
+                        throw new IllegalArgumentException("Tag with name '" + name + "' already exists in this collection");
+                    }
+                });
 
         tag.setName(name);
         tagRepository.save(tag);
@@ -125,7 +146,7 @@ public class TagService {
         }
         
         // 更新封面
-        if (coverResourceId != null && !coverResourceId.trim().isEmpty()) {
+        if (!coverResourceId.trim().isEmpty()) {
             FileResourceId newCoverId = new FileResourceId(coverResourceId);
             tag.setCover(newCoverId);
             
@@ -156,7 +177,7 @@ public class TagService {
 
         // 从所有关联的 Note 中移除这个 Tag
         Set<Note> notes = tag.getNotes();
-        if (notes != null && !notes.isEmpty()) {
+        if (!notes.isEmpty()) {
             for (Note note : notes) {
                 note.getTags().remove(tag);
                 noteRepository.save(note);

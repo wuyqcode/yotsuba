@@ -16,46 +16,49 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useTagStore } from '../hooks/useTagStore';
-import { NoteService, TagService } from 'Frontend/generated/endpoints';
 import TagDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/TagDto';
-import { useNoteStore } from '../hooks/useNotes';
+import NoteCardDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/NoteCardDto';
 import { useCollectionStore } from '../hooks/useCollection';
+import { NoteEndpoint, TagEndpoint } from 'Frontend/generated/endpoints';
 
 interface TagSelectDialogProps {
   open: boolean;
   onClose: () => void;
-  noteId: string;
+  note: NoteCardDto;
 }
 
-export default function TagSelectDialog({ open, onClose, noteId }: TagSelectDialogProps) {
+export default function TagSelectDialog({ open, onClose, note }: TagSelectDialogProps) {
   const [tags, setTags] = useState<TagDto[]>([]);
   const addTag = useTagStore((s) => s.addTag);
   const loading = useTagStore((s) => s.loading);
-  const fetchNotes = useNoteStore((s) => s.fetchNotes);
+  const selectedTag = useTagStore((s) => s.selectedTag);
+  const selectedTags = useTagStore((s) => s.selectedTags);
   const selectedCollection = useCollectionStore((s) => s.selectedCollection);
-
   const [selectedTagIds, setSelectedTagIds] = useState<Set<string>>(new Set());
   const [searchText, setSearchText] = useState('');
   const [saving, setSaving] = useState(false);
   const [creating, setCreating] = useState(false);
 
-    const loadTags = async () => {
-      try {
-        const result = await TagService.findAllTags(selectedCollection?.id, []);
-        setTags(result);
-      return result;
-      } catch (e) {
-        console.error('加载所有标签失败:', e);
-      return [];
-      }
-    };
+  const loadTags = async () => {
+    try {
+      const result = await TagEndpoint.findAllTags(selectedCollection?.id, []);
+      setTags(result);
+    return result;
+    } catch (e) {
+      console.error('加载所有标签失败:', e);
+    return [];
+    }
+  };
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !note.id) return;
+
+    // 打开对话框时清空输入框
+    setSearchText('');
 
     const loadNoteTags = async () => {
       try {
-        const wikiNote = await NoteService.findWikiNoteById(noteId);
+        const wikiNote = await NoteEndpoint.findWikiNoteById(note.id!);
         if (wikiNote.tags) {
           const tagIds = wikiNote.tags.filter((tag): tag is TagDto => !!tag).map((tag) => tag.id);
           setSelectedTagIds(new Set(tagIds));
@@ -67,7 +70,7 @@ export default function TagSelectDialog({ open, onClose, noteId }: TagSelectDial
 
     loadTags();
     loadNoteTags();
-  }, [open, selectedCollection?.id, noteId]);
+  }, [open, selectedCollection?.id, note.id]);
 
   const handleToggleTag = (tagId: string) => {
     setSelectedTagIds((prev) => {
@@ -82,10 +85,10 @@ export default function TagSelectDialog({ open, onClose, noteId }: TagSelectDial
   };
 
   const handleSave = async () => {
+    if (!note.id) return;
     setSaving(true);
     try {
-      await NoteService.updateNoteTags(noteId, Array.from(selectedTagIds));
-      await fetchNotes();
+      await NoteEndpoint.updateNoteTags(note.id, Array.from(selectedTagIds));
       onClose();
     } catch (error) {
       console.error('保存标签失败:', error);
@@ -96,19 +99,41 @@ export default function TagSelectDialog({ open, onClose, noteId }: TagSelectDial
 
   // 过滤标签并排序：已选中的标签排在前面
   const filteredTags = tags
-    .filter((tag) => tag.name.toLowerCase().includes(searchText.toLowerCase()))
+    .filter((tag) => {
+      // 已选中的标签始终显示，即使不匹配搜索文本
+      if (selectedTagIds.has(tag.id)) return true;
+      // 未选中的标签只显示匹配搜索文本的
+      return tag.name.toLowerCase().includes(searchText.toLowerCase());
+    })
     .sort((a, b) => {
-      const aSelected = selectedTagIds.has(a.id);
-      const bSelected = selectedTagIds.has(b.id);
-      if (aSelected && !bSelected) return -1;
-      if (!aSelected && bSelected) return 1;
-      return 0; // 保持原有顺序
+      // 计算优先级：数字越小优先级越高
+      const getPriority = (tagId: string) => {
+        // 优先级 1: 当前笔记已选中的标签
+        if (selectedTagIds.has(tagId)) return 1;
+        // 优先级 2: store 中的 selectedTag
+        if (selectedTag?.id === tagId) return 2;
+        // 优先级 3: store 中的 selectedTags
+        if (selectedTags.some((t) => t.id === tagId)) return 3;
+        // 优先级 4: 其他标签
+        return 4;
+      };
+
+      const aPriority = getPriority(a.id);
+      const bPriority = getPriority(b.id);
+
+      // 按优先级排序
+      if (aPriority !== bPriority) {
+        return aPriority - bPriority;
+      }
+
+      // 相同优先级下，按创建时间排序（TSID id 是按时间顺序生成的，越新的 id 越大）
+      return b.id.localeCompare(a.id);
     });
 
   // 检查搜索文本是否匹配现有标签
   const searchTextLower = searchText.toLowerCase().trim();
   const hasExactMatch = tags.some((tag) => tag.name.toLowerCase() === searchTextLower);
-  const showCreateOption = searchText.trim() && !hasExactMatch && filteredTags.length === 0;
+  const showCreateOption = searchText.trim() && !hasExactMatch;
 
   const handleCreateTag = async () => {
     if (!searchText.trim() || !selectedCollection?.id || creating) return;
@@ -116,6 +141,8 @@ export default function TagSelectDialog({ open, onClose, noteId }: TagSelectDial
     const tagNameToCreate = searchText.trim();
     try {
       setCreating(true);
+      // 先清空输入框
+      setSearchText('');
       await addTag(selectedCollection.id, tagNameToCreate);
       // 刷新标签列表并获取更新后的标签
       const updatedTags = await loadTags();
@@ -124,9 +151,10 @@ export default function TagSelectDialog({ open, onClose, noteId }: TagSelectDial
       if (newTag) {
         setSelectedTagIds((prev) => new Set([...prev, newTag.id]));
       }
-      setSearchText('');
     } catch (error) {
       console.error('创建标签失败:', error);
+      // 创建失败时，恢复输入框内容
+      setSearchText(tagNameToCreate);
     } finally {
       setCreating(false);
     }

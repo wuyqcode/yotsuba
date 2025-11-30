@@ -16,11 +16,11 @@ import {
 import UploadIcon from '@mui/icons-material/Upload';
 import GifIcon from '@mui/icons-material/Gif';
 import FileResourceDto from 'Frontend/generated/io/github/dutianze/yotsuba/file/dto/FileResourceDto';
-import { FileResourceEndpoint, SpriteSeekToGifEndpoint } from 'Frontend/generated/endpoints';
 import ReferenceCategory from 'Frontend/generated/io/github/dutianze/yotsuba/shared/common/ReferenceCategory';
 import { useParams } from 'react-router';
 import FileCard from 'Frontend/components/file/FileCard';
 import FilePreviewModal from 'Frontend/components/file/FilePreviewModal';
+import { FileResourceEndpoint, GenerateGifEndpoint } from 'Frontend/generated/endpoints';
 
 export default function NoteFileList() {
   const { id } = useParams<{ id: string }>();
@@ -186,7 +186,7 @@ export default function NoteFileList() {
 
     try {
       // 调用后端 Endpoint 生成 GIF 并直接保存
-      await SpriteSeekToGifEndpoint.generateGif(
+      await GenerateGifEndpoint.generateGif(
         seekPrefix,
         start,
         end,

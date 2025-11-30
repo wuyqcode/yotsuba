@@ -1,7 +1,5 @@
 package io.github.dutianze.yotsuba.note.application;
 
-import com.vaadin.flow.server.auth.AnonymousAllowed;
-import com.vaadin.hilla.Endpoint;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -12,9 +10,9 @@ import java.util.Objects;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.springframework.stereotype.Service;
 
-@Endpoint
-@AnonymousAllowed
+@Service
 public class WikiFetcher {
 
   private static final HttpClient client = HttpClient.newHttpClient();

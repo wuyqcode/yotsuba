@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Avatar, Box, Button, Divider, Paper, Stack, TextField, Typography, CircularProgress } from '@mui/material';
-import { NoteCommentService } from 'Frontend/generated/endpoints';
 import { useWikiNoteStore } from '../../hooks/useWikiNoteStore';
 import CommentDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/CommentDto';
+import { NoteCommentEndpoint } from 'Frontend/generated/endpoints';
 
 function timeAgo(input: string | null | undefined) {
   if (!input) return 'just now';
@@ -41,7 +41,7 @@ export default function NoteComment() {
     if (!noteId) return;
     setLoading(true);
     try {
-      const result = await NoteCommentService.getComments(noteId);
+      const result = await NoteCommentEndpoint.getComments(noteId);
       setComments(result);
     } catch (error) {
       console.error('加载评论失败:', error);
@@ -55,7 +55,7 @@ export default function NoteComment() {
 
     setSubmitting(true);
     try {
-      const newComment = await NoteCommentService.addComment(noteId, input.trim());
+      const newComment = await NoteCommentEndpoint.addComment(noteId, input.trim());
       setComments((prev) => [...prev, newComment]);
       setInput('');
     } catch (error) {

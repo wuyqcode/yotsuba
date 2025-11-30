@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { CollectionService } from 'Frontend/generated/endpoints';
 import CollectionDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/CollectionDto';
+import { CollectionEndpoint } from 'Frontend/generated/endpoints';
 
 interface CollectionState {
   collections: CollectionDto[];
@@ -29,7 +29,7 @@ export const useCollectionStore = create<CollectionState>((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      const res = await CollectionService.findAllCollections();
+      const res = await CollectionEndpoint.findAllCollections();
 
       const first = res[0];
 
@@ -48,7 +48,7 @@ export const useCollectionStore = create<CollectionState>((set, get) => ({
   async addCollection(name: string) {
     if (!name.trim()) return;
     try {
-      await CollectionService.createCollection(name);
+      await CollectionEndpoint.createCollection(name);
       await get().fetchCollections();
     } catch (err: any) {
       set({ error: err.message || '创建失败' });
@@ -57,7 +57,7 @@ export const useCollectionStore = create<CollectionState>((set, get) => ({
 
   async updateCollection(id: string, name: string) {
     try {
-      await CollectionService.updateCollection(id, name);
+      await CollectionEndpoint.updateCollection(id, name);
       await get().fetchCollections();
     } catch (err: any) {
       set({ error: err.message || '更新失败' });
@@ -66,7 +66,7 @@ export const useCollectionStore = create<CollectionState>((set, get) => ({
 
   async deleteCollection(id: string) {
     try {
-      await CollectionService.deleteCollection(id);
+      await CollectionEndpoint.deleteCollection(id);
       await get().fetchCollections();
 
       const current = get().selectedCollection;

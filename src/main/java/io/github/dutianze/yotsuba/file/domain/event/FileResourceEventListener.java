@@ -4,7 +4,10 @@ import io.github.dutianze.yotsuba.file.domain.FileResource;
 import io.github.dutianze.yotsuba.file.domain.valueobject.FileResourceId;
 import io.github.dutianze.yotsuba.file.domain.valueobject.ReferenceInfo;
 import io.github.dutianze.yotsuba.file.domain.FileResourceRepository;
+import java.util.List;
 import java.util.Optional;
+
+import io.github.dutianze.yotsuba.note.domain.event.NoteDeleted;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.modulith.events.ApplicationModuleListener;
@@ -47,6 +50,29 @@ public class FileResourceEventListener {
     fileResource.linkReference(new ReferenceInfo(event.fileReferenceId(), event.referenceCategory()));
     fileResourceRepository.save(fileResource);
     logger.info("Reference added for resourceId: {}", event.fileResourceId());
+  }
+
+  @ApplicationModuleListener
+  public void handle(NoteDeleted event) {
+    logger.info("Handling NoteDeleted event for noteId: {}", event.noteId());
+
+    String noteId = event.noteId().id();
+    List<FileResource> fileResources = fileResourceRepository.findByReferenceId(noteId);
+
+    if (fileResources.isEmpty()) {
+      logger.info("No FileResource found with referenceId: {}", noteId);
+      return;
+    }
+
+    for (FileResource fileResource : fileResources) {
+      fileResource.removeReference();
+      fileResourceRepository.save(fileResource);
+      logger.info("Reference removed for FileResource id: {}, previously linked to noteId: {}", 
+                  fileResource.getId(), noteId);
+    }
+
+    logger.info("Successfully removed references for {} FileResource(s) linked to noteId: {}", 
+                fileResources.size(), noteId);
   }
 
   private FileResource getFileResourceOrLogAndReturn(FileResourceId fileResourceId) {

@@ -1,4 +1,4 @@
-package io.github.dutianze.yotsuba.note.application;
+package io.github.dutianze.yotsuba.note;
 
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.hilla.Endpoint;
@@ -15,12 +15,12 @@ import java.util.List;
 
 @Endpoint
 @AnonymousAllowed
-public class NoteCommentService {
+public class NoteCommentEndpoint {
 
     private final CommentRepository commentRepository;
     private final NoteRepository noteRepository;
 
-    public NoteCommentService(CommentRepository commentRepository, NoteRepository noteRepository) {
+    public NoteCommentEndpoint(CommentRepository commentRepository, NoteRepository noteRepository) {
         this.commentRepository = commentRepository;
         this.noteRepository = noteRepository;
     }

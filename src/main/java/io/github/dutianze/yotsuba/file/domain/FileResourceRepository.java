@@ -85,4 +85,14 @@ public interface FileResourceRepository extends JpaRepository<FileResource, File
         """, nativeQuery = true)
     List<String> findOrphanFileIds();
 
+    /**
+     * 根据 referenceId 查找所有 FileResource
+     */
+    @Query("""
+        SELECT f
+        FROM FileResource f
+        WHERE f.reference.referenceId.id = :noteId
+        """)
+    List<FileResource> findByReferenceId(@Param("noteId") String noteId);
+
 }
