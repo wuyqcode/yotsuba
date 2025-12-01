@@ -132,8 +132,8 @@ export default function WikiHeader(): JSX.Element {
         style={{
           display: 'flex',
           alignItems: 'center',
-          padding: '0 12px',
-          height: 48,
+          padding: '6px',
+          minHeight: 48,
           borderBottom: '1px solid #e0e0e0',
           background: 'white',
           position: 'sticky',
