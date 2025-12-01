@@ -1,6 +1,5 @@
 package io.github.dutianze.yotsuba.note;
 
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.hilla.Endpoint;
 import io.github.dutianze.yotsuba.file.domain.valueobject.FileResourceId;
 import io.github.dutianze.yotsuba.note.application.dto.*;
@@ -16,6 +15,7 @@ import io.github.dutianze.yotsuba.note.domain.service.ExtractService;
 import io.github.dutianze.yotsuba.note.domain.valueobject.*;
 import io.github.dutianze.yotsuba.search.NoteSearch;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.security.PermitAll;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,7 +31,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Endpoint
-@AnonymousAllowed
+@PermitAll
 public class NoteEndpoint{
 
     private final NoteRepository noteRepository;

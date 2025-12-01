@@ -1,11 +1,11 @@
 package io.github.dutianze.yotsuba.note;
 
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.hilla.Endpoint;
 import io.github.dutianze.yotsuba.file.domain.FileResource;
 import io.github.dutianze.yotsuba.file.service.FileService;
 import io.github.dutianze.yotsuba.note.application.SpriteSeekToGifService;
 import io.github.dutianze.yotsuba.shared.common.ReferenceCategory;
+import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +20,7 @@ import java.nio.file.Files;
  * GIF 生成端点
  */
 @Endpoint
-@AnonymousAllowed
+@PermitAll
 @RequiredArgsConstructor
 public class GenerateGifEndpoint {
 

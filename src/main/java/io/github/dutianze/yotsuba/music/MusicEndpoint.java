@@ -1,12 +1,12 @@
 package io.github.dutianze.yotsuba.music;
 
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.hilla.Endpoint;
 import io.github.dutianze.yotsuba.music.application.dto.MusicDto;
 import io.github.dutianze.yotsuba.music.domain.Music;
 import io.github.dutianze.yotsuba.music.domain.repository.MusicRepository;
 import io.github.dutianze.yotsuba.music.domain.valueobject.MusicId;
 import io.github.dutianze.yotsuba.note.application.dto.PageDto;
+import jakarta.annotation.security.PermitAll;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.ZoneId;
 
 @Endpoint
-@AnonymousAllowed
+@PermitAll
 public class MusicEndpoint {
 
   private final MusicRepository musicRepository;

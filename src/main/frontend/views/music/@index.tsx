@@ -9,7 +9,6 @@ import {
   Snackbar,
 } from '@mui/material';
 import { useState, useEffect, KeyboardEvent } from 'react';
-import { GlassBox } from 'Frontend/components/GlassBox';
 import SearchIcon from '@mui/icons-material/Search';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { SearchBar } from 'Frontend/features/music/components/SearchBar';
@@ -219,7 +218,7 @@ export default function MusicPlayerView() {
         },
       }}
     >
-      <GlassBox sx={{ minHeight: '100vh', background: 'rgba(255, 255, 255, 0.05)' }}>
+      <Box sx={{ minHeight: '100vh', background: 'rgba(255, 255, 255, 0.05)' }}>
         <Box sx={{ p: 3, maxWidth: 1600, mx: 'auto' }}>
           {/* 顶部导航 */}
           <SearchBar
@@ -350,7 +349,7 @@ export default function MusicPlayerView() {
             </Card>
           </Box>
         </Box>
-      </GlassBox>
+      </Box>
 
 
       {/* 通知 */}

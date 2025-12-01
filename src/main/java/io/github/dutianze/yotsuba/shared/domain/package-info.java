@@ -1,4 +1,4 @@
 @NonNullApi
-package io.github.dutianze.yotsuba.shared.data;
+package io.github.dutianze.yotsuba.shared.domain;
 
 import org.springframework.lang.NonNullApi;

@@ -1,6 +1,5 @@
 package io.github.dutianze.yotsuba.note;
 
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.hilla.Endpoint;
 import io.github.dutianze.yotsuba.file.domain.event.FileResourceReferenceAddedEvent;
 import io.github.dutianze.yotsuba.file.domain.event.FileResourceReferenceRemovedEvent;
@@ -18,6 +17,7 @@ import io.github.dutianze.yotsuba.note.domain.valueobject.TagId;
 import io.github.dutianze.yotsuba.shared.common.FileReferenceId;
 import io.github.dutianze.yotsuba.shared.common.ReferenceCategory;
 import jakarta.annotation.Nullable;
+import jakarta.annotation.security.PermitAll;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Endpoint
-@AnonymousAllowed
+@PermitAll
 @RequiredArgsConstructor
 public class TagEndpoint {
 

@@ -1,6 +1,5 @@
 package io.github.dutianze.yotsuba.note;
 
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.hilla.Endpoint;
 import io.github.dutianze.yotsuba.note.application.dto.CommentDto;
 import io.github.dutianze.yotsuba.note.domain.Comment;
@@ -8,13 +7,14 @@ import io.github.dutianze.yotsuba.note.domain.Note;
 import io.github.dutianze.yotsuba.note.domain.repository.CommentRepository;
 import io.github.dutianze.yotsuba.note.domain.repository.NoteRepository;
 import io.github.dutianze.yotsuba.note.domain.valueobject.NoteId;
+import jakarta.annotation.security.PermitAll;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Endpoint
-@AnonymousAllowed
+@PermitAll
 public class NoteCommentEndpoint {
 
     private final CommentRepository commentRepository;

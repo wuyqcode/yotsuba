@@ -1,6 +1,5 @@
 package io.github.dutianze.yotsuba.file;
 
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.hilla.Endpoint;
 import io.github.dutianze.yotsuba.file.domain.FileResource;
 import io.github.dutianze.yotsuba.file.domain.FileResourceRepository;
@@ -12,6 +11,7 @@ import io.github.dutianze.yotsuba.file.service.FileService;
 import io.github.dutianze.yotsuba.note.application.dto.PageDto;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Endpoint
-@AnonymousAllowed
+@PermitAll
 @RequiredArgsConstructor
 public class FileResourceEndpoint {
 

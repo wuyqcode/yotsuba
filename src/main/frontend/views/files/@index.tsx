@@ -12,7 +12,6 @@ import {
 import { useState, useEffect, useMemo } from 'react';
 import { FileResourceEndpoint } from 'Frontend/generated/endpoints';
 import FileResourceDto from 'Frontend/generated/io/github/dutianze/yotsuba/file/dto/FileResourceDto';
-import { GlassBox } from 'Frontend/components/GlassBox';
 import UploadIcon from '@mui/icons-material/Upload';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -251,7 +250,7 @@ export default function FileListView() {
   };
 
   return (
-    <GlassBox height={'100%'}>
+    <Box height={'100%'}>
       <Box sx={{ p: 3 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
           <Box>
@@ -440,7 +439,7 @@ export default function FileListView() {
           textContent={textContent}
         />
       </Box>
-    </GlassBox>
+    </Box>
   );
 }
 

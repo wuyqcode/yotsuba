@@ -4,13 +4,9 @@ import io.github.dutianze.yotsuba.note.domain.valueobject.CollectionCategory;
 import io.github.dutianze.yotsuba.note.domain.valueobject.CollectionCategoryConverter;
 import io.github.dutianze.yotsuba.note.domain.valueobject.CollectionId;
 import io.github.dutianze.yotsuba.search.CollectionIdentifierBridge;
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import io.github.dutianze.yotsuba.shared.domain.User;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +41,10 @@ public class Collection {
   @Convert(converter = CollectionCategoryConverter.class)
   @Column(name = "category", nullable = false)
   private CollectionCategory category;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "owner_id", nullable = false)
+  private User user;
 
   @CreationTimestamp
   private LocalDateTime createdAt;

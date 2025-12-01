@@ -13,7 +13,6 @@ import {
   FormControlLabel,
 } from '@mui/material';
 import { useState } from 'react';
-import { GlassBox } from 'Frontend/components/GlassBox';
 import { SearchManagementService } from 'Frontend/generated/endpoints';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import InfoIcon from '@mui/icons-material/Info';
@@ -63,7 +62,7 @@ export default function SearchManagementView() {
 
 
   return (
-    <GlassBox height={'100%'}>
+    <Box height={'100%'}>
       <Box sx={{ p: 3, maxWidth: 800, mx: 'auto' }}>
         <Box textAlign="center" mb={4}>
           <Typography variant="h4" gutterBottom>
@@ -198,7 +197,7 @@ export default function SearchManagementView() {
           </Card>
         </Stack>
       </Box>
-    </GlassBox>
+    </Box>
   );
 }
 

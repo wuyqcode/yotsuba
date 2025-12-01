@@ -57,3 +57,6 @@ modules:
       driver-class-name: org.sqlite.JDBC
     flyway:
       location: classpath:db/migration/file
+yotsuba:
+  auth:
+    secret: Y9pf6WgTS2FGEIquyzw+lslLFRA3rAn3FluDmnunSM4=

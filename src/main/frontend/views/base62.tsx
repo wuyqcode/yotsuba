@@ -12,7 +12,6 @@ import {
   Alert,
 } from '@mui/material';
 import { useState, KeyboardEvent } from 'react';
-import { GlassBox } from 'Frontend/components/GlassBox';
 
 export const config: ViewConfig = {
   menu: { order: 7, icon: 'NumbersIcon' },
@@ -126,7 +125,7 @@ export default function Base62ConverterView() {
   };
 
   return (
-    <GlassBox height={'100%'}>
+    <Box height={'100%'}>
       <Box sx={{ p: 3, maxWidth: 720, mx: 'auto' }}>
         <Box textAlign="center" mb={3}>
           <Typography variant="h4" gutterBottom>
@@ -223,7 +222,7 @@ export default function Base62ConverterView() {
           </Card>
         </Stack>
       </Box>
-    </GlassBox>
+    </Box>
   );
 }
 
