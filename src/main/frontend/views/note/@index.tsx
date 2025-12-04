@@ -16,6 +16,7 @@ import { TagEndpoint } from 'Frontend/generated/endpoints';
 
 export const config: ViewConfig = {
   menu: { order: 2, icon: 'DescriptionIcon' },
+  loginRequired: true,
   title: '笔记',
 };
 
@@ -50,29 +51,35 @@ export default function NoteListView() {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tagId = params.get('tagId');
-    
-    if (tagId && selectedCollection?.id) {
-      // 获取标签信息并添加到选中列表
-      const loadTagAndSelect = async () => {
-        try {
+
+    if (!selectedCollection?.id) return;
+
+    const loadTagAndSelect = async () => {
+      try {
+        if (tagId) {
           const tags = await TagEndpoint.findAllTags(selectedCollection.id, [tagId]);
           const tag = tags.find((t) => t.id === tagId);
           if (tag) {
             await addSelectedTag(tag);
-            // 触发重新获取笔记列表
-            fetchNotes();
-            // 清除 URL 参数，避免重复触发
-            params.delete('tagId');
-            navigate({ search: params.toString() }, { replace: true });
           }
-        } catch (error) {
-          console.error('加载标签失败:', error);
         }
-      };
-      
-      loadTagAndSelect();
-    }
+      } catch (error) {
+        console.error('加载标签失败:', error);
+      } finally {
+        // 不管有没有 tag，都触发一次笔记列表加载
+        fetchNotes();
+
+        // 清理 URL 参数，避免再次触发
+        if (tagId) {
+          params.delete('tagId');
+          navigate({ search: params.toString() }, { replace: true });
+        }
+      }
+    };
+
+    loadTagAndSelect();
   }, [location.search, selectedCollection?.id, addSelectedTag, fetchNotes, navigate]);
+
 
   console.log('NoteListView render');
   return (

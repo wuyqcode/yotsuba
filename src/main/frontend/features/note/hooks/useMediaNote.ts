@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { immer } from 'zustand/middleware/immer';
 import { nanoid } from 'nanoid';
 
 // ------------------- 🧩 类型定义 -------------------
@@ -75,97 +74,138 @@ function assertEpisode(state: MediaState, id: EpisodeId): asserts id is EpisodeI
 }
 
 // ------------------- 🧩 Zustand Store -------------------
-export const useMediaNote = create<MediaState>()(
-  immer((set) => ({
-    media: {
-      id: nanoid(),
-      title: 'Untitled',
-      overview: '',
-      year: new Date().getFullYear(),
-      cover: '',
-      content: '',
-      type: 'tv',
-      seasonIds: [],
-      rating: 0,
-    },
-    seasons: {},
-    episodes: {},
+export const useMediaNote = create<MediaState>((set) => ({
+  media: {
+    id: nanoid(),
+    title: 'Untitled',
+    overview: '',
+    year: new Date().getFullYear(),
+    cover: '',
+    content: '',
+    type: 'tv',
+    seasonIds: [],
+    rating: 0,
+  },
 
-    // ---- 媒体基础信息 ----
-    setMedia: (media) => {
-      set((state) => {
-        state.media = media;
-      });
-    },
+  seasons: {},
+  episodes: {},
 
-    updateMedia: (patch) => {
-      set((state) => {
-        Object.assign(state.media, patch);
-      });
-    },
+  // ---- 媒体基础信息 ----
+  setMedia: (media) =>
+    set(() => ({
+      media,
+    })),
 
-    // ---- Season 操作 ----
-    addSeason: () => {
-      const id = createSeasonId();
-      set((state) => {
-        state.seasons[id] = {
+  updateMedia: (patch) =>
+    set((state) => ({
+      ...state,
+      media: {
+        ...state.media,
+        ...patch,
+      },
+    })),
+
+  // ---- Season 操作 ----
+  addSeason: () => {
+    const id = createSeasonId();
+    set((state) => ({
+      ...state,
+      seasons: {
+        ...state.seasons,
+        [id]: {
           id,
           name: '新一季',
           year: 'TBD',
           episodeIds: [],
-        };
-        state.media.seasonIds.push(id);
-      });
-      return id;
-    },
+        },
+      },
+      media: {
+        ...state.media,
+        seasonIds: [...state.media.seasonIds, id],
+      },
+    }));
+    return id;
+  },
 
-	removeSeason: (id) => {
-	  set((state) => {
-	    delete state.seasons[id];
-	    state.media.seasonIds = state.media.seasonIds.filter((sid: SeasonId) => sid !== id);
-	  });
-	},
+  removeSeason: (id) =>
+    set((state) => {
+      const { [id]: _, ...rest } = state.seasons;
+      return {
+        ...state,
+        seasons: rest,
+        media: {
+          ...state.media,
+          seasonIds: state.media.seasonIds.filter((sid) => sid !== id),
+        },
+      };
+    }),
 
-    updateSeason: (id, patch) => {
-      set((state) => {
-        assertSeason(state, id);
-        Object.assign(state.seasons[id], patch);
-      });
-    },
+  updateSeason: (id, patch) =>
+    set((state) => ({
+      ...state,
+      seasons: {
+        ...state.seasons,
+        [id]: {
+          ...state.seasons[id],
+          ...patch,
+        },
+      },
+    })),
 
-    // ---- Episode 操作 ----
-    addEpisode: (seasonId) => {
-      const epId = createEpisodeId();
-      set((state) => {
-        assertSeason(state, seasonId);
-        state.episodes[epId] = {
+  // ---- Episode 操作 ----
+  addEpisode: (seasonId) => {
+    const epId = createEpisodeId();
+    set((state) => ({
+      ...state,
+      episodes: {
+        ...state.episodes,
+        [epId]: {
           id: epId,
           title: '新剧集',
           runtime: '24 min',
           rating: 0,
           desc: '',
           img: '',
-        };
-        state.seasons[seasonId].episodeIds.push(epId);
-      });
-      return epId;
-    },
+        },
+      },
+      seasons: {
+        ...state.seasons,
+        [seasonId]: {
+          ...state.seasons[seasonId],
+          episodeIds: [...state.seasons[seasonId].episodeIds, epId],
+        },
+      },
+    }));
+    return epId;
+  },
 
-    updateEpisode: (id, patch) => {
-      set((state) => {
-        assertEpisode(state, id);
-        Object.assign(state.episodes[id], patch);
-      });
-    },
+  updateEpisode: (id, patch) =>
+    set((state) => ({
+      ...state,
+      episodes: {
+        ...state.episodes,
+        [id]: {
+          ...state.episodes[id],
+          ...patch,
+        },
+      },
+    })),
 
-
-	removeEpisode: (id) => {
-	  set((state) => {
-	    delete state.episodes[id];
-	    for (const season of Object.values(state.seasons) as Season[]) {
-	      season.episodeIds = season.episodeIds.filter((eid: EpisodeId) => eid !== id);
-	    }
-	  });
-	},
-  }))
-);
+  removeEpisode: (id) =>
+    set((state) => {
+      const { [id]: _, ...rest } = state.episodes;
+      return {
+        ...state,
+        episodes: rest,
+        seasons: Object.fromEntries(
+          Object.entries(state.seasons).map(([sid, season]) => [
+            sid,
+            {
+              ...season,
+              episodeIds: season.episodeIds.filter((eid) => eid !== id),
+            },
+          ]),
+        ),
+      };
+    }),
+}));

@@ -7,6 +7,7 @@ import {
   Tab,
   Alert,
   Snackbar,
+  useMediaQuery,
 } from '@mui/material';
 import { useState, useEffect, KeyboardEvent } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
@@ -22,6 +23,7 @@ import { Song, API_BASE } from 'Frontend/features/music/types';
 export const config: ViewConfig = {
   menu: { order: 8, icon: 'MusicNoteIcon' },
   title: '云音乐播放器',
+  loginRequired: true,
 };
 
 export default function MusicPlayerView() {
@@ -31,6 +33,8 @@ export default function MusicPlayerView() {
   const [error, setError] = useState<string | null>(null);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'warning' | 'info' } | null>(null);
   const [tabValue, setTabValue] = useState(0);
+  const isMobile = useMediaQuery('(max-width: 900px)');
+  const isTablet = useMediaQuery('(max-width: 1200px)');
 
   const {
     songs,
@@ -219,7 +223,7 @@ export default function MusicPlayerView() {
       }}
     >
       <Box sx={{ minHeight: '100vh', background: 'rgba(255, 255, 255, 0.05)' }}>
-        <Box sx={{ p: 3, maxWidth: 1600, mx: 'auto' }}>
+        <Box sx={{ p: isMobile ? 1 : 3, maxWidth: 1600, mx: 'auto' }}>
           {/* 顶部导航 */}
           <SearchBar
             searchKeyword={searchKeyword}
@@ -230,16 +234,24 @@ export default function MusicPlayerView() {
           />
 
           {/* 主要内容区域 */}
-          <Box sx={{ display: 'grid', gridTemplateColumns: '600px 450px 350px', gap: 3 }}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : isTablet ? '1fr 1fr' : '600px 450px 350px',
+              gap: isMobile ? 1 : 3,
+            }}
+          >
             {/* 搜索结果区域 */}
             <Card
               sx={{
                 background: 'rgba(255, 255, 255, 0.05)',
                 backdropFilter: 'blur(20px)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
-                height: 'calc(100vh)',
+                height: isMobile ? 'auto' : 'calc(100vh)',
+                minHeight: isMobile ? '400px' : 'auto',
                 display: 'flex',
                 flexDirection: 'column',
+                ...(isMobile && isTablet && { gridColumn: '1 / -1' }),
               }}
             >
               <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', p: 0 }}>
@@ -297,9 +309,11 @@ export default function MusicPlayerView() {
                 background: 'rgba(255, 255, 255, 0.05)',
                 backdropFilter: 'blur(20px)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
-                height: 'calc(100vh)',
+                height: isMobile ? 'auto' : 'calc(100vh)',
+                minHeight: isMobile ? '400px' : 'auto',
                 display: 'flex',
                 flexDirection: 'column',
+                ...(isMobile && isTablet && { gridColumn: '1 / -1' }),
               }}
             >
               <CardContent>
@@ -329,9 +343,11 @@ export default function MusicPlayerView() {
                 background: 'rgba(255, 255, 255, 0.05)',
                 backdropFilter: 'blur(20px)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
-                height: 'calc(100vh)',
-                display: 'flex',
+                height: isMobile ? 'auto' : 'calc(100vh)',
+                minHeight: isMobile ? '300px' : 'auto',
+                display: isMobile ? 'none' : 'flex',
                 flexDirection: 'column',
+                ...(isTablet && !isMobile && { gridColumn: '1 / -1' }),
               }}
             >
               <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', p: 0 }}>

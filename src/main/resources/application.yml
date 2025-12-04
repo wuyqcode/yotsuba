@@ -39,7 +39,7 @@ vaadin:
 modules:
   primary:
     datasource:
-      url: jdbc:sqlite:./yotsuba_primary.db
+      url: jdbc:sqlite:./db/yotsuba_primary.db
       driver-class-name: org.sqlite.JDBC
     jpa:
       open-in-view: false
@@ -53,7 +53,7 @@ modules:
       location: classpath:db/migration/primary
   file:
     datasource:
-      url: jdbc:sqlite:./yotsuba_file.db
+      url: jdbc:sqlite:./db/yotsuba_file.db
       driver-class-name: org.sqlite.JDBC
     flyway:
       location: classpath:db/migration/file

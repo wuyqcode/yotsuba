@@ -21,6 +21,7 @@ import CleanupIcon from '@mui/icons-material/CleaningServices';
 export const config: ViewConfig = {
   menu: { order: 5, icon: 'SearchIcon' },
   title: '索引管理',
+  loginRequired: true,
 };
 
 export default function SearchManagementView() {

@@ -43,7 +43,9 @@ public class SecurityConfiguration {
         // Stateless 配置
         http.with(new VaadinStatelessSecurityConfigurer<>(),
                   cfg -> cfg.withSecretKey()
-                            .secretKey(new SecretKeySpec(Base64.getDecoder().decode(authSecret), JwsAlgorithms.HS256)).and()
+                            .secretKey(new SecretKeySpec(Base64.getDecoder().decode(authSecret), JwsAlgorithms.HS256))
+                            .and()
+                            .expiresIn(86400)
                             .issuer("io.github.dutianze"));
 
         http.csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"));

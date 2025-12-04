@@ -1,8 +1,9 @@
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Box, Button, IconButton, Stack, Typography } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import ForumIcon from '@mui/icons-material/Forum';
 import SaveIcon from '@mui/icons-material/Save';
+import MenuIcon from '@mui/icons-material/Menu';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import { EditorMode, useWikiNoteStore } from '../../hooks/useWikiNoteStore';
 import { useEffect, useRef, useState } from 'react';
@@ -13,7 +14,12 @@ const DEFAULT_TITLE_WIDTH = 120;
 const MIN_RIGHT_PADDING = 14;
 const FONT_SIZE = 16;
 
-export default function WikiHeader(): JSX.Element {
+export interface WikiHeaderProps {
+  isMobile?: boolean;
+  onOpenToc?: () => void;
+}
+
+export default function WikiHeader({ isMobile, onOpenToc }: WikiHeaderProps) {
   const { mode, setMode } = useWikiNoteStore();
   const wiki = useWikiNoteStore((s) => s.wiki);
   const updateWiki = useWikiNoteStore((s) => s.updateWiki);
@@ -140,6 +146,15 @@ export default function WikiHeader(): JSX.Element {
           top: 0,
           zIndex: 30,
         }}>
+        {isMobile && (
+          <IconButton
+            size="small"
+            onClick={onOpenToc}
+            style={{ marginRight: 6 }}
+          >
+            <MenuIcon fontSize="small" />
+          </IconButton>
+        )}
         <TitleBox
           focused={focused}
           readonly={isReadOnly}
@@ -200,9 +215,8 @@ export default function WikiHeader(): JSX.Element {
             <ForumIcon fontSize="small" />
           </ModeBtn>
 
-          <SaveBtn
+          <ModeBtn
             disabled={mode !== 'edit' || !isDirty}
-            startIcon={<SaveIcon fontSize="small" />}
             onClick={saveWiki}
             sx={{
               color: mode === 'edit' && isDirty ? 'primary.main' : 'text.disabled',
@@ -210,9 +224,25 @@ export default function WikiHeader(): JSX.Element {
               '&:hover': {
                 bgcolor: mode === 'edit' && isDirty ? 'rgba(25,118,210,0.15)' : 'rgba(0,0,0,0.04)',
               },
-            }}>
-            保存
-          </SaveBtn>
+              ...(mode === 'edit' && isDirty
+                ? {
+                    position: 'relative',
+                    '&::after': {
+                      content: '"*"',
+                      position: 'absolute',
+                      top: -2,
+                      right: -2,
+                      color: 'error.main',
+                      fontSize: 16,
+                      fontWeight: 700,
+                      pointerEvents: 'none',
+                    },
+                  }
+                : {}),
+            }}
+          >
+            <SaveIcon fontSize="small" />
+          </ModeBtn>
         </Stack>
       </div>
     </>

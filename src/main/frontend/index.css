@@ -94,3 +94,10 @@ h6 {
   outline: none !important;
   border: none !important;
 }
+
+@media (max-width: 768px) {
+  .ProseMirror {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}

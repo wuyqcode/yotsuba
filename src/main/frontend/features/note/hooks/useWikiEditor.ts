@@ -1,4 +1,5 @@
 import { useMemo, useCallback } from 'react';
+import { useMediaQuery } from '@mui/material';
 import { BaseKit, type Editor } from 'reactjs-tiptap-editor';
 import { Heading } from 'reactjs-tiptap-editor/heading';
 import { Bold } from 'reactjs-tiptap-editor/bold';
@@ -45,9 +46,10 @@ export function useWikiEditor() {
   const currentEditor = useWikiNoteStore((state) => state.editor);
   const setEditor = useWikiNoteStore((state) => state.setEditor);
   const setHeadings = useWikiNoteStore((state) => state.setHeadings);
+  const isMobile = useMediaQuery('(max-width: 900px)');
 
-  const extensions = useMemo(
-    () => [
+  const extensions = useMemo(() => {
+    const baseExtensions = [
       BaseKit.configure({
         placeholder: { showOnlyCurrent: true, placeholder: '请输入正文内容...' },
       }),
@@ -66,22 +68,30 @@ export function useWikiEditor() {
           };
         },
       }),
-      Bold,
-      Italic,
-      TextUnderline,
-      Strike,
-      BulletList,
-      OrderedList,
-      Blockquote,
       History,
       Link,
       Image.configure({ upload: (file: File) => upload(file), defaultInline: true }),
+      CodeBlock.configure({ defaultTheme: 'dracula' }),
+      TaskList,
+    ];
+
+    if (isMobile) {
+      return baseExtensions;
+    }
+
+    return [
+      ...baseExtensions,
+      Bold,
+      Blockquote,
+      OrderedList,
+      BulletList,
+      Italic,
+      Strike,
+      TextUnderline,
       Video.configure({ upload: (file: File) => upload(file) }),
       Attachment.configure({ upload: (file: File) => upload(file) }),
-      CodeBlock.configure({ defaultTheme: 'dracula' }),
       Code,
       Clear,
-      TaskList,
       TextBubble,
       ExportPdf,
       ExportWord,
@@ -99,9 +109,8 @@ export function useWikiEditor() {
       LineHeight,
       HorizontalRule,
       SlashCommand,
-    ],
-    [upload]
-  );
+    ];
+  }, [upload, isMobile]);
 
   const updateHeadings = useCallback(
     (editor: Editor) => {

@@ -24,6 +24,7 @@ import PaginationBar from 'Frontend/components/PaginationBar';
 export const config: ViewConfig = {
   menu: { order: 6, icon: 'FolderIcon' },
   title: '文件列表',
+  loginRequired: true,
 };
 
 

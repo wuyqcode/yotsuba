@@ -109,7 +109,7 @@ export default function UserSettingsModal({ open, onClose }: Props) {
           right: 0,
           bottom: 0,
           zIndex: 3999,
-          background: 'rgba(0, 0, 0, 0.4)',
+          background: 'rgba(46, 44, 44, 0.4)',
           backdropFilter: 'blur(4px)',
           WebkitBackdropFilter: 'blur(4px)',
           animation: 'fadeIn 0.2s ease',

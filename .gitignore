@@ -10,3 +10,4 @@ index
 *.db-shm
 *.db-wal
 /files/
+/db/

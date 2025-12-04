@@ -31,7 +31,12 @@ function WikiEditorPlaceholder({ loading, error }: { loading?: boolean; error?: 
   );
 }
 
-export default function WikiContent() {
+export interface WikiContentProps {
+  isMobile?: boolean;
+  onOpenToc?: () => void;
+}
+
+export default function WikiContent({ isMobile, onOpenToc }: WikiContentProps) {
   const { setEditor, extensions } = useWikiEditor();
   const wiki = useWikiNoteStore((s) => s.wiki);
   const loading = useWikiNoteStore((s) => s.loading);
@@ -55,8 +60,7 @@ export default function WikiContent() {
         display: 'flex',
         flexDirection: 'column',
       }}>
-      <WikiHeader />
-
+      <WikiHeader isMobile={isMobile} onOpenToc={onOpenToc}/>
       {mode === 'comment' ? (
         <NoteComment />
       ) : mode === 'file' ? (

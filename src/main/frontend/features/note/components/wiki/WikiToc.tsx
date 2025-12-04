@@ -14,7 +14,11 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { HeadingItem, useWikiNoteStore } from '../../hooks/useWikiNoteStore';
 
-export function WikiToc() {
+export interface WikiTocProps {
+  onItemClick?: () => void;
+}
+
+export function WikiToc({ onItemClick }: WikiTocProps) {
   const theme = useTheme();
   const { editor, headings } = useWikiNoteStore();
   const [open, setOpen] = useState(true);
