@@ -22,8 +22,12 @@
     "@vaadin/polymer-legacy-adapter": "24.9.2",
     "@vaadin/react-components": "24.9.2",
     "@vaadin/vaadin-development-mode-detector": "2.0.7",
+    "@vaadin/vaadin-lumo-styles": "24.9.2",
+    "@vaadin/vaadin-material-styles": "24.9.2",
+    "@vaadin/vaadin-themable-mixin": "24.9.2",
     "@vaadin/vaadin-usage-statistics": "2.1.3",
     "construct-style-sheets-polyfill": "3.1.0",
+    "date-fns": "2.29.3",
     "idb-keyval": "^6.2.2",
     "lit": "3.3.1",
     "mermaid": "^8.14.0",
@@ -83,8 +87,12 @@
       "@vaadin/polymer-legacy-adapter": "24.9.2",
       "@vaadin/react-components": "24.9.2",
       "@vaadin/vaadin-development-mode-detector": "2.0.7",
+      "@vaadin/vaadin-lumo-styles": "24.9.2",
+      "@vaadin/vaadin-material-styles": "24.9.2",
+      "@vaadin/vaadin-themable-mixin": "24.9.2",
       "@vaadin/vaadin-usage-statistics": "2.1.3",
       "construct-style-sheets-polyfill": "3.1.0",
+      "date-fns": "2.29.3",
       "lit": "3.3.1",
       "react": "18.3.1",
       "react-dom": "18.3.1",
@@ -122,7 +130,7 @@
       "workbox-core": "7.3.0",
       "workbox-precaching": "7.3.0"
     },
-    "hash": "1bf5adeeaf8fc7c07753c06199e2489a3060d39cc9eaeda31bb98cb345e351f1"
+    "hash": "d15429be9cce05219be3e8251882b53f9961afde51e7c24d15824c72247e6809"
   },
   "pnpm": {
     "overrides": {
@@ -220,7 +228,9 @@
       "@vaadin/virtual-list": "24.9.2",
       "react-is": "18.3.1",
       "prop-types": "15.8.1",
-      "hoist-non-react-statics": "3.3.2"
+      "hoist-non-react-statics": "3.3.2",
+      "date-fns": "$date-fns",
+      "@vaadin/vaadin-themable-mixin": "$@vaadin/vaadin-themable-mixin"
     }
   }
 }
