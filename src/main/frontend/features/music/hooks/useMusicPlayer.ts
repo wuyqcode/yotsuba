@@ -51,7 +51,7 @@ export function useMusicPlayer() {
   
   const lyricsContainerRef = useRef<HTMLDivElement>(null);
   const isUserScrollingRef = useRef(false);
-  const userScrollTimeoutRef = useRef<NodeJS.Timeout>();
+  const userScrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // 初始化时加载收藏列表（只在首次挂载时执行，避免页面切换时重复加载）
   const hasFetchedRef = useRef(false);
@@ -140,10 +140,10 @@ export function useMusicPlayer() {
     if (index < 0 || index >= playlist.length) return;
 
     const song = playlist[index];
-    
+
     // 如果指定了 autoPlay，则应该播放；否则保持之前的播放状态
     const shouldPlay = autoPlay ? true : isPlaying;
-    
+
     // 先更新状态（使用全局 store）
     setCurrentIndex(index);
     setCurrentPlaylist(playlist);
@@ -184,7 +184,7 @@ export function useMusicPlayer() {
       // 设置新的音频源
       audioElement.src = urlData.url;
       audioElement.load();
-      
+
       // 等待音频加载完成并自动播放
       await new Promise<void>((resolve, reject) => {
         const audio = audioRef.current;
@@ -542,4 +542,3 @@ export function useMusicPlayer() {
     currentSong,
   };
 }
-

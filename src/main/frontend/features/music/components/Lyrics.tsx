@@ -5,7 +5,7 @@ import { LyricLine } from '../types';
 interface LyricsProps {
   lyrics: LyricLine[];
   activeLyricIndex: number;
-  lyricsContainerRef: React.RefObject<HTMLDivElement>;
+  lyricsContainerRef: React.RefObject<HTMLDivElement | null>;
   onLyricClick: (time: number) => void;
 }
 

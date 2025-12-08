@@ -46,27 +46,16 @@ export default function AppHeader() {
         border: '1px solid rgba(255, 255, 255, 0.06)',
       }}>
       {/* left: menu + logo */}
-      {!isMobile && (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <CardMedia
-            component="img"
-            src="images/icon.png"
-            sx={{ width: 40, height: 40, cursor: 'pointer' }}
-            onClick={() => navigate('/note')}
-          />
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+       <CardMedia
+         component="img"
+         src="images/icon.png"
+         sx={{ width: 40, height: 40, cursor: 'pointer' }}
+         onClick={() => navigate('/note')}
+       />
 
-          <HeaderNavBar />
-        </Box>
-      )}
-      
-      {isMobile && (
-        <CardMedia
-          component="img"
-          src="images/icon.png"
-          sx={{ width: 32, height: 32, cursor: 'pointer' }}
-          onClick={() => navigate('/note')}
-        />
-      )}
+      <HeaderNavBar />
+    </Box>
 
       {/* center: 音乐播放器（如果有正在播放的音乐） */}
       {currentSong && (

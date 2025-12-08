@@ -19,6 +19,8 @@ type NoteState = {
   loading: boolean;
   error: string | null;
 
+  isDirty: boolean;
+
   fetchNotes: () => Promise<void>;
   createNote: (type: NoteType) => Promise<string>;
   removeNote: (id: string) => Promise<void>;
@@ -31,96 +33,140 @@ type NoteState = {
   toggleViewMode: () => void;
 };
 
-export const useNoteStore = create<NoteState>((set, get) => ({
-  notes: [],
-  page: 1,
-  pageSize: 12,
-  totalPages: 0,
-  totalElements: 0,
-  searchText: '',
-  viewMode: 'card',
 
-  loading: false,
-  error: null,
+export const useNoteStore = create<NoteState>((set, get) => {
 
-  setPage: (page) => set({ page }),
-  setPageSize: (size) => set({ pageSize: size, page: 1 }),
-  setSearchText: (text) => set({ searchText: text, page: 1 }),
-  clearSearch: () => set({ searchText: '', page: 1 }),
-  setViewMode: (mode) => set({ viewMode: mode }),
-  toggleViewMode: () => set((state) => ({ viewMode: state.viewMode === 'card' ? 'list' : 'card' })),
-
-  /** 拉取笔记列表 */
-  fetchNotes: async () => {
-    const selectedCollectionId = useCollectionStore.getState().selectedCollection?.id;
-    const selectedTagIdList = useTagStore.getState().selectedTags.map((tag) => tag.id);
-    const { page, pageSize, searchText } = get();
-
-    if (!selectedCollectionId) {
-      set({
-        notes: [],
-        totalPages: 0,
-        totalElements: 0,
-        error: null,
-        loading: false,
-      });
-      return;
+  function markDirtyIfChanged<K extends keyof NoteState>(
+    key: K,
+    nextValue: NoteState[K],
+  ) {
+    const prevValue = get()[key];
+    if (prevValue !== nextValue) {
+      set({ [key]: nextValue, isDirty: true });
     }
+  }
 
-    set({ loading: true, error: null });
-    try {
-      const res = await NoteEndpoint.searchNotes(
-        selectedCollectionId,
-        searchText,
-        selectedTagIdList,
-        page - 1,
-        pageSize
-      );
-      set({
-        notes: res.content,
-        totalPages: res.totalPages,
-        totalElements: res.totalElements,
-      });
-    } catch (e: any) {
-      console.error('fetchNotes failed:', e);
-      set({ error: e.message ?? 'Failed to fetch notes' });
-    } finally {
-      set({ loading: false });
-    }
-  },
+  return {
+    notes: [],
+    page: 1,
+    pageSize: 12,
+    totalPages: 0,
+    totalElements: 0,
+    searchText: '',
+    viewMode: 'card',
 
-  /** 创建笔记 */
-  createNote: async (type: NoteType) => {
-    const selectedCollectionId = useCollectionStore.getState().selectedCollection?.id;
-    if (!selectedCollectionId) {
-      throw new Error('请先选择一个笔记本');
-    }
+    loading: false,
+    error: null,
 
-    set({ loading: true, error: null });
-    try {
-      const id = await NoteEndpoint.createNote(selectedCollectionId, type);
-      await get().fetchNotes();
-      return id;
-    } catch (e: any) {
-      console.error('createNote failed:', e);
-      set({ error: e.message ?? 'Failed to create note' });
-      throw e;
-    } finally {
-      set({ loading: false });
-    }
-  },
+    isDirty: true,
 
-  /** 删除笔记 */
-  removeNote: async (id: string) => {
-    set({ loading: true, error: null });
-    try {
-      await NoteEndpoint.deleteNote(id);
-      await get().fetchNotes();
-    } catch (e: any) {
-      console.error('removeNote failed:', e);
-      set({ error: e.message ?? 'Failed to delete note' });
-    } finally {
-      set({ loading: false });
-    }
-  },
-}));
+    setPage: (page) => {
+      markDirtyIfChanged('page', page);
+    },
+
+    setPageSize: (size) => {
+      const { pageSize, page } = get();
+      if (pageSize !== size || page !== 1) {
+        set({ pageSize: size, page: 1, isDirty: true });
+      }
+    },
+
+    setSearchText: (text) => {
+      const { searchText, page } = get();
+      if (searchText !== text || page !== 1) {
+        set({ searchText: text, page: 1, isDirty: true });
+      }
+    },
+
+    clearSearch: () => {
+      const { searchText, page } = get();
+      if (searchText !== '' || page !== 1) {
+        set({ searchText: '', page: 1, isDirty: true });
+      }
+    },
+
+    setViewMode: (mode) => set({ viewMode: mode }),
+    toggleViewMode: () =>
+      set((state) => ({
+        viewMode: state.viewMode === 'card' ? 'list' : 'card',
+      })),
+
+    /** 拉取笔记列表，只在 isDirty 时真正请求 */
+    fetchNotes: async () => {
+      const state = get();
+      if (!state.isDirty) {
+        // 条件没变，直接复用现有 notes
+        return;
+      }
+
+      const selectedCollectionId = useCollectionStore.getState().selectedCollection?.id;
+      const selectedTagIdList = useTagStore.getState().selectedTags.map((tag) => tag.id);
+      const { page, pageSize, searchText } = state;
+
+      if (!selectedCollectionId) {
+        return;
+      }
+
+      set({ loading: true, error: null });
+      try {
+        const res = await NoteEndpoint.searchNotes(
+          selectedCollectionId,
+          searchText,
+          selectedTagIdList,
+          page - 1,
+          pageSize,
+        );
+
+        set({
+          notes: res.content,
+          totalPages: res.totalPages,
+          totalElements: res.totalElements,
+          isDirty: false, // ✅ 拉完数据后清空脏标记
+        });
+      } catch (e: any) {
+        console.error('fetchNotes failed:', e);
+        set({ error: e.message ?? 'Failed to fetch notes' });
+      } finally {
+        set({ loading: false });
+      }
+    },
+
+    /** 创建笔记 */
+    createNote: async (type: NoteType) => {
+      const selectedCollectionId = useCollectionStore.getState().selectedCollection?.id;
+      if (!selectedCollectionId) {
+        throw new Error('请先选择一个笔记本');
+      }
+
+      set({ loading: true, error: null });
+      try {
+        const id = await NoteEndpoint.createNote(selectedCollectionId, type);
+        // 数据肯定变了
+        set({ isDirty: true });
+        await get().fetchNotes();
+        return id;
+      } catch (e: any) {
+        console.error('createNote failed:', e);
+        set({ error: e.message ?? 'Failed to create note' });
+        throw e;
+      } finally {
+        set({ loading: false });
+      }
+    },
+
+    /** 删除笔记 */
+    removeNote: async (id: string) => {
+      set({ loading: true, error: null });
+      try {
+        await NoteEndpoint.deleteNote(id);
+        set({ isDirty: true });
+        await get().fetchNotes();
+      } catch (e: any) {
+        console.error('removeNote failed:', e);
+        set({ error: e.message ?? 'Failed to delete note' });
+      } finally {
+        set({ loading: false });
+      }
+    },
+  };
+});

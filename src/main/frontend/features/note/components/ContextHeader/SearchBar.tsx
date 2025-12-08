@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Paper,
   InputBase,
@@ -20,7 +20,7 @@ function useDebounce(fn: (...args: any[]) => void, delay: number) {
   const fnRef = useRef(fn);
   fnRef.current = fn;
 
-  const timerRef = useRef<any>();
+  const timerRef = useRef<any>(null);
 
   const debouncedFn = useCallback(
     (...args: any[]) => {
@@ -35,7 +35,7 @@ function useDebounce(fn: (...args: any[]) => void, delay: number) {
   return debouncedFn;
 }
 
-export default function SearchBar(): JSX.Element {
+export default function SearchBar() {
   const searchText = useNoteStore((s) => s.searchText);
   const setSearchText = useNoteStore((s) => s.setSearchText);
   const fetchNotes = useNoteStore((s) => s.fetchNotes);
@@ -48,18 +48,16 @@ export default function SearchBar(): JSX.Element {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const selectedTagIds = useMemo(
+    () => selectedTags.map((t) => t.id).sort().join(','),
+    [selectedTags]
+  );
 
-  const debouncedSearch = useDebounce(() => {
-    fetchNotes();
-  }, 300);
-
-  // 使用 selectedTags 的 ID 列表作为依赖，而不是整个 selectedTags 数组
-  // 这样可以避免在标签信息更新（如名称、封面）时触发不必要的刷新
-  const selectedTagIds = selectedTags.map((tag) => tag.id).sort().join(',');
+  const debouncedFetch = useDebounce(fetchNotes, 300);
 
   useEffect(() => {
-    debouncedSearch();
-  }, [searchText, debouncedSearch, selectedTagIds, page, pageSize]);
+    debouncedFetch();
+  }, [searchText, selectedTagIds, page, pageSize]);
 
   const handleCreate = async (type: NoteType) => {
     try {
