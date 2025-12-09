@@ -17,7 +17,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTagStore } from '../../hooks/useTagStore';
 import TagEditDialog from './TagEditDialog';
-import TagDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/TagDto';
+import TagDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/dto/TagDto';
 
 interface TagCardProps {
   tag: TagDto;

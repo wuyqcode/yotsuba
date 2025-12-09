@@ -2,8 +2,8 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer'; // 标签图标
 import CloseIcon from '@mui/icons-material/Close';
-import TagDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/TagDto';
 import { useTagStore } from '../../hooks/useTagStore';
+import TagDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/dto/TagDto';
 
 interface TagChipProps {
   tag: TagDto;

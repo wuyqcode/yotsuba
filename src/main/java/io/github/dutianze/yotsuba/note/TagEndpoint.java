@@ -5,12 +5,12 @@ import io.github.dutianze.yotsuba.file.domain.event.FileResourceReferenceAddedEv
 import io.github.dutianze.yotsuba.file.domain.event.FileResourceReferenceRemovedEvent;
 import io.github.dutianze.yotsuba.file.domain.valueobject.FileResourceId;
 import io.github.dutianze.yotsuba.file.service.FileService;
-import io.github.dutianze.yotsuba.note.application.dto.TagDto;
+import io.github.dutianze.yotsuba.note.dto.TagDto;
 import io.github.dutianze.yotsuba.note.domain.*;
 import io.github.dutianze.yotsuba.note.domain.event.TagDeleted;
-import io.github.dutianze.yotsuba.note.domain.repository.CollectionRepository;
-import io.github.dutianze.yotsuba.note.domain.repository.NoteRepository;
-import io.github.dutianze.yotsuba.note.domain.repository.TagRepository;
+import io.github.dutianze.yotsuba.note.domain.CollectionRepository;
+import io.github.dutianze.yotsuba.note.domain.NoteRepository;
+import io.github.dutianze.yotsuba.note.domain.TagRepository;
 import io.github.dutianze.yotsuba.note.domain.valueobject.CollectionCategory;
 import io.github.dutianze.yotsuba.note.domain.valueobject.CollectionId;
 import io.github.dutianze.yotsuba.note.domain.valueobject.TagId;

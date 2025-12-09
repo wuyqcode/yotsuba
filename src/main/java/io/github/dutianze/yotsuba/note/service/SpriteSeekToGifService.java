@@ -1,4 +1,4 @@
-package io.github.dutianze.yotsuba.note.application;
+package io.github.dutianze.yotsuba.note.service;
 
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.stereotype.Service;

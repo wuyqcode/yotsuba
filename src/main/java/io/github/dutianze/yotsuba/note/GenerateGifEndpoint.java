@@ -3,7 +3,7 @@ package io.github.dutianze.yotsuba.note;
 import com.vaadin.hilla.Endpoint;
 import io.github.dutianze.yotsuba.file.domain.FileResource;
 import io.github.dutianze.yotsuba.file.service.FileService;
-import io.github.dutianze.yotsuba.note.application.SpriteSeekToGifService;
+import io.github.dutianze.yotsuba.note.service.SpriteSeekToGifService;
 import io.github.dutianze.yotsuba.shared.common.ReferenceCategory;
 import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;

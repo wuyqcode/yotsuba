@@ -1,10 +1,10 @@
 import { Card, CardMedia, CardContent, Typography, IconButton, Box, Chip } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useNavigate } from 'react-router';
-import NoteCardDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/NoteCardDto';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import { useState } from 'react';
 import TagSelectDialog from './TagSelectDialog';
+import NoteCardDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/dto/NoteCardDto';
 
 interface Props {
   note: NoteCardDto;

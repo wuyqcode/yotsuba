@@ -1,9 +1,9 @@
 import { create } from 'zustand';
-import NoteCardDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/NoteCardDto';
 import NoteType from 'Frontend/generated/io/github/dutianze/yotsuba/note/domain/valueobject/NoteType';
 import { useCollectionStore } from './useCollection';
 import { useTagStore } from './useTagStore';
 import { NoteEndpoint } from 'Frontend/generated/endpoints';
+import NoteCardDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/dto/NoteCardDto';
 
 export type ViewMode = 'card' | 'list';
 
@@ -31,6 +31,7 @@ type NoteState = {
   clearSearch: () => void;
   setViewMode: (mode: ViewMode) => void;
   toggleViewMode: () => void;
+  markDirty: () => void;
 };
 
 
@@ -90,6 +91,7 @@ export const useNoteStore = create<NoteState>((set, get) => {
       set((state) => ({
         viewMode: state.viewMode === 'card' ? 'list' : 'card',
       })),
+    markDirty: () => set({ isDirty: true }),
 
     /** 拉取笔记列表，只在 isDirty 时真正请求 */
     fetchNotes: async () => {

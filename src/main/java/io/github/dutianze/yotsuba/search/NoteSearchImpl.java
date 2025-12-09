@@ -1,7 +1,7 @@
 package io.github.dutianze.yotsuba.search;
 
 import io.github.dutianze.yotsuba.file.domain.valueobject.FileResourceId;
-import io.github.dutianze.yotsuba.note.application.dto.NoteCardDto;
+import io.github.dutianze.yotsuba.note.dto.NoteCardDto;
 import io.github.dutianze.yotsuba.note.domain.Note;
 import io.github.dutianze.yotsuba.note.domain.Tag;
 import io.github.dutianze.yotsuba.note.domain.valueobject.CollectionId;

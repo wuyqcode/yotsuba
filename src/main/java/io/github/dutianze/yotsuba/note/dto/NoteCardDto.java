@@ -1,4 +1,4 @@
-package io.github.dutianze.yotsuba.note.application.dto;
+package io.github.dutianze.yotsuba.note.dto;
 
 import io.github.dutianze.yotsuba.note.domain.valueobject.NoteType;
 import java.util.List;

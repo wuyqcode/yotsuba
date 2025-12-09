@@ -1,6 +1,5 @@
-package io.github.dutianze.yotsuba.note.domain.repository;
+package io.github.dutianze.yotsuba.note.domain;
 
-import io.github.dutianze.yotsuba.note.domain.Tag;
 import io.github.dutianze.yotsuba.note.domain.valueobject.TagId;
 import java.util.List;
 import java.util.Optional;

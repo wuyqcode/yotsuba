@@ -1,10 +1,10 @@
 package io.github.dutianze.yotsuba.note;
 
 import com.vaadin.hilla.Endpoint;
-import io.github.dutianze.yotsuba.note.application.dto.CollectionDto;
+import io.github.dutianze.yotsuba.note.dto.CollectionDto;
 import io.github.dutianze.yotsuba.note.domain.Collection;
-import io.github.dutianze.yotsuba.note.domain.repository.CollectionRepository;
-import io.github.dutianze.yotsuba.note.domain.repository.NoteRepository;
+import io.github.dutianze.yotsuba.note.domain.CollectionRepository;
+import io.github.dutianze.yotsuba.note.domain.NoteRepository;
 import io.github.dutianze.yotsuba.note.domain.valueobject.CollectionCategory;
 import io.github.dutianze.yotsuba.note.domain.valueobject.CollectionId;
 import jakarta.annotation.security.PermitAll;

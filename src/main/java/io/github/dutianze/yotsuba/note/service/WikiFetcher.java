@@ -1,4 +1,4 @@
-package io.github.dutianze.yotsuba.note.application;
+package io.github.dutianze.yotsuba.note.service;
 
 import java.io.IOException;
 import java.net.URI;

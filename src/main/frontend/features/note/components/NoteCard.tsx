@@ -5,9 +5,9 @@ import CommentIcon from '@mui/icons-material/Comment';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import { useNavigate } from 'react-router';
-import NoteCardDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/NoteCardDto';
 import DeleteConfirmDialog from './DeleteConfirmDialog';
 import TagSelectDialog from './TagSelectDialog';
+import NoteCardDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/dto/NoteCardDto';
 
 interface NoteCardProps {
   note: NoteCardDto;

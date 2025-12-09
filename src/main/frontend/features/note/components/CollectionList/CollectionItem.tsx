@@ -4,8 +4,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
-import CollectionDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/CollectionDto';
 import { useCollectionStore } from '../../hooks/useCollection';
+import CollectionDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/dto/CollectionDto';
 
 interface Props {
   col: CollectionDto;

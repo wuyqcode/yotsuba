@@ -8,7 +8,7 @@ import io.github.dutianze.yotsuba.shared.common.ReferenceCategory;
 import io.github.dutianze.yotsuba.file.dto.FileResourceDto;
 import java.util.List;
 import io.github.dutianze.yotsuba.file.service.FileService;
-import io.github.dutianze.yotsuba.note.application.dto.PageDto;
+import io.github.dutianze.yotsuba.note.dto.PageDto;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.security.PermitAll;

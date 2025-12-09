@@ -16,10 +16,10 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useTagStore } from '../hooks/useTagStore';
-import TagDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/TagDto';
-import NoteCardDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/NoteCardDto';
 import { useCollectionStore } from '../hooks/useCollection';
 import { NoteEndpoint, TagEndpoint } from 'Frontend/generated/endpoints';
+import NoteCardDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/dto/NoteCardDto';
+import TagDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/dto/TagDto';
 
 interface TagSelectDialogProps {
   open: boolean;

@@ -15,8 +15,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useTagStore } from '../../hooks/useTagStore';
 import { useCollectionStore } from '../../hooks/useCollection';
 import { useUpload } from '../../hooks/useUpload';
-import TagDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/TagDto';
 import { TagEndpoint } from 'Frontend/generated/endpoints';
+import TagDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/dto/TagDto';
 
 interface TagEditDialogProps {
   open: boolean;

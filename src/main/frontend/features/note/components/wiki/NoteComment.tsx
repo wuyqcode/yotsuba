@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Avatar, Box, Button, Divider, Paper, Stack, TextField, Typography, CircularProgress } from '@mui/material';
 import { useWikiNoteStore } from '../../hooks/useWikiNoteStore';
-import CommentDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/CommentDto';
 import { NoteCommentEndpoint } from 'Frontend/generated/endpoints';
+import CommentDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/dto/CommentDto';
 
 function timeAgo(input: string | null | undefined) {
   if (!input) return 'just now';

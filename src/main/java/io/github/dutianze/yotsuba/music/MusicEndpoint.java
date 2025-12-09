@@ -5,7 +5,7 @@ import io.github.dutianze.yotsuba.music.application.dto.MusicDto;
 import io.github.dutianze.yotsuba.music.domain.Music;
 import io.github.dutianze.yotsuba.music.domain.repository.MusicRepository;
 import io.github.dutianze.yotsuba.music.domain.valueobject.MusicId;
-import io.github.dutianze.yotsuba.note.application.dto.PageDto;
+import io.github.dutianze.yotsuba.note.dto.PageDto;
 import jakarta.annotation.security.PermitAll;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;

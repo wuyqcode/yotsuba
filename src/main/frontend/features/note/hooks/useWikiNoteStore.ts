@@ -1,7 +1,7 @@
 import { create } from 'zustand';
-import WikiNoteDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/WikiNoteDto';
 import { type Editor } from 'reactjs-tiptap-editor';
 import { NoteEndpoint } from 'Frontend/generated/endpoints';
+import WikiNoteDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/dto/WikiNoteDto';
 
 export type EditorMode = 'read' | 'edit' | 'comment' | 'file';
 

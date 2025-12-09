@@ -1,4 +1,4 @@
-package io.github.dutianze.yotsuba.note.application.dto;
+package io.github.dutianze.yotsuba.note.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -10,12 +10,19 @@ import PauseIcon from '@mui/icons-material/Pause';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
 import HeaderUserMenu from './HeaderUserMenu';
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import CommentNotificationPanel from '../features/note/components/CommentNotificationPanel';
+import { useState } from 'react';
+import Badge from '@mui/material/Badge';
+import { useCommentNotificationStore } from 'Frontend/features/note/hooks/useCommentNotificationStore';
 
 const HEIGHT = 50;
 
 export default function AppHeader() {
   const navigate = useNavigate();
   const isMobile = useMediaQuery('(max-width: 900px)');
+  const [openNotification, setOpenNotification] = useState(false);
+  const unreadCount = useCommentNotificationStore((s) => s.unreadCount);
 
   // 音乐播放器状态
   const currentSong = useMusicPlayerStore((s) => s.currentSong);
@@ -47,15 +54,15 @@ export default function AppHeader() {
       }}>
       {/* left: menu + logo */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-       <CardMedia
-         component="img"
-         src="images/icon.png"
-         sx={{ width: 40, height: 40, cursor: 'pointer' }}
-         onClick={() => navigate('/note')}
-       />
+        <CardMedia
+          component="img"
+          src="images/icon.png"
+          sx={{ width: 40, height: 40, cursor: 'pointer' }}
+          onClick={() => navigate('/note')}
+        />
 
-      <HeaderNavBar />
-    </Box>
+        <HeaderNavBar />
+      </Box>
 
       {/* center: 音乐播放器（如果有正在播放的音乐） */}
       {currentSong && (
@@ -76,8 +83,7 @@ export default function AppHeader() {
               maxWidth: 'calc(100% - 90px)',
             }),
           }}
-          onClick={() => navigate('/music')}
-        >
+          onClick={() => navigate('/music')}>
           <CardMedia
             component="img"
             src={
@@ -98,8 +104,7 @@ export default function AppHeader() {
               overflow: 'hidden',
               maxWidth: isMobile ? '120px' : 'none',
               flex: isMobile ? 0 : 1,
-            }}
-          >
+            }}>
             <Typography
               variant="caption"
               sx={{
@@ -119,11 +124,8 @@ export default function AppHeader() {
                   : {
                       textOverflow: 'ellipsis',
                     }),
-              }}
-            >
-              {isMobile && currentSong.name.length > 8
-                ? `${currentSong.name} • ${currentSong.name}`
-                : currentSong.name}
+              }}>
+              {isMobile && currentSong.name.length > 8 ? `${currentSong.name} • ${currentSong.name}` : currentSong.name}
             </Typography>
             {!isMobile && (
               <Typography
@@ -135,8 +137,7 @@ export default function AppHeader() {
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
                   display: 'block',
-                }}
-              >
+                }}>
                 {Array.isArray(currentSong.artist) ? currentSong.artist.join(' / ') : currentSong.artist}
               </Typography>
             )}
@@ -153,8 +154,7 @@ export default function AppHeader() {
                 padding: isMobile ? '2px' : '4px',
                 width: isMobile ? 24 : 28,
                 height: isMobile ? 24 : 28,
-              }}
-            >
+              }}>
               <SkipPreviousIcon sx={{ fontSize: isMobile ? 16 : 20 }} />
             </IconButton>
             <IconButton
@@ -167,8 +167,7 @@ export default function AppHeader() {
                 padding: isMobile ? '2px' : '4px',
                 width: isMobile ? 24 : 28,
                 height: isMobile ? 24 : 28,
-              }}
-            >
+              }}>
               {isPlaying ? (
                 <PauseIcon sx={{ fontSize: isMobile ? 16 : 20 }} />
               ) : (
@@ -186,16 +185,28 @@ export default function AppHeader() {
                 padding: isMobile ? '2px' : '4px',
                 width: isMobile ? 24 : 28,
                 height: isMobile ? 24 : 28,
-              }}
-            >
+              }}>
               <SkipNextIcon sx={{ fontSize: isMobile ? 16 : 20 }} />
             </IconButton>
           </Box>
         </Box>
       )}
+      {/* right: avatar + notification */}
+      <Box sx={{ display: 'flex', alignItems: 'center', ...(isMobile && { position: 'relative', zIndex: 1 }) }}>
+        {/* 通知按钮 */}
+        <IconButton
+          onClick={() => {
+            setOpenNotification((prev) => !prev);
+          }}
+          sx={{ mr: 1 }}>
+          <Badge badgeContent={unreadCount} color="error" max={99}>
+            <NotificationsNoneIcon />
+          </Badge>
+        </IconButton>
 
-      {/* right: avatar */}
-      <Box sx={{ ...(isMobile && { position: 'relative', zIndex: 1 }) }}>
+        {/* 通知面板 */}
+        <CommentNotificationPanel open={openNotification} onClose={() => setOpenNotification(false)} />
+
         <HeaderUserMenu />
       </Box>
     </Box>

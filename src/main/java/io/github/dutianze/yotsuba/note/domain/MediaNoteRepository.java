@@ -1,6 +1,5 @@
-package io.github.dutianze.yotsuba.note.domain.repository;
+package io.github.dutianze.yotsuba.note.domain;
 
-import io.github.dutianze.yotsuba.note.domain.MediaNote;
 import io.github.dutianze.yotsuba.note.domain.valueobject.NoteId;
 import org.springframework.data.repository.CrudRepository;
 

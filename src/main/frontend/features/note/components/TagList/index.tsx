@@ -13,7 +13,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useTagStore } from 'Frontend/features/note/hooks/useTagStore';
 import TagChip from './TagChip';
-import TagDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/application/dto/TagDto';
+import TagDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/dto/TagDto';
 
 const TagList = () => {
   const tags = useTagStore((s) => s.tags);
