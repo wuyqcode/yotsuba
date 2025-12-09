@@ -30,23 +30,54 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # 3. Write settings.xml for GitHub Packages
-      - name: Configure Maven settings (insert server before </settings>)
+      - name: Create Maven settings.xml
         run: |
           mkdir -p ~/.m2
+          cat <<EOF > ~/.m2/settings.xml
+          <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 
+                                        http://maven.apache.org/xsd/settings-1.0.0.xsd">
 
-          # 复制模板 settings.xml 到 Maven 目录
-          cp .github/maven/settings-template.xml ~/.m2/settings.xml
+            <profiles>
+              <profile>
+                <id>maven-https</id>
+                <activation>
+                  <activeByDefault>true</activeByDefault>
+                </activation>
+                <repositories>
+                  <repository>
+                    <id>central</id>
+                    <url>https://repo1.maven.org/maven2</url>
+                    <snapshots>
+                      <enabled>false</enabled>
+                    </snapshots>
+                  </repository>
+                </repositories>
+                <pluginRepositories>
+                  <pluginRepository>
+                    <id>central</id>
+                    <url>https://repo1.maven.org/maven2</url>
+                    <snapshots>
+                      <enabled>false</enabled>
+                    </snapshots>
+                  </pluginRepository>
+                </pluginRepositories>
+              </profile>
+            </profiles>
 
-          # 在倒数第一行 </settings> 之前插入 server 配置
-          sed -i '$i \
-            <server>\n\
-              <id>github</id>\n\
-              <username>wuyqcode</username>\n\
-              <password>'"${{ secrets.PAT_TOKEN }}"'</password>\n\
-            </server>' ~/.m2/settings.xml
+            <servers>
+              <server>
+                <id>github</id>
+                <username>wuyqcode</username>
+                <password>${{ secrets.PAT_TOKEN }}</password>
+              </server>
+            </servers>
 
-          echo "==== FINAL settings.xml ===="
+          </settings>
+          EOF
+
+          echo "=== FINAL settings.xml ==="
           sed 's/<password>.*<\/password>/<password>***<\/password>/' ~/.m2/settings.xml
 
       # 4. Setup JDK
