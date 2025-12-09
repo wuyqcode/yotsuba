@@ -6,18 +6,32 @@ on:
       - master
 
 permissions:
-  contents: write     # 发布 Release
-  packages: read      # ⭐ 允许读取 GitHub Packages
+  contents: write      # 发布 Release
+  packages: read       # 读取 GitHub Packages（私有依赖）
 
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
 
+    # ⭐ 必须绑定 Environment，否则不能读取该 Environment 的 secrets
+    environment: PAT_TOKEN
+
     steps:
+      # 1. Checkout
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ⭐ 配置 Maven，使其能读取 GitHub Packages（使用 GITHUB_TOKEN）
+      # 2. Maven cache（加速构建）
+      - name: Cache Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      # 3. Write settings.xml for GitHub Packages
+      #    使用 Environment Secret: PAT_TOKEN
       - name: Configure Maven settings for GitHub Packages
         run: |
           mkdir -p ~/.m2
@@ -26,32 +40,32 @@ jobs:
             <servers>
               <server>
                 <id>github</id>
-                <username>github-actions[bot]</username>
-                <password>${{ secrets.GITHUB_TOKEN }}</password>
+                <username>wuyqcode</username>
+                <password>${{ secrets.PAT_TOKEN }}</password>
               </server>
             </servers>
           </settings>
           EOF
 
-      # Java
+      # 4. Setup JDK
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
-      # Build JAR
+      # 5. Build JAR（production profile）
       - name: Build JAR (production)
         run: mvn -B -e package -P production
 
-      # Rename to app.jar
-      - name: Rename JAR
+      # 6. Rename to app.jar
+      - name: Rename JAR to app.jar
         run: |
           JAR_FILE=$(ls target/*.jar | head -n 1)
           echo "Found JAR: $JAR_FILE"
           cp "$JAR_FILE" app.jar
 
-      # Publish to release
+      # 7. Release to GitHub（tag = latest）
       - name: Create or update Release
         uses: softprops/action-gh-release@v2
         with:
