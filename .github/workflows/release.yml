@@ -40,11 +40,7 @@ jobs:
       # 5. Build JAR（production profile）
       - name: Build with Maven
         run: |
-          mvn -B -e package \
-            -Drepo.id=github \
-            -Drepo.login=wuyqcode \
-            -Drepo.pwd=${{ secrets.PAT_TOKEN }} \
-            -P production
+          mvn mvn -B -e package -Drepo.id=github -Drepo.login=wuyqcode -Drepo.pwd=${{ secrets.PAT_TOKEN }} -P production
 
       # 6. Rename to app.jar
       - name: Rename JAR to app.jar
