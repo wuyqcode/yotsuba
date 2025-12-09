@@ -54,6 +54,7 @@ public class FileResourceController {
 
     return ResponseEntity.ok()
         .header(HttpHeaders.CONTENT_TYPE, res.getContentType())
+        .header(HttpHeaders.CACHE_CONTROL, "public, max-age=31536000, immutable")
         .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
         .body(responseBody);
   }
@@ -87,6 +88,7 @@ public class FileResourceController {
 
     return ResponseEntity.ok()
         .header(HttpHeaders.CONTENT_TYPE, contentType.toString())
+        .header(HttpHeaders.CACHE_CONTROL, "public, max-age=31536000, immutable")
         .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
         .body(responseBody);
   }

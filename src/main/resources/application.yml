@@ -1,11 +1,15 @@
 server:
   port: 12191
 spring:
+  web:
+    resources:
+      cache:
+        cachecontrol:
+          cache-public: true
+          max-age: 31536000
   sql:
     init:
       mode: never
-  mustache:
-    check-template-location: false
   servlet:
     multipart:
       max-request-size: 200MB

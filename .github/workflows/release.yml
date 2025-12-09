@@ -5,8 +5,12 @@ on:
     branches:
       - master
 
+# ⭐ 必须在这里添加权限
 permissions:
-  contents: write   # 允许发布 Release / 上传文件
+  contents: write     # 上传 Release、推代码
+  packages: read      # 允许读取 GitHub Packages（你要求的）
+  # 如果以后要 push Docker / Maven artifacts：
+  # packages: write
 
 jobs:
   build-and-release:
@@ -22,7 +26,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21    # 根据项目修改
+          java-version: 21
 
       # 3. Build with production profile
       - name: Build JAR (production)
