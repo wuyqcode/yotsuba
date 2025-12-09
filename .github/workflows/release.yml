@@ -5,41 +5,53 @@ on:
     branches:
       - master
 
-# ⭐ 必须在这里添加权限
 permissions:
-  contents: write     # 上传 Release、推代码
-  packages: read      # 允许读取 GitHub Packages（你要求的）
-  # 如果以后要 push Docker / Maven artifacts：
-  # packages: write
+  contents: write     # 发布 Release
+  packages: read      # ⭐ 允许读取 GitHub Packages
 
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Setup JDK
+      # ⭐ 配置 Maven，使其能读取 GitHub Packages（使用 GITHUB_TOKEN）
+      - name: Configure Maven settings for GitHub Packages
+        run: |
+          mkdir -p ~/.m2
+          cat <<EOF > ~/.m2/settings.xml
+          <settings>
+            <servers>
+              <server>
+                <id>github</id>
+                <username>github-actions[bot]</username>
+                <password>${{ secrets.GITHUB_TOKEN }}</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
+
+      # Java
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
-      # 3. Build with production profile
+      # Build JAR
       - name: Build JAR (production)
         run: mvn -B -e package -P production
 
-      # 4. Rename generated JAR to app.jar
-      - name: Rename JAR to app.jar
+      # Rename to app.jar
+      - name: Rename JAR
         run: |
           JAR_FILE=$(ls target/*.jar | head -n 1)
           echo "Found JAR: $JAR_FILE"
           cp "$JAR_FILE" app.jar
 
-      # 5. Create / update Release with tag 'latest'
+      # Publish to release
       - name: Create or update Release
         uses: softprops/action-gh-release@v2
         with:
