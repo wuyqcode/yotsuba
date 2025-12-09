@@ -1,0 +1,41 @@
+name: Reset Git History
+
+on:
+  workflow_dispatch:   # 手动触发，防止误操作
+
+permissions:
+  contents: write      # 重点：允许往仓库 push
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Remove .git and reinitialize repository
+        run: |
+          rm -rf .git
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "init"
+
+      # ⭐ 用 GITHUB_TOKEN 配 remote，不再用自定义 PAT
+      - name: Add remote with GITHUB_TOKEN
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/wuyqcode/yotsuba.git"
+
+      - name: Rename branch to master
+        run: |
+          git branch -M master
+
+      - name: Force push rewritten history to master
+        run: |
+          git push -f origin master
