@@ -8,12 +8,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Delete .git and reinitialize repo
+      - name: Remove .git and reinitialize repository
         run: |
           rm -rf .git
           git init
@@ -22,13 +22,16 @@ jobs:
           git add .
           git commit -m "init"
 
-      - name: Add remote origin (using PAT)
+      - name: Add remote with PAT
         env:
           PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
-          git remote add origin https://${PAT_TOKEN}@github.com/${{ github.repository }}.git
+          git remote add origin "https://${PAT_TOKEN}@github.com/${{ github.repository }}.git"
 
-      - name: Force push new history to main
+      - name: Rename branch to master
         run: |
-          git branch -M main
-          git push -f origin main
+          git branch -M master
+
+      - name: Force push rewritten history to master
+        run: |
+          git push -f origin master
