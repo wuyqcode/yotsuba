@@ -1,0 +1,34 @@
+name: Reset Repo History
+
+on:
+  workflow_dispatch:  # 手动触发，避免误伤
+
+jobs:
+  reset-history:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # 必须获取完整历史才能重写
+
+      - name: Clean repo and recreate init commit
+        run: |
+          git checkout --orphan temp_branch
+          git rm -rf .
+          echo "# Init Commit" > README.md
+          git add README.md
+          git commit -m "init"
+
+      - name: Replace main branch history
+        run: |
+          git branch -D main || true
+          git branch -m main
+
+      - name: Force push to main (rewrite complete history)
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          git remote set-url origin "https://${PAT_TOKEN}@github.com/${{ github.repository }}.git"
+          git push -f origin main
