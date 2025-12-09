@@ -31,21 +31,23 @@ jobs:
             ${{ runner.os }}-maven-
 
       # 3. Write settings.xml for GitHub Packages
-      #    使用 Environment Secret: PAT_TOKEN
-      - name: Configure Maven settings for GitHub Packages
+      - name: Configure Maven settings (insert server before </settings>)
         run: |
           mkdir -p ~/.m2
-          cat <<EOF > ~/.m2/settings.xml
-          <settings>
-            <servers>
-              <server>
-                <id>github</id>
-                <username>wuyqcode</username>
-                <password>${{ secrets.PAT_TOKEN }}</password>
-              </server>
-            </servers>
-          </settings>
-          EOF
+
+          # 复制模板 settings.xml 到 Maven 目录
+          cp .github/maven/settings-template.xml ~/.m2/settings.xml
+
+          # 在倒数第一行 </settings> 之前插入 server 配置
+          sed -i '$i \
+            <server>\n\
+              <id>github</id>\n\
+              <username>wuyqcode</username>\n\
+              <password>'"${{ secrets.PAT_TOKEN }}"'</password>\n\
+            </server>' ~/.m2/settings.xml
+
+          echo "==== FINAL settings.xml ===="
+          sed 's/<password>.*<\/password>/<password>***<\/password>/' ~/.m2/settings.xml
 
       # 4. Setup JDK
       - name: Set up JDK
