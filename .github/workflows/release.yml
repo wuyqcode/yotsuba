@@ -80,7 +80,7 @@ jobs:
           echo "=== FINAL settings.xml ==="
           cat ~/.m2/settings.xml
 
-      # 4. Setup JDK
+      # 4. Setup JDK 
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
