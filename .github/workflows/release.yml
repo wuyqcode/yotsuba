@@ -6,33 +6,36 @@ on:
       - master
 
 permissions:
-  contents: write      # 发布 Release
-  packages: read       # 读取 GitHub Packages
+  contents: write
+  packages: read
 
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
-
-    # ⭐ 必须绑定 Environment，否则不能读取该 Environment 的 secrets
     environment: PAT_TOKEN
 
     steps:
       # 1. Checkout
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # 2. Maven cache（加速构建）
-      - name: Cache Maven repository
-        uses: actions/cache@v3
+      # 2. Maven Cache
+      - uses: actions/cache@v3
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
 
+      # 3. Setup JDK (必须在 settings-action 之前)
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      # 4. Setup Maven settings.xml（GitHub Packages 认证）
       - uses: s4u/maven-settings-action@v4.0.0
         with:
-          githubServer: false   # ❗ 禁用默认 github server 设置
+          githubServer: false
           servers: |
             [{
               "id": "github",
@@ -40,25 +43,18 @@ jobs:
               "password": "${{ secrets.PAT_TOKEN }}"
             }]
 
-      # 4. Setup JDK 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 21
-
       # 5. Build JAR（production profile）
       - name: Build with Maven
         run: mvn -B -e -P production clean package
 
-      # 6. Rename to app.jar
+      # 6. Rename JAR
       - name: Rename JAR to app.jar
         run: |
           JAR_FILE=$(ls target/*.jar | head -n 1)
           echo "Found JAR: $JAR_FILE"
           cp "$JAR_FILE" app.jar
 
-      # 7. Release to GitHub（tag = latest）
+      # 7. Release to GitHub
       - name: Create or update Release
         uses: softprops/action-gh-release@v2
         with:
