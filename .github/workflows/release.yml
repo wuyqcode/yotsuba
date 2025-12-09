@@ -78,7 +78,7 @@ jobs:
           EOF
 
           echo "=== FINAL settings.xml ==="
-          echo ~/.m2/settings.xml
+          cat ~/.m2/settings.xml
 
       # 4. Setup JDK
       - name: Set up JDK
