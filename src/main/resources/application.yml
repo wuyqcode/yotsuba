@@ -1,0 +1,66 @@
+server:
+  port: 12191
+spring:
+  web:
+    resources:
+      cache:
+        cachecontrol:
+          cache-public: true
+          max-age: 31536000
+  sql:
+    init:
+      mode: never
+  servlet:
+    multipart:
+      max-request-size: 200MB
+      max-file-size: 200MB
+  jpa:
+    defer-datasource-initialization: false
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    open-in-view: false
+    hibernate:
+      ddl-auto: none # create none
+    properties:
+      hibernate:
+        format_sql: false
+    show-sql: false
+  flyway:
+    enabled: false
+#logging:
+#  level:
+#    org:
+#      atmosphere: warn
+#      hibernate:
+#        orm:
+#          jdbc:
+#            bind: trace
+vaadin:
+  launch-browser: 'true'
+  allowed-packages: com.vaadin,org.vaadin,io.github.dutianze
+  pnpm:
+    enable: true
+  exclude-urls: /swagger-ui/**
+modules:
+  primary:
+    datasource:
+      url: jdbc:sqlite:./db/yotsuba_primary.db
+      driver-class-name: org.sqlite.JDBC
+    jpa:
+      open-in-view: false
+      properties:
+        hibernate.search.enabled: true
+        hibernate.search.backend.type: lucene
+        hibernate.search.backend.directory.type: local-filesystem
+        hibernate.search.backend.directory.root: ./index
+        hibernate.search.backend.analysis.configurer: bean:customLuceneAnalysisConfigurer
+    flyway:
+      location: classpath:db/migration/primary
+  file:
+    datasource:
+      url: jdbc:sqlite:./db/yotsuba_file.db
+      driver-class-name: org.sqlite.JDBC
+    flyway:
+      location: classpath:db/migration/file
+yotsuba:
+  auth:
+    secret: Y9pf6WgTS2FGEIquyzw+lslLFRA3rAn3FluDmnunSM4=
