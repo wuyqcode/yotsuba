@@ -85,7 +85,7 @@ jobs:
 
       # 5. Build JAR（production profile）
       - name: Build JAR (production)
-        run: mvn -B -e package -P production
+        run: mvn -B -e -s ~/.m2/settings.xml package -P production
 
       # 6. Rename to app.jar
       - name: Rename JAR to app.jar
