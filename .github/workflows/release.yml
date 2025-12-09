@@ -67,7 +67,6 @@ jobs:
               <server>
                 <id>github</id>
                 <username>wuyqcode</username>
-                <password>111</password>
               </server>
             </servers>
           </settings>
