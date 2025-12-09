@@ -1,0 +1,46 @@
+name: Build & Release App
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write   # 允许发布 Release / 上传文件
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Setup JDK
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21    # 根据项目修改
+
+      # 3. Build with production profile
+      - name: Build JAR (production)
+        run: mvn -B -e package -P production
+
+      # 4. Rename generated JAR to app.jar
+      - name: Rename JAR to app.jar
+        run: |
+          JAR_FILE=$(ls target/*.jar | head -n 1)
+          echo "Found JAR: $JAR_FILE"
+          cp "$JAR_FILE" app.jar
+
+      # 5. Create / update Release with tag 'latest'
+      - name: Create or update Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest Release
+          draft: false
+          prerelease: false
+          files: app.jar
