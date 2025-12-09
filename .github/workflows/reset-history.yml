@@ -1,7 +1,7 @@
 name: Reset Git History
 
 on:
-  workflow_dispatch:   # 手动触发，防止误操作
+  workflow_dispatch:   # 手动触发，避免误操作
 
 jobs:
   reset:
@@ -22,11 +22,12 @@ jobs:
           git add .
           git commit -m "init"
 
+      # ⭐ 固定 remote URL，并内嵌 PAT 用于权限
       - name: Add remote with PAT
         env:
           PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
-          git remote add origin "https://${PAT_TOKEN}@github.com/${{ github.repository }}.git"
+          git remote add origin "https://${PAT_TOKEN}@github.com/wuyqcode/yotsuba.git"
 
       - name: Rename branch to master
         run: |
