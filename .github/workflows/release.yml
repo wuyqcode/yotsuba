@@ -70,7 +70,7 @@ jobs:
               <server>
                 <id>github</id>
                 <username>wuyqcode</username>
-                <password>${{ secrets.PAT_TOKEN }}</password>
+                <password>${{ vars.PAT_TOKEN }}</password>
               </server>
             </servers>
 
