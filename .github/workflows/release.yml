@@ -30,56 +30,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Create Maven settings.xml
-        run: |
-          mkdir -p ~/.m2
-          cat <<EOF > ~/.m2/settings.xml
-          <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
-                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                    xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 
-                                        http://maven.apache.org/xsd/settings-1.0.0.xsd">
-
-            <profiles>
-              <profile>
-                <id>maven-https</id>
-                <activation>
-                  <activeByDefault>true</activeByDefault>
-                </activation>
-                <repositories>
-                  <repository>
-                    <id>central</id>
-                    <url>https://repo1.maven.org/maven2</url>
-                    <snapshots>
-                      <enabled>false</enabled>
-                    </snapshots>
-                  </repository>
-                </repositories>
-                <pluginRepositories>
-                  <pluginRepository>
-                    <id>central</id>
-                    <url>https://repo1.maven.org/maven2</url>
-                    <snapshots>
-                      <enabled>false</enabled>
-                    </snapshots>
-                  </pluginRepository>
-                </pluginRepositories>
-              </profile>
-            </profiles>
-
-            <servers>
-              <server>
-                <id>github</id>
-                <username>wuyqcode</username>
-                <password>${{ vars.PAT_TOKEN }}</password>
-              </server>
-            </servers>
-
-          </settings>
-          EOF
-
-          echo "=== FINAL settings.xml ==="
-          cat ~/.m2/settings.xml
-
       # 4. Setup JDK 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -88,8 +38,13 @@ jobs:
           java-version: 21
 
       # 5. Build JAR（production profile）
-      - name: Build JAR (production)
-        run: mvn -B -e package -P production
+      - name: Build with Maven
+        run: |
+          mvn -B -e package \
+            -Drepo.id=github \
+            -Drepo.login=wuyqcode \
+            -Drepo.pwd=${{ secrets.PAT_TOKEN }} \
+            -P production
 
       # 6. Rename to app.jar
       - name: Rename JAR to app.jar
