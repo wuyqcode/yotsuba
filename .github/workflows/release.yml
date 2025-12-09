@@ -7,7 +7,7 @@ on:
 
 permissions:
   contents: write      # 发布 Release
-  packages: read       # 读取 GitHub Packages（私有依赖）
+  packages: read       # 读取 GitHub Packages
 
 jobs:
   build-and-release:
