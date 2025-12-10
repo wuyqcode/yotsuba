@@ -1,16 +1,19 @@
 package io.github.dutianze.yotsuba.tool.domain.pipeline;
 
-import com.atilika.kuromoji.ipadic.neologd.Token;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.github.dutianze.yotsuba.tool.domain.common.Constant;
 import io.github.dutianze.yotsuba.tool.domain.common.ListHelper;
 import io.github.dutianze.yotsuba.tool.domain.common.StringHelper;
+import io.github.dutianze.yotsuba_grpc.proto.TextProcessorGrpc.TextProcessorBlockingStub;
+import io.github.dutianze.yotsuba_grpc.proto.TokenizeReply;
+import io.github.dutianze.yotsuba_grpc.proto.TokenizeRequest;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.domain.SpineReference;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
@@ -25,12 +28,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
+import io.github.dutianze.yotsuba_grpc.proto.Token;
 
-/**
- * @author dutianze
- * @date 2024/7/9
- */
 public class LoadEnglishHandler implements Handler<Book, BookContext> {
+
+    private final TextProcessorBlockingStub textProcessorBlockingStub;
+
+    public LoadEnglishHandler(TextProcessorBlockingStub textProcessorBlockingStub) {
+        this.textProcessorBlockingStub = textProcessorBlockingStub;
+    }
 
     @Override
     public BookContext process(Book input) {
@@ -39,14 +45,16 @@ public class LoadEnglishHandler implements Handler<Book, BookContext> {
             List<SpineReference> spineReferences = input.getSpine().getSpineReferences();
             for (SpineReference spineReference : spineReferences) {
                 Resource resource = spineReference.getResource();
-                Document doc = Jsoup.parse(new String(resource.getData(), resource.getInputEncoding()));
+                Document doc = Jsoup.parse(new String(resource.getData(), resource.getInputEncoding()), Parser.xmlParser());
                 Elements paragraphs = doc.select("p");
                 for (Element paragraph : paragraphs) {
-                    Constant.tokenizer.tokenize(paragraph.text())
-                                      .stream()
-                                      .map(Token::getSurface)
-                                      .filter(StringHelper::containsKatakana)
-                                      .forEach(distinctWord::add);
+                    TokenizeReply tokenizeReply = textProcessorBlockingStub.tokenize(
+                            TokenizeRequest.newBuilder().setText(paragraph.text()).build());
+                    tokenizeReply.getTokensList()
+                                 .stream()
+                                 .map(Token::getSurface)
+                                 .filter(StringHelper::containsKatakana)
+                                 .forEach(distinctWord::add);
 
                 }
             }

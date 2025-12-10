@@ -2,6 +2,7 @@ package io.github.dutianze.yotsuba.tool.api;
 
 import io.github.dutianze.yotsuba.tool.domain.pipeline.*;
 import io.github.dutianze.yotsuba.tool.domain.policy.PolicyManager;
+import io.github.dutianze.yotsuba_grpc.proto.TextProcessorGrpc.TextProcessorBlockingStub;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -30,16 +31,19 @@ public class EpubController {
 
     private static final ConcurrentHashMap<String, String> cache = new ConcurrentHashMap<>();
     private final PolicyManager policyManager;
+    private final TextProcessorBlockingStub textProcessorBlockingStub;
 
-    public EpubController(PolicyManager policyManager) {
+    public EpubController(PolicyManager policyManager,
+                          TextProcessorBlockingStub textProcessorBlockingStub) {
         this.policyManager = policyManager;
+        this.textProcessorBlockingStub = textProcessorBlockingStub;
     }
 
     @PostMapping(value = "/uploadEpub", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = "application/json")
     public ResponseEntity<Resource> uploadEpub(@RequestParam("file") MultipartFile file) {
         // build pipeline
         Pipeline<MultipartFile, ByteArrayOutputStream> pipeline = new Pipeline<>(new EpubReadingHandler())
-                .addHandler(new LoadEnglishHandler())
+                .addHandler(new LoadEnglishHandler(textProcessorBlockingStub))
                 .addHandler(new ParagraphProcessHandler(policyManager))
                 .addHandler(new EpubWriteHandler());
         // execute pipeline

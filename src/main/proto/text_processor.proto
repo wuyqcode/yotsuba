@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package io.github.dutianze.yotsuba_grpc;
+
+option java_multiple_files = true;
+option java_package = "io.github.dutianze.yotsuba_grpc.proto";
+option java_outer_classname = "TextProcessorProto";
+
+// ==========================================================
+// Text Processor Service
+// ==========================================================
+service TextProcessor {
+
+    // --------------------------------------------------------
+    // Tokenize: 将输入文本切分为 Token 列表
+    // 输入：TokenizeRequest{text}
+    // 输出：TokenizeReply{repeated Token}
+    // --------------------------------------------------------
+    rpc Tokenize(TokenizeRequest) returns (TokenizeReply) {}
+
+    // 未来可以加入更多功能（预留）
+    // rpc DetectLanguage(LanguageRequest) returns (LanguageReply);
+    // rpc Normalize(NormalizeRequest) returns (NormalizeReply);
+    // rpc SentenceSplit(SplitRequest) returns (SplitReply);
+    // rpc Keywords(KeywordRequest) returns (KeywordReply);
+}
+
+// ==========================================================
+// Messages
+// ==========================================================
+
+// ------------------------
+// Tokenize 请求
+// ------------------------
+message TokenizeRequest {
+    string text = 1; // 文本内容
+}
+
+// ------------------------
+// Token 数据结构
+// ------------------------
+message Token {
+    string surface = 1;
+    string reading = 2;
+    bool known = 3;
+}
+
+
+// ------------------------
+// Tokenize 回复
+// ------------------------
+message TokenizeReply {
+    repeated Token tokens = 1; // 分词结果列表
+}

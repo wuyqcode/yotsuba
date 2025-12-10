@@ -1,12 +1,8 @@
 package io.github.dutianze.yotsuba.search;
 
-import com.atilika.kuromoji.ipadic.neologd.Token;
-import io.github.dutianze.yotsuba.tool.domain.common.Constant;
 import io.github.dutianze.yotsuba.tool.domain.common.StringHelper;
 import lombok.Getter;
 import org.apache.commons.lang3.CharUtils;
-
-import java.util.List;
 
 @Getter
 public enum LanguageType {
@@ -46,12 +42,14 @@ public enum LanguageType {
         if (StringHelper.containsHiragana(cleaned) || StringHelper.containsKatakana(cleaned)) {
             return JA;
         }
-
+/*
+        TODO
         List<Token> tokenize = Constant.tokenizer.tokenize(cleaned);
         boolean allKnown = tokenize.stream().allMatch(Token::isKnown);
         if (allKnown) {
             return JA;
         }
+*/
 
         return CN;
     }
@@ -64,4 +62,3 @@ public enum LanguageType {
         };
     }
 }
-

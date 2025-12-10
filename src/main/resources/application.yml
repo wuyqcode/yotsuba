@@ -64,3 +64,6 @@ modules:
 yotsuba:
   auth:
     secret: Y9pf6WgTS2FGEIquyzw+lslLFRA3rAn3FluDmnunSM4=
+  grpc:
+    address: 192.168.11.10
+    port: 12193

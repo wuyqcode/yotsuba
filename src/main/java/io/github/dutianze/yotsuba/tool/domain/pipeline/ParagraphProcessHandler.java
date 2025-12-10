@@ -10,6 +10,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
+import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
@@ -34,7 +35,7 @@ public class ParagraphProcessHandler implements Handler<BookContext, Book> {
             List<SpineReference> spineReferences = input.book().getSpine().getSpineReferences();
             for (SpineReference spineReference : spineReferences) {
                 Resource resource = spineReference.getResource();
-                Document doc = Jsoup.parse(new String(resource.getData(), resource.getInputEncoding()));
+                Document doc = Jsoup.parse(new String(resource.getData(), resource.getInputEncoding()), Parser.xmlParser());
                 Elements paragraphs = doc.select("p");
                 for (Element paragraph : paragraphs) {
 
@@ -55,7 +56,7 @@ public class ParagraphProcessHandler implements Handler<BookContext, Book> {
                     }
                     paragraph.html(newHtml.toString());
                 }
-                resource.setData(doc.html().getBytes(StandardCharsets.UTF_8));
+                resource.setData(doc.outerHtml().getBytes(StandardCharsets.UTF_8));
             }
             return input.book();
         } catch (IOException e) {

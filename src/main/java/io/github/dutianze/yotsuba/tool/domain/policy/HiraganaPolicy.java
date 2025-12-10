@@ -20,13 +20,13 @@ public class HiraganaPolicy extends BasePolicy {
 
     @Override
     public boolean canApply(TokenRecord tokenRecord) {
-        return StringHelper.containsKanji(tokenRecord.getSurface());
+        return StringHelper.containsKanji(tokenRecord.surface());
     }
 
     @Override
     public String apply(PolicyContext policyContext) {
-        String surface = policyContext.token().getSurface();
-        String reading = Converter.kata2hira(policyContext.token().getReading());
+        String surface = policyContext.surface();
+        String reading = Converter.kata2hira(policyContext.reading());
         if (!StringHelper.containsHiragana(reading)) {
             return surface;
         }
