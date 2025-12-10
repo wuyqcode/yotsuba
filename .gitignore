@@ -11,4 +11,5 @@ index
 *.db-wal
 /files/
 /db/
+!/db/.gitkeep
 .DS_Store
