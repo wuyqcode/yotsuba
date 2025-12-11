@@ -20,8 +20,6 @@ export default function JapaneseTool() {
   const [file, setFile] = useState<File | null>(null);
   const epubInputRef = useRef<HTMLInputElement | null>(null);
 
-  const textFileRef = useRef<HTMLInputElement | null>(null);
-
   const handleTabChange = (_: any, v: number) => setTab(v);
 
   const handleConvert = async () => {
@@ -30,56 +28,27 @@ export default function JapaneseTool() {
     setResult(res ?? '');
   };
 
-  const handleTextFileChange = (e: any) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    const reader = new FileReader();
-    reader.onload = () => setInput(reader.result as string);
-    reader.readAsText(f, 'utf-8');
-  };
-
-  const handleEpubSelect = (e: any) => {
-    const f = e.target.files?.[0];
-    if (f) setFile(f);
-  };
-
-  const handleUploadEpub = async () => {
-    if (!file) return;
-
-    const fd = new FormData();
-    fd.append('file', file);
-
-    const res = await fetch('/api/uploadEpub', {
-      method: 'POST',
-      body: fd,
-    });
-
-    if (res.ok) {
-      const blob = await res.blob();
-      const disposition = res.headers.get('content-disposition');
-      let filename = file.name;
-
-      if (disposition) {
-        filename = decodeURIComponent(disposition.split('filename=')[1]).replace(/\+/g, ' ');
-      }
-
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      a.click();
-
-      setTimeout(() => URL.revokeObjectURL(url), 200);
-    }
-  };
   return (
     <Box sx={{ maxWidth: '1100px', mx: 'auto', py: 6, px: 3 }}>
       {/* ---- Header ---- */}
-      <Box sx={{ mb: 5 }}>
+      <Box sx={{ mb: 1 }}>
         <Box sx={{ position: 'relative', display: 'inline-block', mb: 1 }}>
-          <Typography variant="h4" fontWeight="bold" color="primary">
+          <Typography
+            variant="h4"
+            fontWeight="bold"
+            color="primary"
+            noWrap
+            sx={{
+              whiteSpace: 'nowrap',
+              fontSize: {
+                xs: '1.2rem',
+                sm: '1.5rem',
+                md: '2rem',
+              },
+            }}>
             かな変換 - ふりがな表示
           </Typography>
+
           {/* 渐变 underline */}
           <Box
             sx={{
@@ -90,16 +59,18 @@ export default function JapaneseTool() {
               width: '100%',
               borderRadius: 2,
               background: (theme) =>
-                `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.primary.contrastText})`,
             }}
           />
         </Box>
 
-        <Typography color="text.secondary">入力した日本語テキストの漢字に、ふりがな（読み仮名）を付けます。</Typography>
+        <Typography pt={2} color="text.secondary">
+          入力した日本語テキストの漢字に、ふりがな（読み仮名）を付けます。
+        </Typography>
       </Box>
 
       {/* ---- Tabs ---- */}
-      <Tabs value={tab} onChange={handleTabChange} sx={{ mb: 4 }}>
+      <Tabs value={tab} onChange={handleTabChange} sx={{ mb: 2 }}>
         <Tab label="テキスト入力" />
         <Tab label="EPUB アップロード" />
       </Tabs>
@@ -112,12 +83,6 @@ export default function JapaneseTool() {
           <Card sx={{ p: 3, mb: 4, borderRadius: 3, boxShadow: 3 }}>
             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
               <Typography variant="subtitle1">日本語テキストを入力</Typography>
-
-              <Button variant="outlined" size="small" onClick={() => textFileRef.current?.click()}>
-                ファイル読み込み
-              </Button>
-
-              <input ref={textFileRef} hidden type="file" accept=".txt" onChange={handleTextFileChange} />
             </Stack>
 
             <TextField
@@ -133,10 +98,6 @@ export default function JapaneseTool() {
                 borderRadius: 2,
               }}
             />
-
-            <Typography textAlign="right" sx={{ mt: 1 }} variant="caption" color="text.secondary">
-              {input.length}/2000
-            </Typography>
           </Card>
 
           <Button
@@ -164,7 +125,7 @@ export default function JapaneseTool() {
             <Box
               sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.8, fontSize: '1.1rem' }}
               dangerouslySetInnerHTML={{
-                __html: result || '（ここに変換結果が表示されます）',
+                __html: result || 'ここに変換結果が表示されます',
               }}
             />
           </Card>
