@@ -91,6 +91,7 @@ export const useWikiNoteStore = create<WikiState>((set, get) => ({
 
     try {
       await NoteEndpoint.updateNote(wiki.id, wiki.title, wiki.content);
+      useNoteStore.getState().markDirty();
       set({ originalWiki: { ...wiki }, isDirty: false });
     } catch (err: any) {
       console.error('[saveWiki] save failed:', err);
