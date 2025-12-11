@@ -113,7 +113,6 @@ export const useWikiNoteStore = create<WikiState>((set, get) => ({
 
       const newWiki = { ...state.wiki, ...patch };
       const isDirty = computeDirty(newWiki, originalWiki);
-      useNoteStore.getState().markDirty();
       return {
         wiki: newWiki,
         originalWiki,
