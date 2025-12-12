@@ -160,46 +160,6 @@ export default function JapaneseTool() {
             </Box>
           )}
 
-          {/* 分割片段 + 当前高亮 */}
-          {parts.length > 0 && (
-            <Card sx={{ p: 2, mb: 4, borderRadius: 2 }}>
-              <Typography variant="subtitle2" mb={1}>
-                分割されたテキスト（現在処理中の段落をハイライト）
-              </Typography>
-
-              <Stack spacing={1}>
-                {parts.map((p, idx) => (
-                  <Box
-                    key={idx}
-                    sx={{
-                      p: 1.5,
-                      borderRadius: 1,
-                      fontSize: '0.9rem',
-                      backgroundColor:
-                        idx === currentIndex ? 'primary.light' : 'grey.100',
-                      border:
-                        idx === currentIndex
-                          ? '1px solid'
-                          : '1px solid transparent',
-                      borderColor: 'primary.main',
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {p}
-                    </Typography>
-                  </Box>
-                ))}
-              </Stack>
-            </Card>
-          )}
-
           {/* 实时结果 */}
           <Card sx={{ p: 4, borderRadius: 3 }}>
             <Typography variant="h6" fontWeight="bold" mb={2}>
