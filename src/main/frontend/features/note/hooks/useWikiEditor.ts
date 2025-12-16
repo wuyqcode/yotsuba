@@ -26,7 +26,6 @@ import { Indent } from 'reactjs-tiptap-editor/lib/Indent.js';
 import { Iframe } from 'reactjs-tiptap-editor/lib/Iframe.js';
 import { Color } from 'reactjs-tiptap-editor/lib/Color.js';
 import { ExportPdf } from 'reactjs-tiptap-editor/lib/ExportPdf.js';
-import { Excalidraw } from 'reactjs-tiptap-editor/lib/Excalidraw.cjs';
 import { ExportWord } from 'reactjs-tiptap-editor/lib/ExportWord.js';
 import { Emoji } from 'reactjs-tiptap-editor/lib/Emoji.js';
 import { SearchAndReplace } from 'reactjs-tiptap-editor/lib/SearchAndReplace.js';
@@ -101,7 +100,6 @@ export function useWikiEditor() {
       Indent,
       LineHeight,
       SlashCommand,
-      Excalidraw
     ];
   }, [upload, isMobile]);
 
