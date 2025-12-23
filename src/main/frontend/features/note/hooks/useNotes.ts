@@ -32,7 +32,7 @@ type NoteState = {
   setViewMode: (mode: ViewMode) => void;
   toggleViewMode: () => void;
 
-  /** 🔥 搜索条件变化统一入口 */
+  markDirty: () => void;
   resetPageAndMarkDirty: () => void;
 };
 
@@ -90,7 +90,6 @@ export const useNoteStore = create<NoteState>((set, get) => {
         viewMode: s.viewMode === 'card' ? 'list' : 'card',
       })),
 
-    /** ✅ 统一用于 tag / collection / search 条件变化 */
     resetPageAndMarkDirty: () => {
       const { page } = get();
       if (page !== 1) {
@@ -99,6 +98,10 @@ export const useNoteStore = create<NoteState>((set, get) => {
         set({ isDirty: true });
       }
     },
+    markDirty: () => {
+      set({ isDirty: true });
+    },
+
 
     /** 拉取笔记（仅 isDirty 时） */
     fetchNotes: async () => {
