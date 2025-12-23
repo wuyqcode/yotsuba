@@ -31,18 +31,18 @@ type NoteState = {
   clearSearch: () => void;
   setViewMode: (mode: ViewMode) => void;
   toggleViewMode: () => void;
-  markDirty: () => void;
+
+  /** 🔥 搜索条件变化统一入口 */
+  resetPageAndMarkDirty: () => void;
 };
 
-
 export const useNoteStore = create<NoteState>((set, get) => {
-
   function markDirtyIfChanged<K extends keyof NoteState>(
     key: K,
-    nextValue: NoteState[K],
+    nextValue: NoteState[K]
   ) {
-    const prevValue = get()[key];
-    if (prevValue !== nextValue) {
+    const prev = get()[key];
+    if (prev !== nextValue) {
       set({ [key]: nextValue, isDirty: true });
     }
   }
@@ -61,9 +61,7 @@ export const useNoteStore = create<NoteState>((set, get) => {
 
     isDirty: true,
 
-    setPage: (page) => {
-      markDirtyIfChanged('page', page);
-    },
+    setPage: (page) => markDirtyIfChanged('page', page),
 
     setPageSize: (size) => {
       const { pageSize, page } = get();
@@ -88,84 +86,77 @@ export const useNoteStore = create<NoteState>((set, get) => {
 
     setViewMode: (mode) => set({ viewMode: mode }),
     toggleViewMode: () =>
-      set((state) => ({
-        viewMode: state.viewMode === 'card' ? 'list' : 'card',
+      set((s) => ({
+        viewMode: s.viewMode === 'card' ? 'list' : 'card',
       })),
-    markDirty: () => set({ isDirty: true }),
 
-    /** 拉取笔记列表，只在 isDirty 时真正请求 */
+    /** ✅ 统一用于 tag / collection / search 条件变化 */
+    resetPageAndMarkDirty: () => {
+      const { page } = get();
+      if (page !== 1) {
+        set({ page: 1, isDirty: true });
+      } else {
+        set({ isDirty: true });
+      }
+    },
+
+    /** 拉取笔记（仅 isDirty 时） */
     fetchNotes: async () => {
       const state = get();
-      if (!state.isDirty) {
-        // 条件没变，直接复用现有 notes
-        return;
-      }
+      if (!state.isDirty) return;
 
-      const selectedCollectionId = useCollectionStore.getState().selectedCollection?.id;
-      const selectedTagIdList = useTagStore.getState().selectedTags.map((tag) => tag.id);
-      const { page, pageSize, searchText } = state;
+      const collectionId =
+        useCollectionStore.getState().selectedCollection?.id;
+      const tagIds =
+        useTagStore.getState().selectedTags.map((t) => t.id);
 
-      if (!selectedCollectionId) {
-        return;
-      }
+      if (!collectionId) return;
 
       set({ loading: true, error: null });
       try {
         const res = await NoteEndpoint.searchNotes(
-          selectedCollectionId,
-          searchText,
-          selectedTagIdList,
-          page - 1,
-          pageSize,
+          collectionId,
+          state.searchText,
+          tagIds,
+          state.page - 1,
+          state.pageSize
         );
 
         set({
           notes: res.content,
           totalPages: res.totalPages,
           totalElements: res.totalElements,
-          isDirty: false, // ✅ 拉完数据后清空脏标记
+          isDirty: false,
         });
       } catch (e: any) {
-        console.error('fetchNotes failed:', e);
         set({ error: e.message ?? 'Failed to fetch notes' });
       } finally {
         set({ loading: false });
       }
     },
 
-    /** 创建笔记 */
-    createNote: async (type: NoteType) => {
-      const selectedCollectionId = useCollectionStore.getState().selectedCollection?.id;
-      if (!selectedCollectionId) {
-        throw new Error('请先选择一个笔记本');
-      }
+    createNote: async (type) => {
+      const collectionId =
+        useCollectionStore.getState().selectedCollection?.id;
+      if (!collectionId) throw new Error('请先选择一个笔记本');
 
       set({ loading: true, error: null });
       try {
-        const id = await NoteEndpoint.createNote(selectedCollectionId, type);
-        // 数据肯定变了
-        set({ isDirty: true });
+        const id = await NoteEndpoint.createNote(collectionId, type);
+        get().resetPageAndMarkDirty();
         await get().fetchNotes();
         return id;
-      } catch (e: any) {
-        console.error('createNote failed:', e);
-        set({ error: e.message ?? 'Failed to create note' });
-        throw e;
       } finally {
         set({ loading: false });
       }
     },
 
-    /** 删除笔记 */
-    removeNote: async (id: string) => {
+    removeNote: async (id) => {
       set({ loading: true, error: null });
       try {
         await NoteEndpoint.deleteNote(id);
-        set({ isDirty: true });
+        get().resetPageAndMarkDirty();
         await get().fetchNotes();
-      } catch (e: any) {
-        console.error('removeNote failed:', e);
-        set({ error: e.message ?? 'Failed to delete note' });
       } finally {
         set({ loading: false });
       }
