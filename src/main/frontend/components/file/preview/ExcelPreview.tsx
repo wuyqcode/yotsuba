@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { Box } from '@mui/material';
 
 interface ExcelPreviewProps {
   fileId?: string;
@@ -19,8 +18,6 @@ export default function ExcelPreview({ fileId, thumbnails }: ExcelPreviewProps) 
     }
   }, [index]);
 
-  if (!thumbnails || thumbnails.length === 0) return null;
-
   useEffect(() => {
     if (!fileId || !thumbnails || thumbnails.length === 0) return;
 
@@ -32,106 +29,35 @@ export default function ExcelPreview({ fileId, thumbnails }: ExcelPreviewProps) 
       .catch(() => setHtmlContent('加载失败'));
   }, [index, fileId, thumbnails]);
 
+  if (!thumbnails || thumbnails.length === 0) return null;
+
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-      <Box sx={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
-        <Box
-          sx={{
-            height: '100%',
-            width: '100%',
-            overflow: 'auto',
-            border: '1px solid #ccc',
-            padding: 2,
-            boxSizing: 'border-box',
-            '&::-webkit-scrollbar': {
-              width: '8px',
-            },
-            '&::-webkit-scrollbar-track': {
-              background: '#f1f1f1',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              background: '#999',
-              borderRadius: '4px',
-              '&:hover': {
-                background: '#777',
-              },
-            },
-            '& > *': {
-              maxWidth: '100%',
-              boxSizing: 'border-box',
-            },
-          }}>
-          <Box
-            sx={{
-              width: '100%',
-              overflow: 'auto',
-              '& table': {
-                maxWidth: '100%',
-                tableLayout: 'auto',
-              },
-            }}
+    <div className="flex h-full flex-col overflow-hidden">
+      <div className="min-h-0 flex-1 overflow-hidden">
+        <div className="h-full w-full overflow-auto border border-base-300 p-4">
+          <div
+            className="w-full overflow-auto [&>*]:max-w-full [&_table]:max-w-full [&_table]:table-auto"
             dangerouslySetInnerHTML={{ __html: htmlContent }}
           />
-        </Box>
-      </Box>
+        </div>
+      </div>
 
       {thumbnails.length > 1 && (
-        <Box
-          ref={thumbsRef}
-          sx={{
-            height: '80px',
-            minHeight: '80px',
-            maxHeight: '80px',
-            display: 'flex',
-            gap: 1,
-            px: 2,
-            py: 1,
-            overflowX: 'auto',
-            overflowY: 'hidden',
-            borderTop: '1px solid #ccc',
-            bgcolor: 'background.default',
-            '&::-webkit-scrollbar': {
-              height: '6px',
-            },
-            '&::-webkit-scrollbar-track': {
-              background: '#f1f1f1',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              background: '#999',
-              borderRadius: '3px',
-              '&:hover': {
-                background: '#777',
-              },
-            },
-          }}>
+        <div ref={thumbsRef} className="flex h-20 min-h-20 max-h-20 gap-2 overflow-x-auto border-t border-base-300 bg-base-200 px-4 py-2">
           {thumbnails.map((t, i) => (
-            <Box
+            <button
               key={i}
+              type="button"
               onClick={() => setIndex(i)}
-              sx={{
-                flexShrink: 0,
-                width: '60px',
-                height: '60px',
-                border: i === index ? '3px solid #2196f3' : '2px solid gray',
-                borderRadius: 2,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                bgcolor: 'background.paper',
-                transition: 'border-color 0.2s',
-                '&:hover': {
-                  borderColor: i === index ? '#2196f3' : '#999',
-                },
-              }}>
-              <Box sx={{ fontSize: '1.2rem', fontWeight: 600, color: 'text.secondary' }}>
-                {i + 1}
-              </Box>
-            </Box>
+              className={[
+                'flex h-15 w-15 shrink-0 items-center justify-center rounded-xl border-2 bg-base-100 font-semibold text-base-content/60 transition',
+                i === index ? 'border-primary' : 'border-base-300 hover:border-base-content/30',
+              ].join(' ')}>
+              {t ? i + 1 : '-'}
+            </button>
           ))}
-        </Box>
+        </div>
       )}
-    </Box>
+    </div>
   );
 }
-

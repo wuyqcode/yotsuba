@@ -1,182 +1,103 @@
 import * as React from 'react';
-import { styled } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import ButtonBase from '@mui/material/ButtonBase';
-import Popper from '@mui/material/Popper';
-import Paper from '@mui/material/Paper';
-import Fade from '@mui/material/Fade';
-import Typography from '@mui/material/Typography';
-import { useNavigate, useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { createMenuItems } from '@vaadin/hilla-file-router/runtime.js';
-import KeyboardArrowDownRounded from '@mui/icons-material/KeyboardArrowDownRounded';
-import { ClickAwayListener } from '@mui/material';
-import DescriptionIcon from '@mui/icons-material/Description';
-import HomeIcon from '@mui/icons-material/Home';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-
-interface MyMenuDetail {
-  detail?: string;
-}
+import { ChevronDownIcon, DocumentIcon, HelpIcon, HomeIcon } from './ui/Icons';
 
 const renderIcon = (iconName?: string) => {
   switch (iconName) {
     case 'HomeIcon':
-      return <HomeIcon fontSize="small" />;
+      return <HomeIcon className="h-4 w-4" />;
     case 'DescriptionIcon':
-      return <DescriptionIcon fontSize="small" />;
+      return <DocumentIcon className="h-4 w-4" />;
     default:
-      return <HelpOutlineIcon fontSize="small" />;
+      return <HelpIcon className="h-4 w-4" />;
   }
 };
-
-const Navigation = styled('nav')(({ theme }) => ({
-  '& ul': {
-    padding: 0,
-    margin: 0,
-    listStyle: 'none',
-    display: 'flex',
-    gap: theme.spacing(2),
-    alignItems: 'center',
-  },
-  '& li': {
-    ...theme.typography.body2,
-    color: theme.palette.text.secondary,
-    fontWeight: 600,
-  },
-  '& li > button': {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 6,
-    color: 'inherit',
-    font: 'inherit',
-    textDecoration: 'none',
-    padding: theme.spacing(0.75, 1.5),
-    borderRadius: theme.shape.borderRadius,
-    border: '1px solid transparent',
-    '&:hover': {
-      color: theme.palette.text.primary,
-      backgroundColor: theme.palette.grey[50],
-      borderColor: theme.palette.grey[100],
-    },
-    '&:focus-visible': {
-      outline: '3px solid rgba(25, 118, 210, 0.5)',
-    },
-  },
-}));
 
 export default function HeaderNavBar() {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLButtonElement>(null);
+  const menuRef = React.useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleToggle = () => {
-    setOpen((prev) => {
-      const next = !prev;
-      return next;
-    });
-  };
-  const handleClose = () => setOpen(false);
+  React.useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const handlePointerDown = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (anchorRef.current?.contains(target) || menuRef.current?.contains(target)) {
+        return;
+      }
+      setOpen(false);
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [open]);
 
   return (
-    <Navigation>
-      <ul>
-        <li>
-          <ButtonBase
+    <nav className="relative">
+      <ul className="m-0 flex list-none items-center gap-2 p-0">
+        <li className="relative">
+          <button
             ref={anchorRef}
-            aria-haspopup
-            aria-expanded={open ? 'true' : undefined}
-            aria-controls={open ? 'menu-popper' : undefined}
-            onClick={handleToggle}>
+            type="button"
+            aria-haspopup="menu"
+            aria-expanded={open}
+            aria-controls={open ? 'header-menu-popper' : undefined}
+            onClick={() => setOpen((prev) => !prev)}
+            className="btn btn-ghost btn-sm gap-2 rounded-full border border-transparent px-4 font-semibold text-base-content/70 hover:border-base-200 hover:bg-base-100 hover:text-base-content">
             Menu
-            <KeyboardArrowDownRounded
-              sx={{
-                ml: 0.5,
-                fontSize: 18,
-                transition: 'transform .2s ease',
-                transform: open ? 'rotate(-180deg)' : 'rotate(0)',
-              }}
-            />
-          </ButtonBase>
+            <ChevronDownIcon className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />
+          </button>
 
-          <Popper
-            id="menu-popper"
-            open={open}
-            anchorEl={anchorRef.current}
-            transition
-            placement="bottom-start"
-            style={{ zIndex: 1200, pointerEvents: open ? 'auto' : 'none' }}>
-            {({ TransitionProps }) => (
-              <Fade {...TransitionProps} timeout={200}>
-                <Paper
-                  variant="outlined"
-                  sx={{
-                    mt: 1,
-                    minWidth: 300,
-                    borderColor: 'grey.200',
-                    bgcolor: 'background.paper',
-                    boxShadow: '0px 16px 20px rgba(170,180,190,0.3)',
-                    p: 2,
-                  }}>
-                  <ClickAwayListener
-                    onClickAway={(event) => {
-                      if (!anchorRef.current?.contains(event.target as Node)) {
-                        handleClose();
-                      }
-                    }}>
-                    <Box
-                      sx={{
-                        display: 'grid',
-                        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
-                        gap: 2,
-                      }}>
-                      {createMenuItems().map((item) => (
-                        <Box
-                          key={item.title}
-                          component="button"
-                          onClick={() => {
-                            navigate(item.to);
-                            handleClose();
-                          }}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'flex-start',
-                            textAlign: 'left',
-                            gap: '8px',
-                            background: location.pathname === item.to ? 'hsl(210, 100%, 90%)' : 'transparent',
-                            border: location.pathname === item.to ? '1px solid #90caf9' : '1px solid transparent',
-                            borderRadius: '8px',
-                            padding: '8px',
-                            cursor: 'pointer',
-                          }}
-                          onMouseEnter={(e) => {
-                            (e.currentTarget as HTMLElement).style.backgroundColor =
-                              location.pathname === item.to ? 'hsl(210, 100%, 90%)' : '#f9f9f9';
-                            (e.currentTarget as HTMLElement).style.borderColor =
-                              location.pathname === item.to ? '#90caf9' : '#eee';
-                          }}
-                          onMouseLeave={(e) => {
-                            (e.currentTarget as HTMLElement).style.backgroundColor =
-                              location.pathname === item.to ? 'hsl(210, 100%, 90%)' : 'transparent';
-                            (e.currentTarget as HTMLElement).style.borderColor =
-                              location.pathname === item.to ? '#90caf9' : 'transparent';
-                          }}>
-                          <Box>
-                            <Typography variant="body2" fontWeight={600} color="text.primary">
-                              {renderIcon(item.icon)}
-                            </Typography>
-                          </Box>
-                          {item.title}
-                        </Box>
-                      ))}
-                    </Box>
-                  </ClickAwayListener>
-                </Paper>
-              </Fade>
-            )}
-          </Popper>
+          {open && (
+            <div
+              id="header-menu-popper"
+              ref={menuRef}
+              className="absolute left-0 top-full z-[1200] mt-3 min-w-[300px] rounded-3xl border border-base-200 bg-base-100/95 p-3 shadow-2xl backdrop-blur">
+              <div className="grid gap-2 sm:grid-cols-2">
+                {createMenuItems().map((item) => {
+                  const active = location.pathname === item.to;
+
+                  return (
+                    <button
+                      key={item.title}
+                      type="button"
+                      onClick={() => {
+                        navigate(item.to);
+                        setOpen(false);
+                      }}
+                      className={[
+                        'flex items-start gap-3 rounded-2xl border p-3 text-left transition',
+                        active
+                          ? 'border-primary/40 bg-primary/10 text-primary'
+                          : 'border-transparent bg-transparent text-base-content/80 hover:border-base-300 hover:bg-base-200/60 hover:text-base-content',
+                      ].join(' ')}>
+                      <span className="mt-0.5 rounded-xl bg-base-200/80 p-2 text-base-content/70">{renderIcon(item.icon)}</span>
+                      <span className="text-sm font-semibold">{item.title}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </li>
       </ul>
-    </Navigation>
+    </nav>
   );
 }

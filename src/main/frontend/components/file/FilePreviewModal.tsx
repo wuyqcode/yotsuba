@@ -1,9 +1,4 @@
-// FilePreviewModal.tsx
 import { useEffect } from 'react';
-import { Modal, Box, IconButton, Typography, Tooltip, Fade, Backdrop } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import DownloadIcon from '@mui/icons-material/Download';
-import LinkIcon from '@mui/icons-material/Link';
 import FileResourceDto from 'Frontend/generated/io/github/dutianze/yotsuba/file/dto/FileResourceDto';
 import { getFileType } from './utils/fileTypeUtils';
 import ImagePreview from './preview/ImagePreview';
@@ -13,6 +8,7 @@ import TextPreview from './preview/TextPreview';
 import PdfPreview from './preview/PdfPreview';
 import PptPreview from './preview/PptPreview';
 import ExcelPreview from './preview/ExcelPreview';
+import { CloseIcon, DownloadIcon, LinkIcon } from '../ui/Icons';
 
 export default function FilePreviewModal({
   open,
@@ -29,7 +25,6 @@ export default function FilePreviewModal({
   loadingText: boolean;
   textContent: string | null;
 }) {
-  // 键盘快捷键支持：ESC 关闭
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && open) {
@@ -39,7 +34,6 @@ export default function FilePreviewModal({
 
     if (open) {
       document.addEventListener('keydown', handleEscape);
-      // 防止背景滚动
       document.body.style.overflow = 'hidden';
     }
 
@@ -49,170 +43,57 @@ export default function FilePreviewModal({
     };
   }, [open, onClose]);
 
-  if (!file || !previewUrl) return null;
+  if (!open || !file || !previewUrl) return null;
 
   const fileType = getFileType(file);
 
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      closeAfterTransition
-      BackdropComponent={Backdrop}
-      BackdropProps={{
-        timeout: 300,
-        sx: {
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          backdropFilter: 'blur(4px)',
-        },
-      }}>
-      <Fade in={open}>
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: { xs: '95%', sm: '90%', md: '85%', lg: '80%' },
-            height: { xs: '95%', sm: '90%', md: '85%', lg: '80%' },
-            maxWidth: '1400px',
-            maxHeight: '90vh',
-            bgcolor: 'background.paper',
-            borderRadius: { xs: 1, sm: 2 },
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            outline: 'none',
-          }}>
-          {/* 现代化标题栏 */}
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              px: { xs: 1, sm: 1.5 },
-              py: 0.75,
-              borderBottom: '1px solid',
-              borderColor: 'divider',
-              bgcolor: 'background.paper',
-              position: 'relative',
-            }}>
-            <Box sx={{ flex: 1, minWidth: 0, mr: 1.5 }}>
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  fontSize: { xs: '0.8125rem', sm: '0.875rem' },
-                  fontWeight: 500,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  lineHeight: 1.4,
-                }}>
-                {file.filename || '-'}
-              </Typography>
-              {file.contentType && (
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: 'text.secondary',
-                    fontSize: '0.6875rem',
-                    display: 'block',
-                    mt: 0.125,
-                    lineHeight: 1.2,
-                  }}>
-                  {file.contentType}
-                </Typography>
-              )}
-            </Box>
+    <div className="fixed inset-0 z-[1400] bg-black/80 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="absolute left-1/2 top-1/2 flex h-[95%] w-[95%] max-h-[90vh] max-w-[1400px] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-base-300 bg-base-100 shadow-2xl md:h-[85%] md:w-[85%] lg:h-[80%] lg:w-[80%]"
+        onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between border-b border-base-300 bg-base-100 px-3 py-2">
+          <div className="mr-3 min-w-0 flex-1">
+            <div className="truncate text-sm font-medium">{file.filename || '-'}</div>
+            {file.contentType && <div className="mt-0.5 text-[11px] text-base-content/60">{file.contentType}</div>}
+          </div>
 
-            <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-              {file.reference?.referenceId?.id && (
-                <IconButton
-                  size="small"
-                  component="a"
-                  href={`/note/WIKI/${file.reference.referenceId.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  sx={{
-                    color: 'text.primary',
-                    '&:hover': {
-                      bgcolor: 'primary.light',
-                      color: 'primary.main',
-                    },
-                  }}>
-                  <LinkIcon fontSize="small" />
-                </IconButton>
-              )}
-              <Tooltip title="下载 (Ctrl+S)">
-                <IconButton
-                  size="small"
-                  component="a"
-                  href={previewUrl}
-                  target="_blank"
-                  download
-                  sx={{
-                    color: 'text.primary',
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                    },
-                  }}>
-                  <DownloadIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="关闭 (ESC)">
-                <IconButton
-                  size="small"
-                  onClick={onClose}
-                  sx={{
-                    color: 'text.primary',
-                    '&:hover': {
-                      bgcolor: 'error.light',
-                      color: 'error.main',
-                    },
-                  }}>
-                  <CloseIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          </Box>
+          <div className="flex items-center gap-1">
+            {file.reference?.referenceId?.id && (
+              <a
+                className="btn btn-ghost btn-sm btn-circle"
+                href={`/note/WIKI/${file.reference.referenceId.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}>
+                <LinkIcon className="h-4 w-4" />
+              </a>
+            )}
+            <a className="btn btn-ghost btn-sm btn-circle" href={previewUrl} target="_blank" download>
+              <DownloadIcon className="h-4 w-4" />
+            </a>
+            <button type="button" className="btn btn-ghost btn-sm btn-circle hover:bg-error/15 hover:text-error" onClick={onClose}>
+              <CloseIcon className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
 
-          {/* 内容区域 */}
-          <Box
-            sx={{
-              flex: 1,
-              minHeight: 0,
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-              position: 'relative',
-            }}>
-            <Box
-              sx={{
-                flex: 1,
-                minHeight: 0,
-                overflow: 'hidden',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              {fileType === 'image' && <ImagePreview previewUrl={previewUrl} filename={file.filename} />}
-              {fileType === 'video' && <VideoPreview previewUrl={previewUrl} />}
-              {fileType === 'audio' && <AudioPreview previewUrl={previewUrl} />}
-              {fileType === 'text' && <TextPreview loadingText={loadingText} textContent={textContent} />}
-              {fileType === 'pdf' && <PdfPreview previewUrl={previewUrl} filename={file.filename} />}
-              {fileType === 'ppt' && file.thumbnailIndexList && file.thumbnailIndexList.length > 0 && (
-                <PptPreview fileId={file.id?.id} thumbnails={file.thumbnailIndexList} />
-              )}
-              {fileType === 'excel' && file.thumbnailIndexList && file.thumbnailIndexList.length > 0 && (
-                <ExcelPreview fileId={file.id?.id} thumbnails={file.thumbnailIndexList} />
-              )}
-            </Box>
-          </Box>
-        </Box>
-      </Fade>
-    </Modal>
+        <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+          <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden">
+            {fileType === 'image' && <ImagePreview previewUrl={previewUrl} filename={file.filename} />}
+            {fileType === 'video' && <VideoPreview previewUrl={previewUrl} />}
+            {fileType === 'audio' && <AudioPreview previewUrl={previewUrl} />}
+            {fileType === 'text' && <TextPreview loadingText={loadingText} textContent={textContent} />}
+            {fileType === 'pdf' && <PdfPreview previewUrl={previewUrl} filename={file.filename} />}
+            {fileType === 'ppt' && file.thumbnailIndexList && file.thumbnailIndexList.length > 0 && (
+              <PptPreview fileId={file.id?.id} thumbnails={file.thumbnailIndexList} />
+            )}
+            {fileType === 'excel' && file.thumbnailIndexList && file.thumbnailIndexList.length > 0 && (
+              <ExcelPreview fileId={file.id?.id} thumbnails={file.thumbnailIndexList} />
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
-

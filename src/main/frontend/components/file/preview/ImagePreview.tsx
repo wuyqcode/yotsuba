@@ -1,4 +1,3 @@
-import { Box, CircularProgress } from '@mui/material';
 import { useState } from 'react';
 
 interface ImagePreviewProps {
@@ -11,40 +10,16 @@ export default function ImagePreview({ previewUrl, filename }: ImagePreviewProps
   const [error, setError] = useState(false);
 
   return (
-    <Box
-      sx={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        position: 'relative',
-        p: { xs: 1, sm: 2, md: 3 },
-        boxSizing: 'border-box',
-      }}>
+    <div className="relative flex h-full w-full items-center justify-center box-border p-2 sm:p-4 md:p-6">
       {loading && (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-          }}>
-          <CircularProgress size={40} />
-        </Box>
+        <span className="loading loading-spinner loading-lg absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" />
       )}
       {error ? (
-        <Box
-          sx={{
-            textAlign: 'center',
-            color: 'text.secondary',
-            p: 3,
-          }}>
+        <div className="p-3 text-center text-base-content/60">
           图片加载失败
-        </Box>
+        </div>
       ) : (
-        <Box
-          component="img"
+        <img
           src={previewUrl}
           alt={filename || ''}
           onLoad={() => setLoading(false)}
@@ -52,16 +27,9 @@ export default function ImagePreview({ previewUrl, filename }: ImagePreviewProps
             setLoading(false);
             setError(true);
           }}
-          sx={{
-            maxWidth: '100%',
-            maxHeight: '100%',
-            objectFit: 'contain',
-            opacity: loading ? 0 : 1,
-            transition: 'opacity 0.3s ease',
-          }}
+          className={`max-h-full max-w-full object-contain transition-opacity duration-300 ${loading ? 'opacity-0' : 'opacity-100'}`}
         />
       )}
-    </Box>
+    </div>
   );
 }
-

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import RichTextEditor, { BaseKit, type Editor } from 'reactjs-tiptap-editor';
 import { Attachment } from 'reactjs-tiptap-editor/attachment';
 import { Blockquote } from 'reactjs-tiptap-editor/blockquote';
@@ -46,7 +46,6 @@ import 'prism-code-editor-lightweight/themes/github-dark.css';
 import 'katex/dist/katex.min.css';
 import 'easydrawer/styles.css';
 import { useUpload } from 'Frontend/features/note/hooks/useUpload';
-import { Box, Stack } from '@mui/material';
 
 interface EditorProps {
   content: string;
@@ -54,6 +53,7 @@ interface EditorProps {
 }
 
 const EditorWrapper: React.FC<EditorProps> = ({ content, onChange }) => {
+  const scopeId = useId().replace(/:/g, '');
   const [disable, setDisable] = useState(false);
 
   const { upload, loading } = useUpload();
@@ -151,30 +151,13 @@ const EditorWrapper: React.FC<EditorProps> = ({ content, onChange }) => {
     }
   }, []);
   return (
-    <Stack direction="row" spacing={1}>
-      <Box
+    <div className="flex flex-row gap-2">
+      <div
         ref={boxRef}
-        sx={{
+        className={`editor-wrapper-scope-${scopeId} w-full overflow-y-hidden`}
+        style={{
           overflowY: 'hidden',
-          width: 'calc(100%-250px)',
           height: `calc(100vh - ${offsetTop}px)`,
-          '.reactjs-tiptap-editor': {
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-            '& > *': {
-              display: 'contents',
-              '& > *': {
-                display: 'contents',
-              },
-            },
-          },
-          '.editor': {
-            flex: '1 1 auto',
-            overflowY: 'auto',
-            minHeight: 0,
-            paddingBottom: '40vh',
-          },
         }}>
         <RichTextEditor
           output="html"
@@ -188,8 +171,30 @@ const EditorWrapper: React.FC<EditorProps> = ({ content, onChange }) => {
           useEditorOptions={{ autofocus: true }}
           ref={editorRef}
         />
-      </Box>
-    </Stack>
+      </div>
+      <style>{`
+        .editor-wrapper-scope-${scopeId} .reactjs-tiptap-editor {
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+        }
+
+        .editor-wrapper-scope-${scopeId} .reactjs-tiptap-editor > * {
+          display: contents;
+        }
+
+        .editor-wrapper-scope-${scopeId} .reactjs-tiptap-editor > * > * {
+          display: contents;
+        }
+
+        .editor-wrapper-scope-${scopeId} .editor {
+          flex: 1 1 auto;
+          min-height: 0;
+          overflow-y: auto;
+          padding-bottom: 40vh;
+        }
+      `}</style>
+    </div>
   );
 };
 

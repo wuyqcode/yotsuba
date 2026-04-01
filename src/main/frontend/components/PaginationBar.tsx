@@ -1,123 +1,120 @@
-import { Box, Typography, Pagination, Select, MenuItem, FormControl, TextField, PaginationItem } from '@mui/material';
-import { ArrowBack, ArrowForward } from '@mui/icons-material';
-import { useState } from 'react';
+import { useId } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export interface PaginationBarProps {
-  /** 当前页码（1-based） */
   page: number;
-  /** 总页数 */
   totalPages: number;
-  /** 总记录数 */
   totalElements: number;
-  /** 每页大小 */
   pageSize: number;
-  /** 可选的每页大小选项，默认为 [12, 24, 48, 96, 192] */
   pageSizeOptions?: number[];
-  /** 页码变化回调 */
   onPageChange: (page: number) => void;
-  /** 每页大小变化回调 */
   onPageSizeChange: (pageSize: number) => void;
-  /** 是否显示跳转页输入框，默认为 true */
   showJumpToPage?: boolean;
-  /** 是否显示每页大小选择器，默认为 true */
   showPageSizeSelector?: boolean;
+}
+
+function getPages(page: number, totalPages: number) {
+  if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+  if (page <= 4) return [1, 2, 3, 4, 5, '…', totalPages];
+  if (page >= totalPages - 3) return [1, '…', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+  return [1, '…', page - 1, page, page + 1, '…', totalPages];
 }
 
 export default function PaginationBar({
   page,
   totalPages,
-  totalElements,
+  totalElements: _totalElements,
   pageSize,
   pageSizeOptions = [12, 24, 48, 96, 192],
   onPageChange,
   onPageSizeChange,
-  showJumpToPage = true,
+  showJumpToPage: _showJumpToPage = true,
   showPageSizeSelector = true,
 }: PaginationBarProps) {
-  const [jumpPage, setJumpPage] = useState<string>('');
+  const pageSizeId = useId();
 
-  const handleJump = (e: React.FormEvent) => {
-    e.preventDefault();
-    const target = Number(jumpPage);
-    if (!isNaN(target) && target >= 1 && target <= totalPages) {
-      onPageChange(target);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      setJumpPage('');
-    }
+  const changePage = (nextPage: number) => {
+    if (nextPage < 1 || nextPage > totalPages || nextPage === page) return;
+    onPageChange(nextPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <Box
-      mt={4}
-      p={2}
-      display="flex"
-      justifyContent="flex-end"
-      alignItems="center"
-      flexWrap="wrap"
-      gap={2}
-      sx={{
-        border: '1px solid',
-        borderColor: 'divider',
-        borderRadius: 2,
-        backgroundColor: 'background.paper',
-      }}>
-      <Typography variant="body2" color="text.secondary">
-        共 {totalElements} 条 · 第 {page} / {totalPages} 页
-      </Typography>
+    <section className="mb-8 mt-5 flex justify-center">
+      <div className="inline-flex items-center rounded-full border border-slate-200 bg-white p-1 shadow-[0_8px_24px_rgba(15,23,42,0.05)]">
+        <div className="inline-flex items-center gap-0.5 rounded-full px-1 py-1">
+          <button
+            type="button"
+            aria-label="Previous page"
+            onClick={() => changePage(page - 1)}
+            disabled={page <= 1}
+            className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 disabled:cursor-not-allowed disabled:opacity-30">
+            <ChevronLeft className="h-3.5 w-3.5" />
+          </button>
 
-      <Pagination
-        count={totalPages}
-        page={page}
-        onChange={(_, newPage) => {
-          onPageChange(newPage);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-        color="primary"
-        shape="rounded"
-        siblingCount={1}
-        boundaryCount={1}
-        showFirstButton
-        showLastButton
-        renderItem={(item) => (
-          <PaginationItem
-            {...item}
-            slots={{
-              previous: ArrowBack,
-              next: ArrowForward,
-            }}
-          />
+          {getPages(page, totalPages).map((item, index) =>
+            item === '…' ? (
+              <span key={index} className="inline-flex h-9 min-w-6 items-center justify-center px-1 text-xs text-slate-300">
+                …
+              </span>
+            ) : (
+              <button
+                key={item}
+                type="button"
+                aria-label={`Page ${item}`}
+                aria-current={item === page ? 'page' : undefined}
+                onClick={() => changePage(item as number)}
+                className={`inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-xs font-semibold [font-variant-numeric:tabular-nums] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 ${
+                  item === page
+                    ? 'bg-sky-100 text-sky-800 ring-1 ring-sky-200'
+                    : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                }`}>
+                {item}
+              </button>
+            )
+          )}
+
+          <button
+            type="button"
+            aria-label="Next page"
+            onClick={() => changePage(page + 1)}
+            disabled={page >= totalPages}
+            className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 disabled:cursor-not-allowed disabled:opacity-30">
+            <ChevronRight className="h-3.5 w-3.5" />
+          </button>
+        </div>
+
+        {showPageSizeSelector && (
+          <>
+            <div className="mx-1 h-6 w-px bg-slate-200" />
+            <label
+              htmlFor={pageSizeId}
+              className="inline-flex items-center gap-2 pr-2">
+              <span className="pl-2 text-[10px] font-medium uppercase tracking-[0.14em] text-slate-400">
+                Size
+              </span>
+              <select
+                id={pageSizeId}
+                aria-label="Page size"
+                name="page_size"
+                autoComplete="off"
+                value={pageSize}
+                onChange={(e) => {
+                  onPageChange(1);
+                  onPageSizeChange(Number(e.target.value));
+                  e.currentTarget.blur();
+                }}
+                className="h-9 cursor-pointer appearance-none rounded-full border-0 bg-white px-3 text-xs text-slate-700 [font-variant-numeric:tabular-nums] transition-colors hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0">
+                  {pageSizeOptions.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </>
         )}
-      />
-
-      {showPageSizeSelector && (
-        <FormControl size="small" sx={{ minWidth: 100 }}>
-          <Select
-            value={pageSize}
-            onChange={(e) => {
-              onPageChange(1);
-              onPageSizeChange(Number(e.target.value));
-            }}>
-            {pageSizeOptions.map((size) => (
-              <MenuItem key={size} value={size}>
-                {size}/页
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      )}
-
-      {showJumpToPage && (
-        <form onSubmit={handleJump}>
-          <TextField
-            size="small"
-            placeholder="跳转页"
-            value={jumpPage}
-            onChange={(e) => setJumpPage(e.target.value)}
-            sx={{ width: 80 }}
-          />
-        </form>
-      )}
-    </Box>
+      </div>
+    </section>
   );
 }
-

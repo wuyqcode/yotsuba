@@ -1,5 +1,3 @@
-import { Box, Typography, CircularProgress, Paper } from '@mui/material';
-
 interface TextPreviewProps {
   loadingText: boolean;
   textContent: string | null;
@@ -7,60 +5,18 @@ interface TextPreviewProps {
 
 export default function TextPreview({ loadingText, textContent }: TextPreviewProps) {
   return (
-    <Box
-      sx={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        p: 2,
-      }}>
-      <Paper
-        elevation={2}
-        sx={{
-          width: '100%',
-          height: '100%',
-          maxHeight: '100%',
-          overflow: 'auto',
-          p: 3,
-          bgcolor: 'background.default',
-          borderRadius: 2,
-          '&::-webkit-scrollbar': {
-            width: '8px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: 'transparent',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: '#ccc',
-            borderRadius: '4px',
-            '&:hover': {
-              background: '#999',
-            },
-          },
-        }}>
+    <div className="flex h-full w-full items-center justify-center p-2">
+      <div className="h-full max-h-full w-full overflow-auto rounded-2xl border border-base-300 bg-base-200/40 p-4">
         {loadingText ? (
-          <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}>
-            <CircularProgress size={40} />
-          </Box>
+          <div className="grid min-h-[200px] place-items-center">
+            <span className="loading loading-spinner loading-lg" />
+          </div>
         ) : (
-          <Typography
-            component="pre"
-            sx={{
-              fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
-              fontSize: '0.875rem',
-              lineHeight: 1.6,
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-              m: 0,
-              color: 'text.primary',
-            }}>
+          <pre className="m-0 whitespace-pre-wrap break-words font-mono text-sm leading-7 text-base-content">
             {textContent || '无内容'}
-          </Typography>
+          </pre>
         )}
-      </Paper>
-    </Box>
+      </div>
+    </div>
   );
 }
-

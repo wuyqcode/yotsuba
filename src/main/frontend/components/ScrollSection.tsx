@@ -1,5 +1,4 @@
-import React from "react";
-import { Box, Typography } from "@mui/material";
+import React from 'react';
 
 interface ScrollSectionProps<T> {
   title?: string;
@@ -11,53 +10,20 @@ function ScrollSection<T>({ title, items, renderItem }: ScrollSectionProps<T>) {
   return (
     <>
       {title && (
-        <Typography
-          variant="h5"
-          fontWeight="bold"
-          sx={{ mb: 2, mt: 5, letterSpacing: 0.5, ml: 2 }}
-        >
+        <h2 className="mb-2 ml-2 mt-5 text-2xl font-bold tracking-wide text-base-content">
           {title}
-        </Typography>
+        </h2>
       )}
 
-      <Box
-        sx={{
-          position: "relative",
-          display: "flex",
-          gap: 2,
-          overflowX: "auto", // ✅ 仍然可滚轮、触屏滑动
-          pb: 1,
-          pl: 2,
-          pr: 2,
-          WebkitOverflowScrolling: "touch",
-          scrollSnapType: "none",
-          scrollBehavior: "smooth", // ✅ 平滑滚动
-          userSelect: "none",
-
-          "&::-webkit-scrollbar": { height: 6 },
-          "&::-webkit-scrollbar-thumb": {
-            backgroundColor: "rgba(0,0,0,0.25)",
-            borderRadius: 3,
-          },
-          "&::before, &::after": {
-            content: '""',
-            position: "absolute",
-            top: 0,
-            bottom: 0,
-            width: 40,
-            pointerEvents: "none",
-            zIndex: 1,
-          },
-          "&::before": { left: 0, background: "linear-gradient(to right, white, transparent)" },
-          "&::after": { right: 0, background: "linear-gradient(to left, white, transparent)" },
-        }}
-      >
+      <div className="relative flex gap-2 overflow-x-auto px-2 pb-1 scroll-smooth [scrollbar-width:thin]">
+        <div className="pointer-events-none sticky left-0 z-10 w-10 shrink-0 bg-gradient-to-r from-white to-transparent" />
         {items.map((item, idx) => (
-          <Box key={idx} sx={{ flex: "0 0 auto" }}>
+          <div key={idx} className="shrink-0">
             {renderItem(item)}
-          </Box>
+          </div>
         ))}
-      </Box>
+        <div className="pointer-events-none sticky right-0 z-10 w-10 shrink-0 bg-gradient-to-l from-white to-transparent" />
+      </div>
     </>
   );
 }

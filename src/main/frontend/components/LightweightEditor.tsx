@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useId, useRef } from 'react';
 import RichTextEditor, { BaseKit, type Editor } from 'reactjs-tiptap-editor';
 import { Bold } from 'reactjs-tiptap-editor/bold';
 import { SlashCommand } from 'reactjs-tiptap-editor/slashcommand';
@@ -19,7 +19,6 @@ import 'reactjs-tiptap-editor/style.css';
 import 'prism-code-editor-lightweight/layout.css';
 import 'prism-code-editor-lightweight/themes/github-dark.css';
 import 'katex/dist/katex.min.css';
-import { Box } from '@mui/material';
 import { useUpload } from 'Frontend/features/note/hooks/useUpload';
 
 interface EditorProps {
@@ -29,6 +28,7 @@ interface EditorProps {
 }
 
 const LightweightEditor: React.FC<EditorProps> = ({ content, onChange, dark = false }) => {
+  const scopeId = useId().replace(/:/g, '');
   const editorRef = useRef<{ editor: Editor | null }>(null);
   const { upload } = useUpload();
 
@@ -59,22 +59,12 @@ const LightweightEditor: React.FC<EditorProps> = ({ content, onChange, dark = fa
   ];
 
   return (
-    <Box
-      sx={{
+    <div
+      className={`lightweight-editor-scope-${scopeId} h-full w-full overflow-hidden`}
+      style={{
         width: '100%',
         height: '100%',
         overflow: 'hidden',
-        '.reactjs-tiptap-editor': {
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-        },
-        '.editor': {
-          flex: 1,
-          overflowY: 'auto',
-          minHeight: 0,
-          paddingBottom: '20vh',
-        },
       }}>
       <RichTextEditor
         ref={editorRef}
@@ -86,7 +76,21 @@ const LightweightEditor: React.FC<EditorProps> = ({ content, onChange, dark = fa
         removeDefaultWrapper={true}
         contentClass="editor"
       />
-    </Box>
+      <style>{`
+        .lightweight-editor-scope-${scopeId} .reactjs-tiptap-editor {
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+        }
+
+        .lightweight-editor-scope-${scopeId} .editor {
+          flex: 1 1 auto;
+          min-height: 0;
+          overflow-y: auto;
+          padding-bottom: 20vh;
+        }
+      `}</style>
+    </div>
   );
 };
 

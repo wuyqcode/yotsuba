@@ -1,5 +1,4 @@
-import { Box, Paper } from '@mui/material';
-import MusicNoteIcon from '@mui/icons-material/MusicNote';
+import { MusicIcon } from '../../ui/Icons';
 
 interface AudioPreviewProps {
   previewUrl: string;
@@ -7,42 +6,13 @@ interface AudioPreviewProps {
 
 export default function AudioPreview({ previewUrl }: AudioPreviewProps) {
   return (
-    <Box
-      sx={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        p: 3,
-      }}>
-      <Paper
-        elevation={3}
-        sx={{
-          p: 4,
-          borderRadius: 3,
-          maxWidth: 500,
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 3,
-          bgcolor: 'background.paper',
-        }}>
-        <MusicNoteIcon sx={{ fontSize: 64, color: 'primary.main', opacity: 0.7 }} />
-        <Box
-          component="audio"
-          src={previewUrl}
-          controls
-          sx={{
-            width: '100%',
-            '&::-webkit-media-controls-panel': {
-              bgcolor: 'background.default',
-            },
-          }}
-        />
-      </Paper>
-    </Box>
+    <div className="flex h-full w-full items-center justify-center p-6">
+      <div className="card w-full max-w-[500px] border border-base-300 bg-base-100 shadow-xl">
+        <div className="card-body items-center gap-6">
+          <MusicIcon className="h-16 w-16 text-primary/70" />
+          <audio src={previewUrl} controls className="w-full" />
+        </div>
+      </div>
+    </div>
   );
 }
-

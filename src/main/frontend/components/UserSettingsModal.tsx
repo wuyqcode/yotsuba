@@ -1,12 +1,8 @@
-import { useState, useEffect } from 'react';
-import { Box, Typography, Avatar, Button, TextField, Divider, Collapse, IconButton } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import LogoutIcon from '@mui/icons-material/Logout';
-
+import { useEffect, useState } from 'react';
 import { UserEndpoint } from 'Frontend/generated/endpoints';
 import UserDto from 'Frontend/generated/io/github/dutianze/yotsuba/shared/security/UserDto';
 import { useAuth } from 'Frontend/utils/auth';
+import { ChevronDownIcon, CloseIcon, EditIcon, LogoutIcon } from './ui/Icons';
 
 interface Props {
   open: boolean;
@@ -25,15 +21,12 @@ export default function UserSettingsModal({ open, onClose }: Props) {
   const [name, setName] = useState('');
   const [originalName, setOriginalName] = useState('');
   const [profilePicture, setProfilePicture] = useState<string | undefined>();
-
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
 
-  // 检查名称是否有修改
   const isNameChanged = name.trim() !== originalName.trim();
-  // 检查密码是否已输入
-  const isPasswordValid = oldPassword.trim() && newPassword.trim();
+  const isPasswordValid = Boolean(oldPassword.trim() && newPassword.trim());
 
   const handleLogout = async () => {
     await logout();
@@ -41,10 +34,8 @@ export default function UserSettingsModal({ open, onClose }: Props) {
     document.location.reload();
   };
 
-  // 加载用户信息
   useEffect(() => {
     if (!open) {
-      // 关闭模态框时重置状态
       setName('');
       setOriginalName('');
       setOldPassword('');
@@ -55,8 +46,8 @@ export default function UserSettingsModal({ open, onClose }: Props) {
 
     UserEndpoint.getAuthenticatedUser().then((u) => {
       if (!u) return;
-      setUser(u);
       const userName = u.name ?? '';
+      setUser(u);
       setName(userName);
       setOriginalName(userName);
       setProfilePicture(byteArrayToDataUrl(u.profilePicture as number[]));
@@ -88,7 +79,7 @@ export default function UserSettingsModal({ open, onClose }: Props) {
   };
 
   const savePassword = async () => {
-    if (!oldPassword.trim() || !newPassword.trim() || !isPasswordValid) return;
+    if (!isPasswordValid) return;
     await UserEndpoint.changePassword(oldPassword, newPassword);
     alert('密码修改成功');
     setOldPassword('');
@@ -99,296 +90,127 @@ export default function UserSettingsModal({ open, onClose }: Props) {
 
   return (
     <>
-      {/* —— 透明遮罩 —— */}
-      <Box
+      <div
+        role="presentation"
         onClick={onClose}
-        sx={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 3999,
-          background: 'rgba(46, 44, 44, 0.4)',
-          backdropFilter: 'blur(4px)',
-          WebkitBackdropFilter: 'blur(4px)',
-          animation: 'fadeIn 0.2s ease',
-        }}
+        className="fixed inset-0 z-[3999] bg-neutral/35 backdrop-blur-sm"
       />
 
-      {/* —— 液态玻璃主体 —— */}
-      <Box
-        onClick={(e) => e.stopPropagation()}
-        sx={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%) scale(1)',
-          width: 380,
-          maxWidth: '90vw',
-          borderRadius: '22px',
-          p: 3,
-          zIndex: 4000,
+      <div
+        role="dialog"
+        aria-modal="true"
+        className="fixed left-1/2 top-1/2 z-[4000] w-[min(380px,90vw)] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[22px] border border-white/35 bg-white/25 p-6 text-base-content shadow-2xl backdrop-blur-2xl"
+        onClick={(e) => e.stopPropagation()}>
+        <div className="pointer-events-none absolute inset-[-50%] opacity-90 blur-3xl">
+          <div className="h-full w-full animate-[liquidMove_7s_linear_infinite] bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.25),transparent_60%)]" />
+        </div>
 
-          // 🎨 Liquid Glass 基础层
-          background: 'rgba(255,255,255,0.22)',
-          backdropFilter: 'blur(22px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(22px) saturate(180%)',
+        <div className="relative">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-base font-bold">用户设置</h2>
+            <button type="button" onClick={onClose} className="btn btn-ghost btn-sm btn-circle">
+              <CloseIcon className="h-4 w-4" />
+            </button>
+          </div>
 
-          // 🎨 高光玻璃边框（顶级质感）
-          border: '1px solid rgba(255,255,255,0.35)',
-          boxShadow: `0 0 0 1px rgba(255,255,255,0.2) inset,
-             0 20px 40px rgba(0,0,0,0.35)`,
+          <div className="mb-6 flex items-center gap-4">
+            <div className="relative h-32 w-32">
+              <img
+                src={profilePicture}
+                alt={user?.name ?? 'profile'}
+                className="h-full w-full rounded-full object-cover shadow-xl"
+              />
+              <label className="btn btn-circle btn-sm absolute -bottom-1 -right-1 border-white/60 bg-white/45 text-base-content shadow-md backdrop-blur hover:bg-white/65">
+                <EditIcon className="h-4 w-4" />
+                <input hidden accept="image/*" type="file" onChange={onAvatarChange} />
+              </label>
+            </div>
 
-          // 🎨 Liquid Shine 动画光斑（最关键的 A 级效果）
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: '-50%',
-            left: '-50%',
-            width: '200%',
-            height: '200%',
-            background: 'radial-gradient(circle at center, rgba(255,255,255,0.25), transparent 60%)',
-            animation: 'liquidMove 7s infinite linear',
-            pointerEvents: 'none',
-            filter: 'blur(40px)',
-            opacity: 0.9,
-          },
+            <div className="min-w-0">
+              <div className="truncate font-semibold">{user?.name}</div>
+              <div className="truncate text-sm text-base-content/70">{user?.username}</div>
+            </div>
+          </div>
 
-          animation: 'modalPop 0.28s cubic-bezier(0.22,0.61,0.36,1)',
-        }}>
-        {/* —— 顶部栏 —— */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-          <Typography fontWeight={700} fontSize="1.05rem">
-            用户设置
-          </Typography>
-          <IconButton onClick={onClose}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
+          <div className="mb-2 text-xs uppercase tracking-[0.2em] text-base-content/55">基本信息</div>
 
-        {/* —— 用户卡片 —— */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-          <Box sx={{ position: 'relative', width: 128, height: 128 }}>
-            <Avatar
-              src={profilePicture}
-              sx={{
-                width: '100%',
-                height: '100%',
-                boxShadow: '0 14px 26px rgba(0,0,0,0.25)',
-              }}
-            />
-
-            {/* 悬浮编辑按钮 */}
-            <Button
-              component="label"
-              sx={{
-                position: 'absolute',
-                bottom: -6,
-                right: -6,
-                minWidth: 0,
-                width: 32,
-                height: 32,
-                borderRadius: '50%',
-                background: 'rgba(255,255,255,0.35)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-                border: '1px solid rgba(255,255,255,0.5)',
-                p: 0,
-                cursor: 'pointer',
-                '&:hover': {
-                  background: 'rgba(255,255,255,0.45)',
-                },
-              }}>
-              <Typography sx={{ fontSize: '0.75rem', fontWeight: 700 }}>✎</Typography>
-              <input hidden accept="image/*" type="file" onChange={onAvatarChange} />
-            </Button>
-          </Box>
-
-          <Box>
-            <Typography fontWeight={600}>{user?.name}</Typography>
-            <Typography sx={{ fontSize: '0.8rem', opacity: 0.75 }}>{user?.username}</Typography>
-          </Box>
-        </Box>
-
-        {/* —— 基本信息 —— */}
-        <Typography
-          sx={{
-            fontSize: '0.8rem',
-            opacity: 0.6,
-            mb: 1,
-          }}>
-          基本信息
-        </Typography>
-
-        <TextField
-          label="显示名字"
-          size="small"
-          fullWidth
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          sx={{ mb: 1.5 }}
-        />
-
-        <Button
-          fullWidth
-          onClick={saveName}
-          disabled={!isNameChanged || !name.trim()}
-          sx={{
-            borderRadius: '12px',
-            textTransform: 'none',
-            py: 1.2,
-            mb: 3,
-            background: isNameChanged && name.trim()
-              ? 'rgba(255,255,255,0.15)'
-              : 'rgba(255,255,255,0.06)',
-            backdropFilter: 'blur(10px)',
-            WebkitBackdropFilter: 'blur(10px)',
-            border: isNameChanged && name.trim()
-              ? '1px solid rgba(255,255,255,0.25)'
-              : '1px solid rgba(255,255,255,0.1)',
-            color: isNameChanged && name.trim()
-              ? 'rgba(0,0,0,0.85)'
-              : 'rgba(0,0,0,0.4)',
-            boxShadow: isNameChanged && name.trim()
-              ? '0 4px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.2)'
-              : 'none',
-            transition: 'all 0.3s ease',
-            '&:hover:not(:disabled)': {
-              background: 'rgba(255,255,255,0.2)',
-              borderColor: 'rgba(255,255,255,0.35)',
-              transform: 'translateY(-1px)',
-              boxShadow: '0 6px 16px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.3)',
-            },
-            '&:disabled': {
-              cursor: 'not-allowed',
-            },
-          }}>
-          保存修改
-        </Button>
-
-        <Divider sx={{ opacity: 0.5, mb: 2 }} />
-
-        {/* —— 修改密码（折叠） —— */}
-        <Box
-          onClick={() => setPasswordOpen((v) => !v)}
-          sx={{ display: 'flex', justifyContent: 'space-between', cursor: 'pointer', mb: 1 }}>
-          <Typography fontWeight={600}>修改密码</Typography>
-          <ExpandMoreIcon
-            sx={{
-              transform: passwordOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-              transition: '0.2s',
-            }}
-          />
-        </Box>
-
-        <Collapse in={passwordOpen}>
-          <TextField
-            label="旧密码"
-            type="password"
-            size="small"
-            fullWidth
-            sx={{ mb: 1.5 }}
-            value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
+          <input
+            className="input input-bordered mb-3 w-full border-white/45 bg-white/70"
+            placeholder="显示名字"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
 
-          <TextField
-            label="新密码"
-            type="password"
-            size="small"
-            fullWidth
-            sx={{ mb: 2 }}
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && isPasswordValid) {
-                savePassword();
-              }
-            }}
-          />
+          <button
+            type="button"
+            onClick={saveName}
+            disabled={!isNameChanged || !name.trim()}
+            className="btn mb-6 w-full rounded-2xl border-white/25 bg-white/25 text-base-content shadow-sm backdrop-blur disabled:border-white/10 disabled:bg-white/10 disabled:text-base-content/40 hover:bg-white/40">
+            保存修改
+          </button>
 
-          <Button
-            fullWidth
-            onClick={savePassword}
-            disabled={!isPasswordValid}
-            sx={{
-              borderRadius: '12px',
-              textTransform: 'none',
-              py: 1.2,
-              background: isPasswordValid
-                ? 'rgba(255,255,255,0.15)'
-                : 'rgba(255,255,255,0.06)',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-              border: isPasswordValid
-                ? '1px solid rgba(255,255,255,0.25)'
-                : '1px solid rgba(255,255,255,0.1)',
-              color: isPasswordValid
-                ? 'rgba(0,0,0,0.85)'
-                : 'rgba(0,0,0,0.4)',
-              boxShadow: isPasswordValid
-                ? '0 4px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.2)'
-                : 'none',
-              transition: 'all 0.3s ease',
-              '&:hover:not(:disabled)': {
-                background: 'rgba(255,255,255,0.2)',
-                borderColor: 'rgba(255,255,255,0.35)',
-                transform: 'translateY(-1px)',
-                boxShadow: '0 6px 16px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.3)',
-              },
-              '&:disabled': {
-                cursor: 'not-allowed',
-              },
-            }}>
-            更新密码
-          </Button>
-        </Collapse>
+          <div className="divider my-0 opacity-50" />
 
-        <Divider sx={{ opacity: 0.5, my: 2 }} />
+          <button
+            type="button"
+            onClick={() => setPasswordOpen((v) => !v)}
+            className="flex w-full items-center justify-between py-3 text-left font-semibold">
+            <span>修改密码</span>
+            <ChevronDownIcon className={`h-4 w-4 transition-transform ${passwordOpen ? 'rotate-180' : ''}`} />
+          </button>
 
-        {/* —— 退出登录 —— */}
-        <Button
-          fullWidth
-          variant="outlined"
-          color="error"
-          startIcon={<LogoutIcon />}
-          onClick={handleLogout}
-          sx={{
-            borderRadius: '999px',
-            textTransform: 'none',
-            py: 1,
-            borderColor: 'rgba(255,0,0,0.3)',
-            color: 'rgba(255,0,0,0.8)',
-            '&:hover': {
-              borderColor: 'rgba(255,0,0,0.5)',
-              background: 'rgba(255,0,0,0.1)',
-            },
-          }}>
-          退出登录
-        </Button>
-      </Box>
+          {passwordOpen && (
+            <div className="pb-2">
+              <input
+                type="password"
+                className="input input-bordered mb-3 w-full border-white/45 bg-white/70"
+                placeholder="旧密码"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+              />
 
-      <style>
-        {`
-          @keyframes fadeIn {
-            from { opacity: 0 }
-            to { opacity: 1 }
-          }
+              <input
+                type="password"
+                className="input input-bordered mb-4 w-full border-white/45 bg-white/70"
+                placeholder="新密码"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && isPasswordValid) {
+                    savePassword();
+                  }
+                }}
+              />
 
-          @keyframes modalPop {
-            0% { opacity: 0; transform: scale(0.92) translate(-50%, -50%) }
-            100% { opacity: 1; transform: scale(1) translate(-50%, -50%) }
-          }
+              <button
+                type="button"
+                onClick={savePassword}
+                disabled={!isPasswordValid}
+                className="btn w-full rounded-2xl border-white/25 bg-white/25 text-base-content shadow-sm backdrop-blur disabled:border-white/10 disabled:bg-white/10 disabled:text-base-content/40 hover:bg-white/40">
+                更新密码
+              </button>
+            </div>
+          )}
 
-          @keyframes liquidMove {
-            0%   { transform: rotate(0deg) translate(0, 0) }
-            50%  { transform: rotate(180deg) translate(80px, 40px) }
-            100% { transform: rotate(360deg) translate(0, 0) }
-          }
-        `}
-      </style>
+          <div className="divider my-0 opacity-50" />
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="btn btn-outline btn-error mt-4 w-full rounded-full">
+            <LogoutIcon className="h-4 w-4" />
+            退出登录
+          </button>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes liquidMove {
+          0% { transform: rotate(0deg) translate(0, 0); }
+          50% { transform: rotate(180deg) translate(80px, 40px); }
+          100% { transform: rotate(360deg) translate(0, 0); }
+        }
+      `}</style>
     </>
   );
 }

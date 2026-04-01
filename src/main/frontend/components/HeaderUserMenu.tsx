@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { Box } from '@mui/material';
 import { useNavigate } from 'react-router';
 import { useAuth } from 'Frontend/utils/auth';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import UserSettingsModal from './UserSettingsModal';
+import { UserIcon } from './ui/Icons';
 
 export default function HeaderUserMenu() {
   const { state } = useAuth();
@@ -24,68 +23,27 @@ export default function HeaderUserMenu() {
   const closeProfileModal = () => setModalOpen(false);
 
   return (
-    <Box sx={{ position: 'relative' }}>
+    <div className="relative">
       {state.user ? (
         <>
-          <Box
+          <button
             onClick={openProfileModal}
-            sx={{
-              width: 44,
-              height: 44,
-              borderRadius: '50%',
-              overflow: 'hidden',
-              cursor: 'pointer',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              background: 'rgba(255,255,255,0.25)',
-              border: '1px solid rgba(255,255,255,0.3)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'all 0.2s ease',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.08), 0 3px 12px rgba(0,0,0,0.12)',
-              '&:hover': {
-                background: 'rgba(255,255,255,0.35)',
-                transform: 'scale(1.04)',
-              },
-            }}>
+            className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-white/40 bg-white/35 shadow-lg backdrop-blur transition hover:scale-[1.04] hover:bg-white/50">
             <img
               src={profilePictureUrl || ''}
               alt="profile"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-              }}
+              className="h-full w-full object-cover"
             />
-          </Box>
+          </button>
           <UserSettingsModal open={modalOpen} onClose={closeProfileModal} />
         </>
       ) : (
-        <Box
+        <button
           onClick={() => navigate('/login')}
-          sx={{
-            width: 34,
-            height: 34,
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            color: '#fff',
-            backdropFilter: 'blur(12px)',
-            background: 'rgba(255,255,255,0.25)',
-            border: '1px solid rgba(255,255,255,0.3)',
-            transition: 'all 0.25s ease',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.08), 0 3px 12px rgba(0,0,0,0.12)',
-            '&:hover': {
-              background: 'rgba(255,255,255,0.35)',
-              transform: 'scale(1.04)',
-            },
-          }}>
-          <AccountCircleIcon fontSize="large" sx={{ color: 'rgba(0,0,0,0.75)' }} />
-        </Box>
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-white/35 text-base-content shadow-lg backdrop-blur transition hover:scale-[1.04] hover:bg-white/50">
+          <UserIcon className="h-6 w-6 text-base-content/80" />
+        </button>
       )}
-    </Box>
+    </div>
   );
 }
