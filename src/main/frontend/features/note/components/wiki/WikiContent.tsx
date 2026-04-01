@@ -8,6 +8,8 @@ import WikiHeader from 'Frontend/features/note/components/wiki/WikiHeader';
 import { useWikiNoteStore } from '../../hooks/useWikiNoteStore';
 import NoteComment from './NoteComment';
 import NoteFileList from './NoteFileList';
+import 'prism-code-editor-lightweight/layout.css';
+import 'prism-code-editor-lightweight/themes/prism-tomorrow.css';
 
 function WikiEditorPlaceholder({ loading, error }: { loading?: boolean; error?: string | null }) {
   return (
@@ -60,7 +62,7 @@ export default function WikiContent({ isMobile, onOpenToc }: WikiContentProps) {
         display: 'flex',
         flexDirection: 'column',
       }}>
-      <WikiHeader isMobile={isMobile} onOpenToc={onOpenToc}/>
+      <WikiHeader isMobile={isMobile} onOpenToc={onOpenToc} />
       {mode === 'comment' ? (
         <NoteComment />
       ) : mode === 'file' ? (

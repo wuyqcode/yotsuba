@@ -104,3 +104,7 @@ h6 {
     padding-right: 16px !important;
   }
 }
+.prism-code-editor.pce-has-selection ::selection {
+  background: #355da3 !important;
+}
+

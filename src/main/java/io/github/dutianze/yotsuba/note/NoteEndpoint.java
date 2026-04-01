@@ -78,13 +78,8 @@ public class NoteEndpoint{
         List<TagId> tagIds = tagIdList.stream().map(TagId::new).toList();
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         
-        if (StringUtils.isBlank(searchText)) {
-            Page<Note> notePage;
-            if (tagIds.isEmpty()) {
-                notePage = noteRepository.findAllByCollectionId(collectionId, pageRequest);
-            } else {
-                notePage = noteRepository.findAllByCollectionIdAndTags(collectionId, tagIds, pageRequest);
-            }
+        if (StringUtils.isBlank(searchText) && tagIds.isEmpty()) {
+            Page<Note> notePage = noteRepository.findAllByCollectionId(collectionId, pageRequest);
             Page<NoteCardDto> dtoPage = notePage.map(noteAssembler::toCardDto);
             return PageDto.from(dtoPage);
         } else {

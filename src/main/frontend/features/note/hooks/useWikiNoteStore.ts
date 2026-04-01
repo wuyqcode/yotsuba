@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { type Editor } from 'reactjs-tiptap-editor';
 import { NoteEndpoint } from 'Frontend/generated/endpoints';
+import { useNoteStore } from './useNotes';
 import WikiNoteDto from 'Frontend/generated/io/github/dutianze/yotsuba/note/dto/WikiNoteDto';
 
 export type EditorMode = 'read' | 'edit' | 'comment' | 'file';
@@ -90,6 +91,7 @@ export const useWikiNoteStore = create<WikiState>((set, get) => ({
 
     try {
       await NoteEndpoint.updateNote(wiki.id, wiki.title, wiki.content);
+      useNoteStore.getState().markDirty();
       set({ originalWiki: { ...wiki }, isDirty: false });
     } catch (err: any) {
       console.error('[saveWiki] save failed:', err);
@@ -111,7 +113,6 @@ export const useWikiNoteStore = create<WikiState>((set, get) => ({
 
       const newWiki = { ...state.wiki, ...patch };
       const isDirty = computeDirty(newWiki, originalWiki);
-
       return {
         wiki: newWiki,
         originalWiki,

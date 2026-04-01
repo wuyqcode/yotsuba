@@ -11,7 +11,6 @@ interface TagState {
 
   loading: boolean;
   error: string | null;
-
   isDirty: boolean;
 
   fetchTags: (collectionId?: string) => Promise<void>;
@@ -51,7 +50,6 @@ export const useTagStore = create<TagState>((set, get) => {
 
     loading: false,
     error: null,
-
     isDirty: true,
 
     markDirty: () => set({ isDirty: true }),
@@ -67,9 +65,14 @@ export const useTagStore = create<TagState>((set, get) => {
       try {
         const state = get();
         const tagIdList =
-          state.selectedTags.length > 0 ? state.selectedTags.map((t) => t.id) : undefined;
+          state.selectedTags.length > 0
+            ? state.selectedTags.map((t) => t.id)
+            : undefined;
 
-        const res = await TagEndpoint.findAllTags(collectionId, tagIdList);
+        const res = await TagEndpoint.findAllTags(
+          collectionId,
+          tagIdList
+        );
 
         const updatedSelectedTags = state.selectedTags
           .map((t) => res.find((x) => x.id === t.id))
@@ -94,7 +97,6 @@ export const useTagStore = create<TagState>((set, get) => {
 
     addTag: async (collectionId, name) => {
       if (!collectionId || !name.trim()) return;
-
       try {
         await TagEndpoint.createTag(collectionId, name);
         set({ isDirty: true });
@@ -107,10 +109,11 @@ export const useTagStore = create<TagState>((set, get) => {
     updateTag: async (id, name) => {
       try {
         await TagEndpoint.updateTag(id, name);
-
         const state = get();
 
-        const tags = state.tags.map((t) => (t.id === id ? { ...t, name } : t));
+        const tags = state.tags.map((t) =>
+          t.id === id ? { ...t, name } : t
+        );
         const selectedTags = state.selectedTags.map((t) =>
           t.id === id ? { ...t, name } : t
         );
@@ -133,8 +136,8 @@ export const useTagStore = create<TagState>((set, get) => {
     deleteTag: async (id) => {
       try {
         await TagEndpoint.deleteTag(id);
-
-        const collectionId = useCollectionStore.getState().selectedCollection?.id;
+        const collectionId =
+          useCollectionStore.getState().selectedCollection?.id;
 
         set({
           selectedTags: get().selectedTags.filter((t) => t.id !== id),
@@ -152,20 +155,25 @@ export const useTagStore = create<TagState>((set, get) => {
       }
     },
 
-    setSelectedTag: (tag) => markDirtyIfChanged('selectedTag', tag),
+    setSelectedTag: (tag) =>
+      markDirtyIfChanged('selectedTag', tag),
 
     clearSelectedTag: () => {
       const first = get().tags[0] ?? null;
       markDirtyIfChanged('selectedTag', first);
     },
 
+    /** ⬇⬇⬇ 这里只改了 dirty 行 ⬇⬇⬇ */
+
     addSelectedTag: async (tag) => {
       const state = get();
       markDirtyIfChanged('selectedTags', [...state.selectedTags, tag]);
-      // 当 tag 选择改变时，标记 notes 为 dirty，触发刷新
-      useNoteStore.getState().markDirty();
 
-      const collectionId = useCollectionStore.getState().selectedCollection?.id;
+      // ✅ 原来是 markDirty()
+      useNoteStore.getState().resetPageAndMarkDirty();
+
+      const collectionId =
+        useCollectionStore.getState().selectedCollection?.id;
       await get().fetchTags(collectionId);
     },
 
@@ -174,26 +182,29 @@ export const useTagStore = create<TagState>((set, get) => {
         'selectedTags',
         get().selectedTags.filter((t) => t.id !== id)
       );
-      // 当 tag 选择改变时，标记 notes 为 dirty，触发刷新
-      useNoteStore.getState().markDirty();
 
-      const collectionId = useCollectionStore.getState().selectedCollection?.id;
+      // ✅ 原来是 markDirty()
+      useNoteStore.getState().resetPageAndMarkDirty();
+
+      const collectionId =
+        useCollectionStore.getState().selectedCollection?.id;
       await get().fetchTags(collectionId);
     },
 
     toggleSelectedTag: async (tag) => {
       const state = get();
       const exists = state.selectedTags.some((t) => t.id === tag.id);
-
       const next = exists
         ? state.selectedTags.filter((t) => t.id !== tag.id)
         : [...state.selectedTags, tag];
 
       markDirtyIfChanged('selectedTags', next);
-      // 当 tag 选择改变时，标记 notes 为 dirty，触发刷新
-      useNoteStore.getState().markDirty();
 
-      const collectionId = useCollectionStore.getState().selectedCollection?.id;
+      // ✅ 原来是 markDirty()
+      useNoteStore.getState().resetPageAndMarkDirty();
+
+      const collectionId =
+        useCollectionStore.getState().selectedCollection?.id;
       await get().fetchTags(collectionId);
     },
 
